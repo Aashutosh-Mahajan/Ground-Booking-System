@@ -1,6 +1,7 @@
-# Force Python to be counted and prioritized
+# Make sure Python files are detected
 *.py linguist-detectable=true
 *.py linguist-language=Python
 
-# Keep HTML visible but reduce its weight in stats
-*.html linguist-documentation=true
+# Make sure HTML files are detected
+*.html linguist-detectable=true
+*.html linguist-language=HTML
