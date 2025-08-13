@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block title %}Book Ground{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Book a Ground</h2>
+
+        <form method="POST" action="{% url 'student-booking' %}" class="space-y-6">
+            {% csrf_token %}
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <label for="full-name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <input type="text" name="full_name" required
+                        class="w-full px-3 py-3 border border-gray-300 rounded-lg"
+                        placeholder="Enter your full name">
+                </div>
+                <div>
+                    <label for="roll-number" class="block text-sm font-medium text-gray-700 mb-2">Roll Number</label>
+                    <input type="text" name="roll_number" required
+                        class="w-full px-3 py-3 border border-gray-300 rounded-lg"
+                        placeholder="Enter your roll number">
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <label for="ground-selection" class="block text-sm font-medium text-gray-700 mb-2">Ground Selection</label>
+                    <select name="ground" required
+                        class="w-full px-3 py-3 border border-gray-300 rounded-lg">
+                        <option value="">Select a ground</option>
+                        <option value="Ground A">Ground A</option>
+                        <option value="Ground B">Ground B</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="booking-date" class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                    <input type="date" name="date" required
+                        class="w-full px-3 py-3 border border-gray-300 rounded-lg">
+                </div>
+            </div>
+
+            <div>
+                <label for="time-slot" class="block text-sm font-medium text-gray-700 mb-2">Time Slot</label>
+                <select name="time_slot" required
+                    class="w-full px-3 py-3 border border-gray-300 rounded-lg">
+                    <option value="">Select time slot</option>
+                    <option value="1">9.00 - 11.00 </option>
+                    <option value="2">11.00 - 13.00</option>
+                    <option value="3">13.00 - 15.00</option>
+                    <option value="4">15.00 - 17.00</option>
+                    <option value="5">17.00 - 19.00</option>
+                </select>
+            </div>
+
+             <div class="mb-4">
+      <label class="block mb-1">Number of Players</label>
+      {{ booking_form.number_of_players }}
+    </div>
+ <form method="post" action="{% url 'student-booking' %}" class="space-y-6">
+  {% csrf_token %}
+
+
+  <!-- JS will insert player forms here -->
+  <div id="players-container" class="mt-4"></div>
+</form>
+
+            <div>
+                <label for="purpose" class="block text-sm font-medium text-gray-700 mb-2">Purpose</label>
+                <textarea name="purpose" rows="4" required
+                    class="w-full px-3 py-3 border border-gray-300 rounded-lg"
+                    placeholder="Describe the purpose of your booking (e.g., football practice, event, etc.)"></textarea>
+            </div>
+
+            <button type="submit"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg">
+                Submit Booking Request
+            </button>
+        </form>
+
+        {% if success %}
+            <div class="mt-6 text-green-600 text-center font-semibold">
+                {{ success }}
+            </div>
+        {% endif %}
+    </div>
+</div>
+    <script>
+    window.addEventListener('DOMContentLoaded', function () {
+  const event = new Event('change');
+  numPlayersSelect.dispatchEvent(event);
+});
+  const numPlayersSelect = document.querySelector('select[name="number_of_players"]');
+  const playersContainer = document.getElementById('players-container');
+
+  numPlayersSelect.addEventListener('change', function () {
+    const count = parseInt(this.value);
+    playersContainer.innerHTML = '';
+
+    for (let i = 1; i <= count; i++) {
+      playersContainer.innerHTML += `
+        <div class="p-4 bg-white shadow rounded mb-4">
+          <h2 class="text-lg font-bold mb-2">Player ${i}</h2>
+          <div class="mb-2">
+            <label>Name</label>
+            <input type="text" name="player${i}_name" class="w-full border px-2 py-1 rounded" required>
+          </div>
+          <div class="mb-2">
+            <label>Branch</label>
+            <select name="player${i}_branch" class="w-full border px-2 py-1 rounded">
+              <option>CSE</option>
+              <option>IT</option>
+              <option>EXCS</option>
+              <option>EXTC</option>
+              <option>BIOM</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <label>Year</label>
+            <select name="player${i}_year" class="w-full border px-2 py-1 rounded">
+              <option>FE</option>
+              <option>SE</option>
+              <option>TE</option>
+              <option>BE</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <label>Division</label>
+            <input type="text" name="player${i}_division" class="w-full border px-2 py-1 rounded" required>
+          </div>
+        </div>
+      `;
+    }
+  });
+</script>
+{% endblock %}
