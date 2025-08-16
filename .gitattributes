@@ -3,7 +3,7 @@
 *.py linguist-language=Python
 
 # Ignore everything else
-*.html linguist-detectable=true
+*.html linguist-detectable=false
 *.css linguist-detectable=false
 *.js linguist-detectable=false
 *.json linguist-detectable=false
