@@ -1,7 +1,7 @@
-# Make sure Python files are detected
+# Force GitHub Linguist to detect Python files
 *.py linguist-detectable=true
 *.py linguist-language=Python
 
-# Make sure HTML files are detected
+# Force GitHub Linguist to detect HTML files
 *.html linguist-detectable=true
 *.html linguist-language=HTML
