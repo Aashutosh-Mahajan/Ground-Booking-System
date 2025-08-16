@@ -1,7 +1,10 @@
-# Force GitHub Linguist to detect Python files
+# Count only Python files
 *.py linguist-detectable=true
 *.py linguist-language=Python
 
-# Force GitHub Linguist to detect HTML files
-*.html linguist-detectable=true
-*.html linguist-language=HTML
+# Ignore everything else
+*.html linguist-detectable=false
+*.css linguist-detectable=false
+*.js linguist-detectable=false
+*.json linguist-detectable=false
+*.md linguist-detectable=false
