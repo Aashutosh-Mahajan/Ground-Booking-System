@@ -1,16 +1,21 @@
+{% load static %}
 <nav class="bg-white shadow-lg sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between h-16">
-      <div class="flex items-center">
-        <div class="flex-shrink-0">
-          <h1 class="text-2xl font-bold text-primary">🏟️ GroundBook</h1>
-        </div>
+
+      <div class="flex items-center space-x-3">
+        <a href="{% url 'home' %}" class="flex items-center space-x-3">
+          <img src="{% static 'images/VITLogo.png' %}" alt="VIT Logo" class="h-16 md:h-20 w-auto object-contain">
+          <h1 class="text-2xl font-bold text-primary">Slotter</h1>
+        </a>
       </div>
+
       <div class="flex items-center space-x-8">
         <a href="{% url 'home' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
         <a href="{% url 'student_login' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">Student Login</a>
         <a href="{% url 'admin_login' %}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">Admin Login</a>
       </div>
+
     </div>
   </div>
 </nav>
