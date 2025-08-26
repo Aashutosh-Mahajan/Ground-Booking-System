@@ -3,18 +3,18 @@
 {% block content %}
  <div id="home-page" class="page-content">
         <!-- Hero Section -->
-        <div class="relative overflow-hidden">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-                <div class="text-center">
-                    <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+        <div class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">
                         Book Your College Ground
                         <span class="text-primary">Instantly</span>
                     </h1>
-                    <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+                    <p class="hero-subtitle">
                         Reserve sports grounds, event spaces, and recreational areas with our easy-to-use booking system. 
                         Perfect for students, clubs, and college events.
                     </p>
-                    <a href="{% url 'student_login' %}" class="bg-primary hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-colors transform hover:scale-105">
+                    <a href="{% url 'student_login' %}" class="btn btn-primary btn-lg">
     Book your Ground
 </a>
                 </div>
@@ -22,25 +22,25 @@
         </div>
 
         <!-- Features Section -->
-        <div class="py-16 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
+        <div class="features">
+            <div class="container">
+                <div class="features-header">
                     <h2 class="text-3xl font-bold text-gray-900 mb-4">Why Choose GroundBook?</h2>
                     <p class="text-gray-600">Simple, fast, and reliable ground booking for your college</p>
                 </div>
-                <div class="grid md:grid-cols-3 gap-8">
-                    <div class="text-center p-6 rounded-lg bg-blue-50">
-                        <div class="text-4xl mb-4">⚡</div>
+                <div class="features-grid">
+                    <div class="feature-card bg-blue-50">
+                        <div class="feature-icon">⚡</div>
                         <h3 class="text-xl font-semibold mb-2">Instant Booking</h3>
                         <p class="text-gray-600">Book your preferred ground in just a few clicks</p>
                     </div>
-                    <div class="text-center p-6 rounded-lg bg-green-50">
-                        <div class="text-4xl mb-4">📅</div>
+                    <div class="feature-card bg-green-50">
+                        <div class="feature-icon">📅</div>
                         <h3 class="text-xl font-semibold mb-2">Real-time Availability</h3>
                         <p class="text-gray-600">See available time slots and dates instantly</p>
                     </div>
-                    <div class="text-center p-6 rounded-lg bg-purple-50">
-                        <div class="text-4xl mb-4">🎯</div>
+                    <div class="feature-card bg-purple-50">
+                        <div class="feature-icon">🎯</div>
                         <h3 class="text-xl font-semibold mb-2">Easy Management</h3>
                         <p class="text-gray-600">Track your bookings and get instant approvals</p>
                     </div>

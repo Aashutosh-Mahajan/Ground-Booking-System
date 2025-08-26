@@ -7,10 +7,15 @@ class Player(models.Model):
     division = models.CharField(max_length=10)
 
 class Booking(models.Model):
+    student_name = models.CharField(max_length=100)
+    roll_number = models.CharField(max_length=20, unique=True)
     ground = models.CharField(max_length=100)
-    game_type = models.CharField(max_length=100)
     date = models.DateField()
-    time = models.TimeField()
-    duration = models.IntegerField()
+    time_slot = models.CharField(max_length=50)
+    purpose = models.TextField()
+    number_of_players = models.IntegerField(default=1)
     status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Approved', 'Approved'), ('Rejected', 'Rejected')], default='Pending')
-    players = models.ManyToManyField(Player)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.student_name} - {self.ground} - {self.date}"

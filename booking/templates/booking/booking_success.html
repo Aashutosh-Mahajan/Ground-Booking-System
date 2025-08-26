@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Booking Success{% endblock %}
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-12 px-4">
+    <div class="max-w-md w-full text-center">
+        <div class="card">
+            <div class="text-6xl mb-6">✅</div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-4">Booking Successful!</h1>
+            <p class="text-gray-600 mb-8">
+                Your ground booking request has been submitted successfully. 
+                You will receive a confirmation once it's approved by the admin.
+            </p>
+            <div class="space-y-4">
+                <a href="{% url 'home' %}" class="btn btn-primary btn-full">
+                    Return to Home
+                </a>
+                <a href="{% url 'student-booking' %}" class="btn btn-secondary btn-full">
+                    Book Another Ground
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

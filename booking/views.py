@@ -1,13 +1,16 @@
-from django.shortcuts import render, redirect,get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import BookingForm, PlayerForm, PlayerFormSet
-from .models import Player,Booking
+from .models import Player, Booking
 from django.forms import formset_factory
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.contrib.auth import authenticate, login
+from datetime import date, timedelta
+
 
 def home(request):
     return render(request, 'booking/home.html')
+
 
 def student_login(request):
     if request.method == 'POST':
@@ -28,6 +31,10 @@ HARDCODED_ADMIN = {
 
 
 def custom_admin_login(request):
+    # Clear any existing session
+    if 'is_admin_logged_in' in request.session:
+        del request.session['is_admin_logged_in']
+
     if request.method == "POST":
         username = request.POST.get('email')
         password = request.POST.get('password')
@@ -42,74 +49,126 @@ def custom_admin_login(request):
     return render(request, 'booking/admin_login.html')
 
 
+def admin_logout(request):
+    if 'is_admin_logged_in' in request.session:
+        del request.session['is_admin_logged_in']
+    return redirect('admin_login')
+
+
+def create_sample_data(request):
+    """Create sample booking data for testing purposes"""
+    if not request.session.get('is_admin_logged_in'):
+        return redirect('admin_login')
+
+    # Create sample bookings if none exist
+    if Booking.objects.count() == 0:
+        Booking.objects.create(
+            student_name="John Smith",
+            roll_number="CS2021001",
+            ground="Ground A",
+            date=date.today() + timedelta(days=1),
+            time_slot="9.00 - 11.00",
+            purpose="Football practice session for college team",
+            number_of_players=8,
+            status="Pending"
+        )
+        Booking.objects.create(
+            student_name="Sarah Johnson",
+            roll_number="EE2021045",
+            ground="Ground B",
+            date=date.today() + timedelta(days=2),
+            time_slot="15.00 - 17.00",
+            purpose="Basketball tournament preparation",
+            number_of_players=10,
+            status="Approved"
+        )
+        Booking.objects.create(
+            student_name="Mike Wilson",
+            roll_number="ME2021078",
+            ground="Ground A",
+            date=date.today() + timedelta(days=3),
+            time_slot="13.00 - 15.00",
+            purpose="Cricket match preparation and practice",
+            number_of_players=11,
+            status="Pending"
+        )
+
+        # Sample players (not linked due to no relation in model)
+        Player.objects.create(name="John Smith", branch="CSE", year="TE", division="A")
+        Player.objects.create(name="Sarah Johnson", branch="EE", year="SE", division="B")
+        Player.objects.create(name="Mike Wilson", branch="ME", year="BE", division="C")
+
+    return redirect('custom_admin_dashboard')
+
+
 def custom_admin_dashboard(request):
     if not request.session.get('is_admin_logged_in'):
         return redirect('admin_login')
-    print("✅ Admin session set successfully")
 
-    return render(request, 'booking/admin_dashboard.html')
+    all_bookings = Booking.objects.all().order_by('-created_at')
+    pending_bookings = Booking.objects.filter(status='Pending').order_by('-created_at')
+    approved_bookings = Booking.objects.filter(status='Approved').order_by('-created_at')
+
+    context = {
+        'all_bookings': all_bookings,
+        'pending_bookings': pending_bookings,
+        'approved_bookings': approved_bookings,
+    }
+
+    return render(request, 'booking/admin_dashboard.html', context)
+
 
 def student_booking(request):
-    PlayerFormSet = formset_factory(PlayerForm, extra=0)
-
     if request.method == 'POST':
         booking_form = BookingForm(request.POST)
-        formset = PlayerFormSet(request.POST)
 
-        if booking_form.is_valid() and formset.is_valid():
+        if booking_form.is_valid():
             booking = booking_form.save()
-            for form in formset:
-                player = form.save(commit=False)
-                player.booking = booking
-                player.save()
-            return redirect('success-page')
+
+            # Handle dynamic player entries
+            num_players = int(request.POST.get('number_of_players', 1))
+            for i in range(1, num_players + 1):
+                player_name = request.POST.get(f'player{i}_name')
+                player_branch = request.POST.get(f'player{i}_branch')
+                player_year = request.POST.get(f'player{i}_year')
+                player_division = request.POST.get(f'player{i}_division')
+                if player_name and player_branch and player_year and player_division:
+                    Player.objects.create(
+                        name=player_name,
+                        branch=player_branch,
+                        year=player_year,
+                        division=player_division
+                    )
+
+            return redirect('booking_success')
     else:
         booking_form = BookingForm()
-        formset = PlayerFormSet()
 
     return render(request, 'booking/student_booking.html', {
         'booking_form': booking_form,
-        'formset': formset,
     })
+
+
 def load_formset(request):
     num = int(request.GET.get('num', 0))
-    PlayerFormSet = formset_factory(PlayerForm, extra=num)
-    formset = PlayerFormSet()
+    PlayerFormSetLocal = formset_factory(PlayerForm, extra=num)
+    formset = PlayerFormSetLocal()
     html = render_to_string('booking/player_formset.html', {'formset': formset})
     return HttpResponse(html)
-def booking_view(request):
-    if request.method == 'POST':
-        booking_form = BookingForm(request.POST)
-        number = int(request.POST.get('number_of_players', 1))
-        player_formset = PlayerFormSet(request.POST, prefix='players', initial=[{}]*number)
 
-        if booking_form.is_valid() and player_formset.is_valid():
-            # Process data here
-            return render(request, 'success.html')
-    else:
-        booking_form = BookingForm()
-        player_formset = PlayerFormSet(prefix='players')
-
-    return render(request, 'booking_form.html', {
-        'booking_form': booking_form,
-        'player_formset': player_formset
-    })
-def admin_dashboard(request):
-    pending = Booking.objects.filter(status='Pending')
-    approved = Booking.objects.filter(status='Approved')
-    return render(request, 'booking/admin_dashboard.html', {'pending': pending, 'approved': approved})
 
 def approve_booking(request, roll_no):
-    booking = get_object_or_404(Booking, roll_no=roll_no)
+    booking = get_object_or_404(Booking, roll_number=roll_no)
     booking.status = 'Approved'
     booking.save()
-    return redirect('admin_dashboard')
+    return redirect('custom_admin_dashboard')
+
 
 def reject_booking(request, roll_no):
-    booking = get_object_or_404(Booking, roll_no=roll_no)
+    booking = get_object_or_404(Booking, roll_number=roll_no)
     booking.status = 'Rejected'
     booking.save()
-    return redirect('admin_dashboard')
+    return redirect('custom_admin_dashboard')
 
 
 def booking_success(request):

@@ -1,6 +1,6 @@
 {{ formset.management_form }}
 {% for form in formset %}
-  <div class="p-4 mb-4 bg-white shadow rounded">
+  <div class="player-form">
     <h3 class="font-bold">Player {{ forloop.counter }}</h3>
     {{ form.as_p }}
   </div>
