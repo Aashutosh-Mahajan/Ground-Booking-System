@@ -157,22 +157,25 @@ h1, h2, h3, h4, h5, h6 {
 
 .navbar-content {
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    justify-content: space-between; /* Logo+Center on left, links on right */
     height: 4rem;
 }
 
-.navbar-brand {
+/* Left side: Logo + center menu */
+.navbar-left {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 1rem; /* Space between logo and center items */
 }
 
-.navbar-logo {
-    height: 4rem;
-    width: auto;
-    object-fit: contain;
+.navbar-center {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
+/* Right side: Navigation links */
 .navbar-links {
     display: flex;
     align-items: center;
@@ -192,6 +195,20 @@ h1, h2, h3, h4, h5, h6 {
 .navbar-link:hover {
     color: #1e40af;
 }
+
+.navbar-left a {
+    text-decoration: none !important;
+}
+.navbar-left a:hover {
+    text-decoration: none !important;
+}
+
+.navbar-logo {
+    height: 3rem;
+    width: auto;
+    object-fit: contain;
+}
+
 
 /* Buttons */
 .btn {
