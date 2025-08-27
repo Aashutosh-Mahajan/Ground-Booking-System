@@ -3,6 +3,20 @@ from django.forms import formset_factory
 from .models import Booking, Player
 
 class BookingForm(forms.ModelForm):
+    # Add non-model fields so no database is required
+    student_branch = forms.ChoiceField(
+        choices=[('', 'Select Branch'), ('CSE', 'CSE'), ('IT', 'IT'), ('EXCS', 'EXCS'), ('EXTC', 'EXTC'), ('BIOM', 'BIOM')],
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    student_year = forms.ChoiceField(
+        choices=[('', 'Select Year'), ('FE', 'FE'), ('SE', 'SE'), ('TE', 'TE'), ('BE', 'BE')],
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    student_division = forms.ChoiceField(
+        choices=[('', 'Select Division'), ('A', 'A'), ('B', 'B'), ('C', 'C')],
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+
     class Meta:
         model = Booking
         fields = ['student_name', 'roll_number', 'ground', 'date', 'time_slot', 'purpose', 'number_of_players']
@@ -32,6 +46,9 @@ class BookingForm(forms.ModelForm):
             ('17.00 - 19.00', '17.00 - 19.00')
         ]
         self.fields['number_of_players'].choices = [(i, str(i)) for i in range(1, 12)]
+        # Ensure at least one player form is shown by default
+        self.fields['number_of_players'].initial = 1
+        # choices already set at field declaration for non-model fields
 
 class PlayerForm(forms.ModelForm):
     class Meta:
@@ -41,7 +58,7 @@ class PlayerForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Enter player name'}),
             'branch': forms.Select(attrs={'class': 'form-select'}),
             'year': forms.Select(attrs={'class': 'form-select'}),
-            'division': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Enter division'})
+            'division': forms.Select(attrs={'class': 'form-select'})
         }
 
     def __init__(self, *args, **kwargs):
@@ -60,6 +77,12 @@ class PlayerForm(forms.ModelForm):
             ('SE', 'SE'),
             ('TE', 'TE'),
             ('BE', 'BE')
+        ]
+        self.fields['division'].choices = [
+            ('', 'Select Division'),
+            ('A', 'A'),
+            ('B', 'B'),
+            ('C', 'C')
         ]
 
 # Create formset

@@ -19,12 +19,30 @@
                     {{ booking_form.roll_number }}
                 </div>
             </div>
+            <div class="grid grid-cols-3 gap-6">
+                <div class="form-group">
+                    <label for="id_student_branch" class="form-label">Branch</label>
+                    {{ booking_form.student_branch }}
+                </div>
+                <div class="form-group">
+                    <label for="id_student_year" class="form-label">Year</label>
+                    {{ booking_form.student_year }}
+                </div>
+                <div class="form-group">
+                    <label for="id_student_division" class="form-label">Division</label>
+                    {{ booking_form.student_division }}
+                </div>
+            </div>
 
             <!-- Ground and Date Selection -->
             <div class="grid grid-cols-2 gap-6">
                 <div class="form-group">
                     <label for="id_ground" class="form-label">Ground Selection</label>
-                    {{ booking_form.ground }}
+                    <select name="ground" id="id_ground" class="form-select">
+                        <option value="">Select a ground</option>
+                        <option value="Ground A">Ground A</option>
+                        <option value="Ground B">Ground B</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="id_date" class="form-label">Date</label>
@@ -36,11 +54,30 @@
             <div class="grid grid-cols-2 gap-6">
                 <div class="form-group">
                     <label for="id_time_slot" class="form-label">Time Slot</label>
-                    {{ booking_form.time_slot }}
+                    <select name="time_slot" id="id_time_slot" class="form-select">
+                        <option value="">Select time slot</option>
+                        <option value="9.00 - 11.00">9.00 - 11.00</option>
+                        <option value="11.00 - 13.00">11.00 - 13.00</option>
+                        <option value="13.00 - 15.00">13.00 - 15.00</option>
+                        <option value="15.00 - 17.00">15.00 - 17.00</option>
+                        <option value="17.00 - 19.00">17.00 - 19.00</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="id_number_of_players" class="form-label">Number of Players</label>
-                    {{ booking_form.number_of_players }}
+                    <select name="number_of_players" id="id_number_of_players" class="form-select">
+                        <option value="1" selected>1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                    </select>
                 </div>
             </div>
 
@@ -109,7 +146,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="form-group">
                         <label class="form-label">Division</label>
-                        <input type="text" name="player${i}_division" class="form-input" required>
+                        <select name="player${i}_division" class="form-select" required>
+                            <option value="">Select Division</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                        </select>
                     </div>
                 </div>
             `;
@@ -117,16 +159,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Generate initial player forms
-    if (numPlayersSelect.value) {
-        generatePlayerForms(parseInt(numPlayersSelect.value));
+    // Ensure a default of 1 player displayed
+    if (!numPlayersSelect.value) {
+        numPlayersSelect.value = '1';
     }
+    generatePlayerForms(parseInt(numPlayersSelect.value));
 
     // Update player forms when selection changes
     numPlayersSelect.addEventListener('change', function() {
         const count = parseInt(this.value) || 0;
         generatePlayerForms(count);
     });
+
 });
 </script>
 {% endblock %}
