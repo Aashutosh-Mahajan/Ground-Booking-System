@@ -104,6 +104,8 @@ h1, h2, h3, h4, h5, h6 {
 .mt-4 { margin-top: 1rem; }
 .mt-2 { margin-top: 0.5rem; }
 
+.mr-4 { margin-right: 2rem;}
+
 .ml-4 { margin-left: 1rem; }
 
 /* Flexbox */
@@ -158,7 +160,7 @@ h1, h2, h3, h4, h5, h6 {
 .navbar-content {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Logo+Center on left, links on right */
+    justify-content: space-between; 
     height: 4rem;
 }
 
@@ -166,8 +168,8 @@ h1, h2, h3, h4, h5, h6 {
 .navbar-left {
     display: flex;
     align-items: center;
-    gap: 1rem; /* Space between logo and center items */
 }
+
 
 .navbar-center {
     display: flex;
@@ -196,15 +198,8 @@ h1, h2, h3, h4, h5, h6 {
     color: #1e40af;
 }
 
-.navbar-left a {
-    text-decoration: none !important;
-}
-.navbar-left a:hover {
-    text-decoration: none !important;
-}
-
 .navbar-logo {
-    height: 3rem;
+    height: 4rem;
     width: auto;
     object-fit: contain;
 }
