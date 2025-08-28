@@ -11,15 +11,22 @@ from datetime import date, timedelta
 def home(request):
     return render(request, 'booking/home.html')
 
-
 def student_login(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
+        
+        # Dummy credentials for now (you can later integrate Django authentication)
         if email == 'student@college.edu' and password == 'student123':
-            return redirect('student-booking')
+            # Store session data for student
+            request.session['student_email'] = email
+            request.session['student_name'] = 'John Doe'  # Replace with dynamic name if available
+
+            # Redirect to dashboard instead of booking page
+            return redirect('student_dashboard')
         else:
             return render(request, 'booking/student_login.html', {'error': 'Invalid credentials'})
+    
     return render(request, 'booking/student_login.html')
 
 
@@ -50,9 +57,9 @@ def custom_admin_login(request):
 
 
 def admin_logout(request):
-    if 'is_admin_logged_in' in request.session:
-        del request.session['is_admin_logged_in']
+    request.session.flush()
     return redirect('admin_login')
+
 
 
 def create_sample_data(request):
@@ -117,7 +124,6 @@ def custom_admin_dashboard(request):
 
     return render(request, 'booking/admin_dashboard.html', context)
 
-
 def student_booking(request):
     if request.method == 'POST':
         booking_form = BookingForm(request.POST)
@@ -173,3 +179,39 @@ def reject_booking(request, roll_no):
 
 def booking_success(request):
     return render(request, 'booking/booking_success.html')
+
+
+def student_dashboard(request):
+    # Check if session exists
+    student_email = request.session.get('student_email')
+    if not student_email:
+        return redirect('student_login')  # Redirect if not logged in
+
+    student_name = request.session.get('student_name', 'Student')
+
+    # Use the session email instead of request.user.email
+    bookings = Booking.objects.filter(student_email=student_email).order_by('-date')
+
+    return render(request, 'booking/student_dashboard.html', {
+        'student_name': student_name,
+        'student_email': student_email,
+        'bookings': bookings,
+    })
+
+def student_logout(request):
+    request.session.flush()  # This clears all session data
+    return redirect('home')
+
+def rules_regulations(request):
+    return render(request, 'booking/rules_regulations.html')
+
+def student_history(request):
+    student_email = request.session.get('student_email')
+    if not student_email:
+        return redirect('student-login')
+
+    # Filter bookings by the logged-in student
+    history = Booking.objects.filter(student_email=student_email).order_by('-date')
+    return render(request, 'booking/student_history.html', {'history': history})
+
+

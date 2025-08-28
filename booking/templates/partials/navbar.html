@@ -4,21 +4,29 @@
     <div class="navbar-content">
 
       <!-- Left: VIT Logo + SportDeck -->
-      <div class="navbar-left flex items-center gap-4">
+      <div class="navbar-left flex items-center">
         <a href="{% url 'home' %}">
-          <img src="{% static 'images/VITLogo.png' %}" alt="VIT Logo" class="navbar-logo">
+          <img src="{% static 'images/VITLogo.png' %}" alt="VIT Logo" class="navbar-logo mr-4">
         </a>
         <a href="{% url 'home' %}" class="flex items-center gap-2 no-underline">
           <img src="{% static 'images/SportDeckLogo.png' %}" alt="SportDeck Logo" class="navbar-logo">
-          <h1 class="text-2xl font-bold text-primary">SportDeck</h1>
         </a>
+        <h1 class="text-2xl font-bold text-primary">SportDeck</h1>
       </div>
 
       <!-- Right: Navigation links -->
       <div class="navbar-links">
         <a href="{% url 'home' %}" class="navbar-link">Home</a>
-        <a href="{% url 'student_login' %}" class="navbar-link">Student Login</a>
-        <a href="{% url 'admin_login' %}" class="navbar-link">Admin Login</a>
+
+        {% if request.session.student_email %}
+          <!-- Show only for logged-in students -->
+          <a href="{% url 'student_dashboard' %}" class="navbar-link">Dashboard</a>
+          <a href="{% url 'student_logout' %}" class="navbar-link">Logout</a>
+        {% else %}
+          <!-- Show Login options if NOT logged in -->
+          <a href="{% url 'student_login' %}" class="navbar-link">Student Login</a>
+          <a href="{% url 'admin_login' %}" class="navbar-link">Admin Login</a>
+        {% endif %}
       </div>
 
     </div>

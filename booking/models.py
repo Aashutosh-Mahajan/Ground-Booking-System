@@ -8,6 +8,7 @@ class Player(models.Model):
 
 class Booking(models.Model):
     student_name = models.CharField(max_length=100)
+    student_email = models.EmailField(blank=True, null=True)
     roll_number = models.CharField(max_length=20, unique=True)
     ground = models.CharField(max_length=100)
     date = models.DateField()
