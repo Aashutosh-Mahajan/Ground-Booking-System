@@ -4,21 +4,21 @@
 {% block content %}
 
 <!-- Enhanced Navbar (Logo Removed) -->
-<nav class="navbar bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
+<nav class="navbar">
     <div class="navbar-container flex justify-between items-center px-6 py-4">
 
         <!-- Right: Navigation Links -->
         <div class="navbar-links">
             <a href="{% url 'student_booking' %}" 
-               class="navbar-link {% if request.resolver_match.url_name == 'student_booking' %}text-primary{% endif %}">
+               class="navbar-link {% if request.resolver_match.url_name == 'student_booking' %}active{% endif %}">
                 Booking
             </a>
             <a href="{% url 'rules_regulations' %}" 
-               class="navbar-link {% if request.resolver_match.url_name == 'rules_regulations' %}text-primary{% endif %}">
+               class="navbar-link {% if request.resolver_match.url_name == 'rules_regulations' %}active{% endif %}">
                 Rules & Regulations
             </a>
             <a href="{% url 'student_history' %}" 
-               class="navbar-link {% if request.resolver_match.url_name == 'student_history' %}text-primary{% endif %}">
+               class="navbar-link {% if request.resolver_match.url_name == 'student_history' %}active{% endif %}">
                 History
             </a>
         </div>
@@ -26,53 +26,579 @@
 </nav>
 
 <!-- Page Content -->
-<div class="max-w-5xl mx-auto py-10 px-6">
-    <h2 class="text-3xl font-bold text-gray-900 mb-6">Welcome, {{ student_name }}</h2>
-    <p class="text-gray-600 mb-8">Here is your dashboard to manage your ground bookings.</p>
-
-    <!-- Ground Availability -->
-    <div class="grid grid-cols-2 gap-6 mb-8">
-        <div class="card p-6">
-            <h3 class="text-xl font-semibold text-gray-800 mb-4">Ground A</h3>
-            <p class="text-gray-600">Available for: Cricket, Football</p>
-            <p class="mt-2 text-green-600 font-medium">Status: Available</p>
-        </div>
-        <div class="card p-6">
-            <h3 class="text-xl font-semibold text-gray-800 mb-4">Ground B</h3>
-            <p class="text-gray-600">Available for: Volleyball, Badminton, Tennis, Basketball</p>
-            <p class="mt-2 text-red-600 font-medium">Status: Fully Booked</p>
-        </div>
-    </div>
-
-    <!-- Booking History -->
-    <div class="card p-6 mb-8">
-        <h3 class="text-xl font-semibold text-gray-800 mb-4">Your Booking History</h3>
-        {% if bookings %}
-            <div class="table-container">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Ground</th>
-                            <th>Date</th>
-                            <th>Time Slot</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for booking in bookings %}
-                        <tr>
-                            <td>{{ booking.ground }}</td>
-                            <td>{{ booking.date }}</td>
-                            <td>{{ booking.time_slot }}</td>
-                            <td>{{ booking.status }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <p class="text-gray-600">No bookings yet.</p>
-        {% endif %}
-    </div>
+<div class="dashboard-center">
+    <h2 class="welcome-text">Welcome, {{ student_name }}</h2>
+    <p class="welcome-subtext">Here is your dashboard to manage your ground bookings.</p>
 </div>
+
+<div>
+    <!-- Ground Booking Form Start -->
+    <div class="booking-form">
+        <!-- Date Selection -->
+        <div class="form-section date-section">
+            <h2 class="section-title">📅 Select Date</h2>
+            <div class="date-picker">
+                <input type="date" id="dateInput" min="" />
+            </div>
+        </div>
+
+        <!-- Ground Selection -->
+        <div class="form-section disabled" id="groundSection">
+            <h2 class="section-title">🏟️ Choose Ground</h2>
+            <div class="grounds-grid">
+                <div class="ground-card" onclick="selectGround('A')">
+                    <div class="ground-title">Ground A</div>
+                    <div class="sports-list">
+                        <span class="sport-tag">⚽ Football</span>
+                        <span class="sport-tag">🤸 Kabaddi</span>
+                    </div>
+                </div>
+                <div class="ground-card" onclick="selectGround('B')">
+                    <div class="ground-title">Ground B</div>
+                    <div class="sports-list">
+                        <span class="sport-tag">🏏 Cricket</span>
+                        <span class="sport-tag">🏀 Basketball</span>
+                        <span class="sport-tag">🏃 Athletics</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sport Selection -->
+        <div class="form-section sports-section disabled" id="sportsSection">
+            <h2 class="section-title">🏃 Select Sport</h2>
+            <div class="sports-grid" id="sportsGrid"></div>
+        </div>
+
+        <!-- Time Slots -->
+        <div class="form-section disabled" id="timeSection">
+            <h2 class="section-title">⏰ Choose Time Slot</h2>
+            <div class="time-slots-grid" id="slotsGrid"></div>
+        </div>
+
+        <!-- Booking Summary -->
+        <div class="booking-summary">
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <span>📅 Date:</span>
+                    <strong id="summaryDate">Not selected</strong>
+                </div>
+                <div class="summary-item">
+                    <span>🏟️ Ground:</span>
+                    <strong id="summaryGround">Not selected</strong>
+                </div>
+                <div class="summary-item">
+                    <span>🏃 Sport:</span>
+                    <strong id="summarySport">Not selected</strong>
+                </div>
+                <div class="summary-item">
+                    <span>⏰ Time:</span>
+                    <strong id="summaryTime">Not selected</strong>
+                </div>
+            </div>
+            <button class="confirm-btn" id="confirmBtn" onclick="confirmBooking()" disabled>
+                Confirm Booking
+            </button>
+        </div>
+    </div>
+    <!-- Ground Booking Form End -->
+
+</div>
+
+<!-- Scripts -->
+<script>
+    let bookingData = { date: '', ground: '', sport: '', timeSlot: '' };
+    const groundSports = {
+        'A': [{name:'Football',icon:'⚽'},{name:'Kabaddi',icon:'🤸'}],
+        'B': [{name:'Cricket',icon:'🏏'},{name:'Basketball',icon:'🏀'},{name:'Athletics',icon:'🏃'}]
+    };
+    const timeSlots = [
+        '06:00 - 07:00','07:00 - 08:00','08:00 - 09:00','09:00 - 10:00',
+        '10:00 - 11:00','11:00 - 12:00','12:00 - 13:00','13:00 - 14:00',
+        '14:00 - 15:00','15:00 - 16:00','16:00 - 17:00','17:00 - 18:00',
+        '18:00 - 19:00','19:00 - 20:00','20:00 - 21:00','21:00 - 22:00'
+    ];
+
+    document.getElementById('dateInput').min = new Date().toISOString().split('T')[0];
+    document.getElementById('dateInput').addEventListener('change', function() {
+        bookingData.date = this.value;
+        if(this.value) document.getElementById('groundSection').classList.remove('disabled');
+        else {
+            document.getElementById('groundSection').classList.add('disabled');
+            document.getElementById('sportsSection').classList.add('disabled');
+            document.getElementById('timeSection').classList.add('disabled');
+            resetSelections();
+        }
+        updateSummary();
+    });
+
+    function selectGround(ground) {
+        bookingData.ground = ground; bookingData.sport=''; bookingData.timeSlot='';
+        document.querySelectorAll('.ground-card').forEach(c=>c.classList.remove('selected'));
+        event.target.closest('.ground-card').classList.add('selected');
+        document.getElementById('sportsSection').classList.remove('disabled');
+        populateSports(ground);
+        document.getElementById('timeSection').classList.add('disabled');
+        document.querySelectorAll('.sport-option, .time-slot').forEach(el=>el.classList.remove('selected'));
+        updateSummary();
+    }
+
+    function populateSports(ground){
+        const grid=document.getElementById('sportsGrid'); grid.innerHTML='';
+        groundSports[ground].forEach(s=>{
+            const btn=document.createElement('button'); btn.className='sport-option';
+            btn.innerHTML=`${s.icon} ${s.name}`; btn.onclick=()=>selectSport(s.name); grid.appendChild(btn);
+        });
+    }
+
+    function selectSport(sport){
+        bookingData.sport=sport; bookingData.timeSlot='';
+        document.querySelectorAll('.sport-option').forEach(o=>o.classList.remove('selected'));
+        event.target.classList.add('selected');
+        document.getElementById('timeSection').classList.remove('disabled');
+        populateTimeSlots();
+        document.querySelectorAll('.time-slot').forEach(slot=>slot.classList.remove('selected'));
+        updateSummary();
+    }
+
+    function populateTimeSlots(){
+        const grid=document.getElementById('slotsGrid'); grid.innerHTML='';
+        timeSlots.forEach(slot=>{
+            const div=document.createElement('div'); div.className='time-slot'; div.textContent=slot;
+            if(Math.random()<0.25){ div.classList.add('booked'); div.title='This slot is already booked'; }
+            else div.onclick=()=>selectTimeSlot(slot);
+            grid.appendChild(div);
+        });
+    }
+
+    function selectTimeSlot(slot){
+        bookingData.timeSlot=slot;
+        document.querySelectorAll('.time-slot:not(.booked)').forEach(s=>s.classList.remove('selected'));
+        event.target.classList.add('selected');
+        updateSummary();
+    }
+
+    function resetSelections(){
+        bookingData={date:'',ground:'',sport:'',timeSlot:''};
+        document.querySelectorAll('.ground-card,.sport-option,.time-slot').forEach(el=>el.classList.remove('selected'));
+    }
+
+    function updateSummary(){
+        document.getElementById('summaryDate').textContent=bookingData.date?new Date(bookingData.date).toDateString():'Not selected';
+        document.getElementById('summaryGround').textContent=bookingData.ground?`Ground ${bookingData.ground}`:'Not selected';
+        document.getElementById('summarySport').textContent=bookingData.sport||'Not selected';
+        document.getElementById('summaryTime').textContent=bookingData.timeSlot||'Not selected';
+        document.getElementById('confirmBtn').disabled=!(bookingData.date && bookingData.ground && bookingData.sport && bookingData.timeSlot);
+    }
+
+    function confirmBooking(){
+        if(bookingData.date && bookingData.ground && bookingData.sport && bookingData.timeSlot){
+            alert(`🎉 Booking Confirmed!\n📅 Date: ${new Date(bookingData.date).toDateString()}\n🏟️ Ground: Ground ${bookingData.ground}\n🏃 Sport: ${bookingData.sport}\n⏰ Time: ${bookingData.timeSlot}`);
+            document.getElementById('dateInput').value='';
+            document.getElementById('groundSection').classList.add('disabled');
+            document.getElementById('sportsSection').classList.add('disabled');
+            document.getElementById('timeSection').classList.add('disabled');
+            resetSelections(); updateSummary();
+        }
+    }
+</script>
+
+<!-- Booking Form CSS -->
+<style>
+/* Navbar Styling */
+.navbar {
+    background: linear-gradient(90deg, #0ea5e9 0%, #2563eb 50%, #1e3a8a 100%);
+    color: #ffffff;
+    box-shadow: 0 10px 30px rgba(37, 99, 235, 0.25);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.navbar-links {
+    display: flex;
+    gap: 1rem;
+}
+
+.navbar-link {
+    display: inline-block;
+    text-decoration: none;
+    color: #e5edff;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    transition: all 0.25s ease;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+
+.navbar-link:hover {
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+.navbar-link.active {
+    background: #ffffff;
+    color: #1e3a8a;
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, #DBEAFE 0%, #EFF6FF 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    background-attachment: fixed;
+}
+
+/* Decorative animated gradients */
+body::before, body::after {
+    content: '';
+    position: fixed;
+    width: 40vmax;
+    height: 40vmax;
+    border-radius: 50%;
+    filter: blur(60px);
+    z-index: -1;
+    opacity: 0.35;
+}
+
+body::before {
+    top: -10vmax;
+    left: -10vmax;
+    background: radial-gradient(circle at center, #93c5fd, transparent 60%);
+    animation: floatA 16s ease-in-out infinite;
+}
+
+body::after {
+    bottom: -12vmax;
+    right: -8vmax;
+    background: radial-gradient(circle at center, #a5b4fc, transparent 60%);
+    animation: floatB 18s ease-in-out infinite;
+}
+
+@keyframes floatA { 0%, 100% { transform: translate(0, 0);} 50% { transform: translate(20px, 10px);} }
+@keyframes floatB { 0%, 100% { transform: translate(0, 0);} 50% { transform: translate(-16px, -8px);} }
+
+
+.booking-form {
+    max-width: 1100px;
+    margin: 2.5rem auto;
+    padding: 2rem; 
+    background: rgba(255, 255, 255, 0.6); 
+    border-radius: 20px; 
+    box-shadow: 0 25px 60px rgba(30, 58, 138, 0.15); 
+    display: grid;
+    gap: 2rem;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.form-section {
+    position: relative;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid #e8eefc; 
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 8px 22px rgba(59, 130, 246, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(59, 130, 246, 0.12);
+}
+
+
+.form-section.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.form-section.disabled::after {
+    content: '🔒 Please select date first';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    font-weight: 600;
+    color: #666;
+    z-index: 10;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.section-title {
+    font-size: 1.35rem;
+    color: #0f172a; 
+    margin-bottom: 1rem;
+    padding-bottom: 0.3rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 2px solid #e2e8f0; 
+}
+
+.section-title::after {
+    content: '';
+    width: 40px;
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #60A5FA, #2563EB);
+    display: inline-block;
+    margin-left: 0.5rem;
+}
+
+
+.date-picker input {
+    width: 320px;
+    padding: 1rem 1.25rem;
+    font-size: 1.05rem;
+    border: 2px solid #dbeafe;
+    border-radius: 12px;
+    text-align: center;
+    background: #f8fafc;
+    transition: all 0.2s ease;
+}
+
+.date-picker input:hover {
+    border-color: #93c5fd;
+}
+
+.date-picker input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+    background: #ffffff;
+}
+
+.grounds-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.ground-card {
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+    color: white;
+    padding: 1.1rem;
+    border-radius: 14px;
+    cursor: pointer;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.25);
+}
+
+.ground-card.selected {
+    background: linear-gradient(135deg, #1E40AF 0%, #1E3A8A 100%);
+    border-color: #1E3A8A;
+    box-shadow: 0 12px 28px rgba(30, 64, 175, 0.35);
+}
+
+.ground-card:hover {
+    transform: translateY(-3px);
+}
+
+.sports-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.sport-tag {
+    background: rgba(255,255,255,0.2);
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.84rem;
+    border: 1px solid rgba(255,255,255,0.35);
+}
+
+.sports-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.sport-option {
+    background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+    color: white;
+    padding: 1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 8px 20px rgba(96, 165, 250, 0.25);
+}
+
+.sport-option.selected {
+    background: linear-gradient(135deg, #1E40AF 0%, #1E3A8A 100%);
+    border-color: #1E3A8A;
+    box-shadow: 0 10px 22px rgba(30, 64, 175, 0.3);
+}
+
+.sport-option:hover {
+    transform: translateY(-2px);
+}
+
+.time-slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.time-slot {
+    background: #eef5ff;
+    border: 2px solid #3B82F6;
+    padding: 0.85rem;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    font-weight: 600;
+    color: #1E3A8A;
+    transition: all 0.2s ease;
+}
+
+.time-slot.selected {
+    background: #1E40AF;
+    color: white;
+    border-color: #1E3A8A;
+}
+
+.time-slot:not(.booked):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(30, 64, 175, 0.15);
+}
+
+.time-slot.booked {
+    background: #eaf1ff;
+    border-color: #93C5FD;
+    cursor: not-allowed;
+    color: #3B82F6;
+    opacity: 0.8;
+    position: relative;
+}
+
+.time-slot.booked::after {
+    content: '\1F512';
+    position: absolute;
+    right: 8px;
+    top: 6px;
+    opacity: 0.7;
+}
+
+.booking-summary {
+    padding: 2rem;
+    border-radius: 18px;
+    border: 1px solid #e6ecff;
+    margin-top: 2rem;
+    background: linear-gradient(135deg, #f8fbff 0%, #eef3ff 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 14px 36px rgba(37, 99, 235, 0.12);
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.summary-item {
+    background: white;
+    padding: 1rem 1.2rem;
+    border-radius: 12px;
+    border: 1px solid #e6ecff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.08);
+}
+
+.summary-item strong {
+    color: #4CAF50;
+}
+
+.confirm-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    color: white;
+    padding: 1.2rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    box-shadow: 0 12px 28px rgba(16, 185, 129, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.confirm-btn:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+}
+
+.confirm-btn:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(16, 185, 129, 0.35);
+    filter: brightness(1.05);
+}
+.dashboard-center {
+    max-width: 900px;
+    margin: 3.5rem auto;
+    text-align: center;
+    padding: 2rem;
+}
+
+.welcome-text {
+    font-size: 2.6rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 0.75rem;
+    text-shadow: 0 2px 0 rgba(255,255,255,0.6);
+}
+
+.welcome-subtext {
+    font-size: 1.15rem;
+    color: #334155;
+    margin-bottom: 2rem;
+}
+
+/* Responsive Tweaks */
+@media (max-width: 768px) {
+    .navbar-container { padding: 0.9rem 1rem; }
+    .navbar-links { gap: 0.6rem; }
+    .navbar-link { padding: 0.4rem 0.75rem; font-size: 0.95rem; }
+    .booking-form { padding: 1rem; border-radius: 16px; }
+    .grounds-grid { grid-template-columns: 1fr; gap: 1rem; }
+    .summary-grid { grid-template-columns: 1fr; }
+    .date-picker input { width: 100%; }
+}
+
+</style>
+
 {% endblock %}
