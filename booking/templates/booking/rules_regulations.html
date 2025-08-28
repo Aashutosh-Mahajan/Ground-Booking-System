@@ -1,11 +1,127 @@
-{% extends "base.html" %}
-
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Rules & Regulations{% endblock %}
 {% block content %}
-<h1>Rules & Regulations</h1>
-<p>All students must follow these rules when booking the ground.</p>
-<ul>
-  <li>Rule 1: Be on time.</li>
-  <li>Rule 2: Carry your college ID.</li>
-  <li>Rule 3: Respect the schedule and clean up after use.</li>
-</ul>
+<div class="rules-container">
+  <div class="rules-header">
+    <h1>Ground Booking Rules & Regulations</h1>
+    <p>Follow these rules to ensure safe and fair use of college grounds.</p>
+    <img src="{% static 'images/rules-banner.jpeg' %}" alt="Rules Banner" class="rules-banner">
+  </div>
+
+  <div class="rules-list-container">
+    <div class="rule-card"><span class="rule-badge">1</span> Bookings must be made at least 24 hours in advance.</div>
+    <div class="rule-card"><span class="rule-badge">2</span> Maximum of 2 hours per day per student/group.</div>
+    <div class="rule-card"><span class="rule-badge">3</span> Only registered students may make bookings.</div>
+    <div class="rule-card"><span class="rule-badge">4</span> Leave the ground clean and on time.</div>
+    <div class="rule-card"><span class="rule-badge">5</span> Report any damages immediately.</div>
+    <div class="rule-card"><span class="rule-badge">6</span> Cancel bookings at least 12 hours in advance.</div>
+    <div class="rule-card"><span class="rule-badge">7</span> Unauthorized use may lead to suspension.</div>
+    <div class="rule-card"><span class="rule-badge">8</span> Follow all college safety and sports regulations.</div>
+    <div class="rule-card"><span class="rule-badge">9</span> Use of alcohol, drugs, or tobacco is strictly prohibited.</div>
+    <div class="rule-card"><span class="rule-badge">10</span> Maintain proper conduct; do not disturb other groups.</div>
+    <div class="rule-card"><span class="rule-badge">11</span> Equipment must be used responsibly and returned after use.</div>
+    <div class="rule-card"><span class="rule-badge">12</span> Restricted areas are off-limits.</div>
+    <div class="rule-card"><span class="rule-badge">13</span> Only authorized personnel can operate lighting/sound systems.</div>
+  </div>
+
+  <div class="note">
+    <p>By using the ground booking system, you agree to follow all rules and regulations.</p>
+    <a href="{% url 'student_dashboard' %}" class="btn-back">I agree</a>
+  </div>
+</div>
+
+<style>
+/* Container */
+.rules-container {
+  max-width: 900px;
+  margin: 50px auto;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Header */
+.rules-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.rules-header h1 {
+  font-size: 32px;
+  color: #1e3a8a;
+  margin-bottom: 10px;
+}
+
+.rules-header p {
+  font-size: 18px;
+  color: #374151;
+}
+
+.rules-banner {
+  margin-top: 20px;
+  max-width: 300px;
+}
+
+/* Rule Cards */
+.rules-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.rule-card {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #eff6ff, #e0f2fe);
+  color: #1e3a8a;
+  font-size: 16px;
+  font-weight: 500;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.rule-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.rule-badge {
+  display: inline-block;
+  min-width: 28px;
+  height: 28px;
+  line-height: 28px;
+  border-radius: 50%;
+  background-color: #2563eb;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+/* Note and Back Button */
+.note {
+  text-align: center;
+  margin-top: 40px;
+  font-style: italic;
+  color: #4b5563;
+}
+
+.btn-back {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: #2563eb;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.btn-back:hover {
+  background: #1e40af;
+}
+</style>
 {% endblock %}
