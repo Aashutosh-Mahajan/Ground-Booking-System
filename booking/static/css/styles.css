@@ -385,7 +385,7 @@ h1, h2, h3, h4, h5, h6 {
 .hero {
     position: relative;
     overflow: hidden;
-    padding: 6rem 0;
+    padding: 5rem 0;
 }
 
 .hero-content {
@@ -402,7 +402,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .hero-subtitle {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     color: #4b5563;
     margin-bottom: 2rem;
     max-width: 48rem;
@@ -421,22 +421,112 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 3rem;
 }
 
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
+/* Single-card slider (auto rotate every 1s) */
+.features-slider {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    min-height: 420px;
 }
+
+.features-slides {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.feature-slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    animation: feature-fade 9s infinite;
+}
+
+.feature-slide:nth-child(1) { animation-delay: 0s; }
+.feature-slide:nth-child(2) { animation-delay: 3s; }
+.feature-slide:nth-child(3) { animation-delay: 6s; }
+
+@keyframes feature-fade {
+    0% { opacity: 0; }
+    3%, 32% { opacity: 1; }
+    35%, 100% { opacity: 0; }
+}
+/* Remove radio styles (not used) */
 
 .feature-card {
     text-align: center;
-    padding: 1.5rem;
-    border-radius: 0.5rem;
+    padding: 2.5rem;
+    border-radius: 0.75rem;
+    width: 36rem;
+    max-width: 95vw;
+    min-height: 320px;
+    margin: 0 auto;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+/* Dots */
+.feature-controls {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.feature-controls .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 9999px;
+    background: #d1d5db;
+    cursor: pointer;
+}
+
+#feature-1:checked ~ .features-slider .feature-controls label:nth-child(1),
+#feature-2:checked ~ .features-slider .feature-controls label:nth-child(2),
+#feature-3:checked ~ .features-slider .feature-controls label:nth-child(3) {
+    background: #1e40af;
 }
 
 .feature-icon {
     font-size: 2.25rem;
     margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
+    min-width: 100px;
+    background-color: rgba(0,0,0,0.03);
+    border-radius: 9999px;
 }
+
+/* Background-image variant for icons */
+.feature-icon.bg-icon {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: #ffffff;
+    border-radius: 9999px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #e5e7eb;
+}
+
+/* Ensure feature icon images are uniform */
+.feature-icon img {
+    width: 96px !important;
+    height: 96px !important;
+    display: block;
+    object-fit: contain;
+    margin: 0 auto;
+}
+
+.feature-card img { display: block; }
 
 /* Utilities */
 .text-center { text-align: center; }
@@ -510,15 +600,30 @@ details ul {
     white-space: nowrap;
 }
 
+/* Sizing utilities for home page icons and logo */
+.h-16 { height: 4rem; }
+.w-16 { width: 4rem; }
+.h-20 { height: 5rem; }
+.h-12 { height: 3rem; }
+.w-12 { width: 3rem; }
+
+/* Spacing utilities */
+.my-6 { margin-top: 1.5rem; margin-bottom: 1.5rem; }
+
+/* Centering utility */
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+/* Rounded images */
+.rounded { border-radius: 0.25rem; }
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .features-grid {
-        grid-template-columns: 1fr;
-    }
+    .features-slider { min-height: 360px; }
+    .feature-card { width: 22rem; max-width: 94vw; padding: 1.75rem; min-height: 280px; }
     
-    .hero-title {
-        font-size: 2rem;
-    }
+    .hero { padding: 4rem 0; }
+    .hero-title { font-size: 2rem; }
+    .hero-subtitle { font-size: 1rem; }
     
     .navbar-content {
         flex-direction: column;
@@ -535,4 +640,24 @@ details ul {
     .grid-cols-3 {
         grid-template-columns: 1fr;
     }
+}
+
+/* Tablet */
+@media (min-width: 640px) and (max-width: 1023px) {
+    .feature-card { width: 28rem; }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+    .feature-card { width: 36rem; }
+    .hero { padding: 6rem 0; }
+    .hero-title { font-size: 3rem; }
+    .hero-subtitle { font-size: 1.25rem; }
+}
+
+/* Logo sizing stability */
+.logo img {
+    max-width: 100%;
+    height: 4rem;
+    object-fit: contain;
 }

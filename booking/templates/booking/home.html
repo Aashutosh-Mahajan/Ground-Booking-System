@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Home{% endblock %}
 {% block content %}
  <div id="home-page" class="page-content">
+
+        
 
         <div class="hero">
             <div class="container">
@@ -14,9 +17,7 @@
                         Reserve sports grounds, event spaces, and recreational areas with our easy-to-use booking system. 
                         Perfect for students, clubs, and college events.
                     </p>
-                    <a href="{% url 'student_login' %}" class="btn btn-primary btn-lg">
-    Book your Ground
-</a>
+                    <a href="{% url 'student_login' %}" class="btn btn-primary btn-lg">Book your Ground</a>
                 </div>
             </div>
         </div>
@@ -28,21 +29,35 @@
                     <h2 class="text-3xl font-bold text-gray-900 mb-4">Why Choose GroundBook?</h2>
                     <p class="text-gray-600">Simple, fast, and reliable ground booking for your college</p>
                 </div>
-                <div class="features-grid">
-                    <div class="feature-card bg-blue-50">
-                        <div class="feature-icon">⚡</div>
-                        <h3 class="text-xl font-semibold mb-2">Instant Booking</h3>
-                        <p class="text-gray-600">Book your preferred ground in just a few clicks</p>
-                    </div>
-                    <div class="feature-card bg-green-50">
-                        <div class="feature-icon">📅</div>
-                        <h3 class="text-xl font-semibold mb-2">Real-time Availability</h3>
-                        <p class="text-gray-600">See available time slots and dates instantly</p>
-                    </div>
-                    <div class="feature-card bg-purple-50">
-                        <div class="feature-icon">🎯</div>
-                        <h3 class="text-xl font-semibold mb-2">Easy Management</h3>
-                        <p class="text-gray-600">Track your bookings and get instant approvals</p>
+                <div class="features-slider">
+                    <div class="features-slides" aria-live="polite">
+                        <div class="feature-slide">
+                            <div class="feature-card bg-blue-50">
+                                <div class="feature-icon">
+                                    <img src="{% static 'images/ground.png' %}" alt="Instant Booking" style="width:96px;height:96px;display:block;object-fit:contain;"/>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-2">Instant Booking</h3>
+                                <p class="text-gray-600">Book your preferred ground in just a few clicks</p>
+                            </div>
+                        </div>
+                        <div class="feature-slide">
+                            <div class="feature-card bg-green-50">
+                                <div class="feature-icon">
+                                    <img src="{% static 'images/calendar.png' %}" alt="Real-time Availability" style="width:96px;height:96px;display:block;object-fit:contain;"/>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-2">Real-time Availability</h3>
+                                <p class="text-gray-600">See available time slots and dates instantly</p>
+                            </div>
+                        </div>
+                        <div class="feature-slide">
+                            <div class="feature-card bg-purple-50">
+                                <div class="feature-icon">
+                                    <img src="{% static 'images/management.png' %}" alt="Easy Management" style="width:96px;height:96px;display:block;object-fit:contain;"/>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-2">Easy Management</h3>
+                                <p class="text-gray-600">Track your bookings and get instant approvals</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
