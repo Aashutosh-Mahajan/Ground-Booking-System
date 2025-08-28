@@ -1,78 +1,81 @@
 {% extends 'base.html' %}
-{% load static %}
 {% block title %}Student Dashboard{% endblock %}
+
 {% block content %}
+<div class="max-w-6xl mx-auto py-10 px-6">
+    <h2 class="text-3xl font-bold text-gray-900 mb-6">Welcome, {{ request.user.first_name }} {{ request.user.last_name }}</h2>
 
-<!-- Enhanced Navbar (Logo Removed) -->
-<nav class="navbar bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
-    <div class="navbar-container flex justify-between items-center px-6 py-4">
+    <!-- ✅ Check Ground Availability Section -->
+    <div class="card mb-8">
+        <h3 class="text-2xl font-semibold mb-4 text-center">Check Ground Availability</h3>
 
-        <!-- Right: Navigation Links -->
-        <div class="navbar-links">
-            <a href="{% url 'student_booking' %}" 
-               class="navbar-link {% if request.resolver_match.url_name == 'student_booking' %}text-primary{% endif %}">
-                Booking
-            </a>
-            <a href="{% url 'rules_regulations' %}" 
-               class="navbar-link {% if request.resolver_match.url_name == 'rules_regulations' %}text-primary{% endif %}">
-                Rules & Regulations
-            </a>
-            <a href="{% url 'student_history' %}" 
-               class="navbar-link {% if request.resolver_match.url_name == 'student_history' %}text-primary{% endif %}">
-                History
-            </a>
-        </div>
-    </div>
-</nav>
+        <form id="availabilityForm" method="POST" action="{% url 'check_availability' %}">
+            {% csrf_token %}
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label for="date" class="block text-sm font-medium text-gray-700">Select Date:</label>
+                    <input type="date" id="date" name="date" 
+                           value="{{ selected_date|default:'' }}"
+                           class="w-full border-gray-300 rounded-lg shadow-sm">
+                </div>
 
-<!-- Page Content -->
-<div class="max-w-5xl mx-auto py-10 px-6">
-    <h2 class="text-3xl font-bold text-gray-900 mb-6">Welcome, {{ student_name }}</h2>
-    <p class="text-gray-600 mb-8">Here is your dashboard to manage your ground bookings.</p>
-
-    <!-- Ground Availability -->
-    <div class="grid grid-cols-2 gap-6 mb-8">
-        <div class="card p-6">
-            <h3 class="text-xl font-semibold text-gray-800 mb-4">Ground A</h3>
-            <p class="text-gray-600">Available for: Cricket, Football</p>
-            <p class="mt-2 text-green-600 font-medium">Status: Available</p>
-        </div>
-        <div class="card p-6">
-            <h3 class="text-xl font-semibold text-gray-800 mb-4">Ground B</h3>
-            <p class="text-gray-600">Available for: Volleyball, Badminton, Tennis, Basketball</p>
-            <p class="mt-2 text-red-600 font-medium">Status: Fully Booked</p>
-        </div>
-    </div>
-
-    <!-- Booking History -->
-    <div class="card p-6 mb-8">
-        <h3 class="text-xl font-semibold text-gray-800 mb-4">Your Booking History</h3>
-        {% if bookings %}
-            <div class="table-container">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Ground</th>
-                            <th>Date</th>
-                            <th>Time Slot</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for booking in bookings %}
-                        <tr>
-                            <td>{{ booking.ground }}</td>
-                            <td>{{ booking.date }}</td>
-                            <td>{{ booking.time_slot }}</td>
-                            <td>{{ booking.status }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div>
+                    <label for="ground" class="block text-sm font-medium text-gray-700">Select Ground:</label>
+                    <select id="ground" name="ground" class="w-full border-gray-300 rounded-lg shadow-sm">
+                        <option value="A" {% if selected_ground == 'A' %}selected{% endif %}>Ground A</option>
+                        <option value="B" {% if selected_ground == 'B' %}selected{% endif %}>Ground B</option>
+                    </select>
+                </div>
             </div>
+
+            <!-- Time Slots -->
+            <div id="timeSlots" class="grid grid-cols-4 gap-4">
+                {% for slot in slots %}
+                    <button type="button" 
+                            class="slot-btn px-4 py-2 rounded-lg shadow font-semibold 
+                                   {% if slot.booked %} bg-red-500 text-white cursor-not-allowed {% else %} bg-green-500 text-white {% endif %}"
+                            data-slot="{{ slot.time }}"
+                            {% if slot.booked %}disabled{% endif %}>
+                        {{ slot.time }}
+                    </button>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+
+    <!-- ✅ Booking History Section -->
+    <div class="card">
+        <h3 class="text-2xl font-semibold mb-4">Your Booking History</h3>
+        {% if bookings %}
+            <ul class="space-y-2">
+                {% for booking in bookings %}
+                    <li class="p-3 border rounded-lg shadow-sm">
+                        {{ booking.ground }} - {{ booking.date }} at {{ booking.time }}
+                    </li>
+                {% endfor %}
+            </ul>
         {% else %}
             <p class="text-gray-600">No bookings yet.</p>
         {% endif %}
     </div>
 </div>
+
+<!-- JS for Slot Selection Popup -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".slot-btn").forEach(button => {
+        button.addEventListener("click", function() {
+            if (this.classList.contains("bg-red-500")) {
+                alert("❌ This ground is already booked for this slot!");
+            } else {
+                alert("✅ Slot available! Redirecting to booking form...");
+                window.location.href = "{% url 'student_booking' %}?date=" + 
+                                       document.getElementById("date").value + 
+                                       "&ground=" + document.getElementById("ground").value + 
+                                       "&time=" + this.dataset.slot;
+            }
+        });
+    });
+});
+</script>
 {% endblock %}
