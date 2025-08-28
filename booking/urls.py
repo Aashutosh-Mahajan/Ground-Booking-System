@@ -1,6 +1,8 @@
 from django.urls import path
 from .import views
 from .views import custom_admin_login
+from django.contrib.auth.views import LogoutView
+
 urlpatterns = [
     path('', views.home, name='home'),
     path('student/login/', views.student_login, name='student_login'),         # ✅ changed from student-login/
@@ -13,4 +15,9 @@ urlpatterns = [
     path('approve-booking/<str:roll_no>/', views.approve_booking, name='approve_booking'),
     path('reject-booking/<str:roll_no>/', views.reject_booking, name='reject_booking'),
     path('load-formset/', views.load_formset, name='load-formset'),
+    path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
+    path('student-logout/', views.student_logout, name='student_logout'),
+    path('student/booking/', views.student_booking, name='student_booking'),  # Define this view
+    path('student/rules/', views.rules_regulations, name='rules_regulations'),  # Define this view
+    path('student/history/', views.student_history, name='student_history'), 
 ]

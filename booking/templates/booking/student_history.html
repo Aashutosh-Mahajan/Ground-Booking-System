@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1>Your Booking History</h1>
+    {% if history %}
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Ground</th>
+                <th>Time Slot</th>
+                <th>Status</th>
+            </tr>
+            {% for booking in history %}
+            <tr>
+                <td>{{ booking.date }}</td>
+                <td>{{ booking.ground }}</td>
+                <td>{{ booking.time_slot }}</td>
+                <td>{{ booking.status }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No past bookings found.</p>
+    {% endif %}
+</div>
+{% endblock %}
