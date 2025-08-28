@@ -1,122 +1,176 @@
 {% extends 'base.html' %}
-{% load static %}
 {% block title %}Book Ground{% endblock %}
 {% block content %}
-
 <div class="max-w-4xl mx-auto py-12 px-4">
-    <div class="card p-8 shadow-lg">
+    <div class="card">
         <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Book a Ground</h2>
 
-        <!-- Ground & Date Selection -->
-        <div class="mb-4">
-            <label class="block text-gray-700 font-medium">Select Ground</label>
-            {{ booking_form.ground }}
-        </div>
-
-        <div class="mb-4">
-            <label class="block text-gray-700 font-medium">Select Date</label>
-            {{ booking_form.date }}
-        </div>
-
-        <!-- Time Slots -->
-        <div id="slot-container" class="mt-4">
-            <p class="text-gray-600">Select a ground & date to see available slots.</p>
-        </div>
-
-        <!-- Booking Form -->
-        <form method="POST" action="{% url 'student_booking' %}" id="bookingForm" class="mt-6">
+        <form method="POST" action="{% url 'student_booking' %}" class="space-y-6">
             {% csrf_token %}
-
-            <!-- Hidden values filled by JS -->
-            <input type="hidden" name="ground" id="groundField">
-            <input type="hidden" name="date" id="dateField">
-            <input type="hidden" name="time_slot" id="slotField">
-
-            <!-- Student Info -->
-            <div class="mb-4">
-                <label class="block text-gray-700 font-medium">Student Name</label>
-                <input type="text" name="student_name" class="input w-full border rounded p-2" required>
+            
+            <!-- Student Information -->
+            <div class="grid grid-cols-2 gap-6">
+                <div class="form-group">
+                    <label for="id_student_name" class="form-label">Full Name</label>
+                    {{ booking_form.student_name }}
+                </div>
+                <div class="form-group">
+                    <label for="id_roll_number" class="form-label">Roll Number</label>
+                    {{ booking_form.roll_number }}
+                </div>
+            </div>
+            <div class="grid grid-cols-3 gap-6">
+                <div class="form-group">
+                    <label for="id_student_branch" class="form-label">Branch</label>
+                    {{ booking_form.student_branch }}
+                </div>
+                <div class="form-group">
+                    <label for="id_student_year" class="form-label">Year</label>
+                    {{ booking_form.student_year }}
+                </div>
+                <div class="form-group">
+                    <label for="id_student_division" class="form-label">Division</label>
+                    {{ booking_form.student_division }}
+                </div>
             </div>
 
-            <div class="mb-4">
-                <label class="block text-gray-700 font-medium">Student Email</label>
-                <input type="email" name="student_email" class="input w-full border rounded p-2" required>
+            <!-- Ground and Date Selection -->
+            <div class="grid grid-cols-2 gap-6">
+                <div class="form-group">
+                    <label for="id_ground" class="form-label">Ground Selection</label>
+                    <select name="ground" id="id_ground" class="form-select">
+                        <option value="">Select a ground</option>
+                        <option value="Ground A">Ground A</option>
+                        <option value="Ground B">Ground B</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="id_date" class="form-label">Date</label>
+                    {{ booking_form.date }}
+                </div>
             </div>
 
-            <div class="mb-4">
-                <label class="block text-gray-700 font-medium">Roll Number</label>
-                <input type="text" name="roll_number" class="input w-full border rounded p-2" required>
+            <!-- Time Slot and Number of Players -->
+            <div class="grid grid-cols-2 gap-6">
+                <div class="form-group">
+                    <label for="id_time_slot" class="form-label">Time Slot</label>
+                    <select name="time_slot" id="id_time_slot" class="form-select">
+                        <option value="">Select time slot</option>
+                        <option value="9.00 - 11.00">9.00 - 11.00</option>
+                        <option value="11.00 - 13.00">11.00 - 13.00</option>
+                        <option value="13.00 - 15.00">13.00 - 15.00</option>
+                        <option value="15.00 - 17.00">15.00 - 17.00</option>
+                        <option value="17.00 - 19.00">17.00 - 19.00</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="id_number_of_players" class="form-label">Number of Players</label>
+                    <select name="number_of_players" id="id_number_of_players" class="form-select">
+                        <option value="1" selected>1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="mb-4">
-                <label class="block text-gray-700 font-medium">Purpose</label>
-                <textarea name="purpose" class="input w-full border rounded p-2" rows="3" required></textarea>
+            <!-- Purpose -->
+            <div class="form-group">
+                <label for="id_purpose" class="form-label">Purpose</label>
+                {{ booking_form.purpose }}
             </div>
 
-            <div class="mb-6">
-                <label class="block text-gray-700 font-medium">Number of Players</label>
-                <input type="number" name="number_of_players" class="input w-full border rounded p-2" min="1" required>
+            <!-- Player Information (Dynamic) -->
+            <div id="players-container" class="space-y-4">
+                <!-- Player forms will be generated here -->
             </div>
 
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow">
-                Confirm Booking
+            <button type="submit" class="btn btn-primary btn-full">
+                Submit Booking Request
             </button>
         </form>
+
+        {% if success %}
+            <div class="mt-6 text-green-600 text-center font-semibold">
+                {{ success }}
+            </div>
+        {% endif %}
     </div>
 </div>
 
 <script>
-    function loadSlots() {
-        const ground = document.getElementById("id_ground").value;
-        const date = document.getElementById("id_date").value;
+document.addEventListener('DOMContentLoaded', function() {
+    const numPlayersSelect = document.getElementById('id_number_of_players');
+    const playersContainer = document.getElementById('players-container');
 
-        // Update hidden fields
-        document.getElementById("groundField").value = ground;
-        document.getElementById("dateField").value = date;
-
-        if (ground && date) {
-            fetch(`/check_availability/?ground=${ground}&date=${date}`)
-                .then(res => res.json())
-                .then(data => {
-                    let html = "<h3 class='font-bold mb-2'>Available Slots</h3>";
-                    data.availability.forEach(slot => {
-                        let colorClass = "";
-                        let disabled = "";
-
-                        if (slot.status === "available") {
-                            colorClass = "bg-green-200 hover:bg-green-300 cursor-pointer";
-                        } else if (slot.status === "booked") {
-                            colorClass = "bg-red-200 cursor-not-allowed";
-                            disabled = "disabled";
-                        } else {
-                            colorClass = "bg-blue-200 cursor-not-allowed";
-                            disabled = "disabled";
-                        }
-
-                        html += `
-                            <label class="block p-2 ${colorClass} rounded mb-2">
-                                <input type="radio" name="time_slot_choice" value="${slot.time}" ${disabled}
-                                    onchange="selectSlot('${slot.time}', '${slot.status}')"> 
-                                ${slot.time}
-                            </label>
-                        `;
-                    });
-                    document.getElementById("slot-container").innerHTML = html;
-                });
+    function generatePlayerForms(count) {
+        playersContainer.innerHTML = '';
+        
+        for (let i = 1; i <= count; i++) {
+            const playerForm = document.createElement('div');
+            playerForm.className = 'player-form';
+            playerForm.innerHTML = `
+                <h3 class="text-lg font-semibold mb-4">Player ${i}</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-label">Name</label>
+                        <input type="text" name="player${i}_name" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Branch</label>
+                        <select name="player${i}_branch" class="form-select" required>
+                            <option value="">Select Branch</option>
+                            <option value="CSE">CSE</option>
+                            <option value="IT">IT</option>
+                            <option value="EXCS">EXCS</option>
+                            <option value="EXTC">EXTC</option>
+                            <option value="BIOM">BIOM</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Year</label>
+                        <select name="player${i}_year" class="form-select" required>
+                            <option value="">Select Year</option>
+                            <option value="FE">FE</option>
+                            <option value="SE">SE</option>
+                            <option value="TE">TE</option>
+                            <option value="BE">BE</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Division</label>
+                        <select name="player${i}_division" class="form-select" required>
+                            <option value="">Select Division</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+            playersContainer.appendChild(playerForm);
         }
     }
 
-    function selectSlot(slot, status) {
-        if (status === "booked") {
-            alert(`❌ Ground already booked for ${slot}`);
-            document.getElementById("slotField").value = "";
-        } else if (status === "available") {
-            document.getElementById("slotField").value = slot;
-        }
+    // Ensure a default of 1 player displayed
+    if (!numPlayersSelect.value) {
+        numPlayersSelect.value = '1';
     }
+    generatePlayerForms(parseInt(numPlayersSelect.value));
 
-    document.getElementById("id_ground").addEventListener("change", loadSlots);
-    document.getElementById("id_date").addEventListener("change", loadSlots);
+    // Update player forms when selection changes
+    numPlayersSelect.addEventListener('change', function() {
+        const count = parseInt(this.value) || 0;
+        generatePlayerForms(count);
+    });
+
+});
 </script>
-
 {% endblock %}
