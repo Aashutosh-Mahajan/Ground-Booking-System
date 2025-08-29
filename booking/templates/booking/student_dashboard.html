@@ -1,80 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard</title>
-</head>
-<body>
-
-<!-- Ultra Enhanced Main Navbar -->
-<nav class="main-navbar">
-    <!-- Animated Background Elements -->
-    <div class="navbar-bg-animation">
-        <div class="floating-orb orb-1"></div>
-        <div class="floating-orb orb-2"></div>
-        <div class="floating-orb orb-3"></div>
-    </div>
-    
-    <div class="main-navbar-container">
-        <!-- Left: Enhanced VIT Logo and SportDeck -->
-        <div class="navbar-left">
-            <div class="vit-logo-enhanced">
-                <div class="vit-logo-circle">
-                    <span class="vit-text-main">VIT</span>
-                    <div class="vit-glow-ring"></div>
-                </div>
-                <div class="vit-text-container">
-                    <div class="vit-title">Vidyalankar Institute</div>
-                    <div class="vit-subtitle">of Technology</div>
-                </div>
-            </div>
-            
-            <div class="separator-line"></div>
-            
-            <div class="sportdeck-enhanced">
-                <div class="sportdeck-icon-container">
-                    <div class="sportdeck-icon">🏟️</div>
-                    <div class="icon-pulse-ring"></div>
-                </div>
-                <div class="sportdeck-text-container">
-                    <span class="sportdeck-main">SportDeck</span>
-                    <span class="sportdeck-tagline">Ground Management System</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Right: Premium Navigation Links -->
-<div class="navbar-right">
-    <div class="nav-buttons-container">
-        <a href="{% url 'home' %}" class="nav-button-enhanced home-btn active">
-            <div class="nav-icon">🏠</div>
-            <span>Home</span>
-            <div class="nav-shine"></div>
-        </a>
-        <a href="{% url 'student_dashboard' %}" class="nav-button-enhanced dashboard-btn">
-            <div class="nav-icon">📊</div>
-            <span>Dashboard</span>
-            <div class="nav-shine"></div>
-        </a>
-        <a href="{% url 'student_logout' %}" class="nav-button-enhanced logout-btn">
-            <div class="nav-icon">🚪</div>
-            <span>Logout</span>
-            <div class="nav-shine"></div>
-        </a>
-    </div>
-</div>
-
-
-        
-
-    
-    <!-- Bottom gradient line -->
-    <div class="navbar-bottom-glow"></div>
-</nav>
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}student_dashboard{% endblock %}
+{% block content %}
 
 <!-- Secondary Navbar -->
-<nav class="navbar">
+<nav class="navbar-secondary">
     <div class="navbar-container flex justify-between items-center px-6 py-4">
         <!-- Right: Navigation Links -->
         <div class="navbar-links">
@@ -91,6 +21,16 @@
     <h2 class="welcome-text">Welcome, John Doe</h2>
     <p class="welcome-subtext">Here is your dashboard to manage your ground bookings.</p>
 </div>
+
+<div class="note-box">
+  <div class="note-content">
+    <div class="note-accent"></div>
+    <p class="note-text">
+      <p class="note-text-red">NOTE :</p> KNOW YOUR GROUND AVAILABILITY ACCORDING TO YOUR TIME,SPORT AND GROUND.
+    </p>
+  </div>
+</div>
+
 
 <div>
     <!-- Ground Booking Form Start -->
@@ -264,412 +204,7 @@
 </script>
 
 <style>
-/* Ultra Enhanced Main Navbar Styling */
-.main-navbar {
-    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 25%, #1565c0 75%, #1e88e5 100%);
-    color: #ffffff;
-    box-shadow: 
-        0 8px 32px rgba(13, 71, 161, 0.4),
-        0 4px 16px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    overflow: hidden;
-    position: relative;
-}
-
-.navbar-bg-animation {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow: hidden;
-    z-index: 1;
-}
-
-.floating-orb {
-    position: absolute;
-    border-radius: 50%;
-    opacity: 0.15;
-    animation: float 8s ease-in-out infinite;
-}
-
-.orb-1 {
-    width: 120px;
-    height: 120px;
-    background: radial-gradient(circle, #60a5fa, transparent);
-    top: -60px;
-    left: 10%;
-    animation-delay: 0s;
-}
-
-.orb-2 {
-    width: 80px;
-    height: 80px;
-    background: radial-gradient(circle, #a78bfa, transparent);
-    top: -40px;
-    right: 20%;
-    animation-delay: 2s;
-}
-
-.orb-3 {
-    width: 100px;
-    height: 100px;
-    background: radial-gradient(circle, #34d399, transparent);
-    bottom: -50px;
-    right: 5%;
-    animation-delay: 4s;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    33% { transform: translateY(-10px) rotate(120deg); }
-    66% { transform: translateY(5px) rotate(240deg); }
-}
-
-.main-navbar-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 3rem;
-    max-width: 1400px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 2;
-}
-
-.navbar-left {
-    display: flex;
-    align-items: center;
-    gap: 3rem;
-}
-
-.vit-logo-enhanced {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-}
-
-.vit-logo-circle {
-    position: relative;
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 
-        0 8px 32px rgba(255, 255, 255, 0.2),
-        inset 0 2px 4px rgba(0, 0, 0, 0.1);
-    animation: logoGlow 3s ease-in-out infinite alternate;
-}
-
-@keyframes logoGlow {
-    0% { box-shadow: 0 8px 32px rgba(255, 255, 255, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.1); }
-    100% { box-shadow: 0 12px 40px rgba(255, 255, 255, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.1); }
-}
-
-.vit-glow-ring {
-    position: absolute;
-    top: -4px;
-    left: -4px;
-    right: -4px;
-    bottom: -4px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    animation: ringRotate 4s linear infinite;
-}
-
-@keyframes ringRotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.vit-text-main {
-    font-size: 1.8rem;
-    font-weight: 900;
-    color: #1e3a8a;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.vit-text-container {
-    display: flex;
-    flex-direction: column;
-}
-
-.vit-title {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #ffffff;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    margin-bottom: 0.2rem;
-}
-
-.vit-subtitle {
-    font-size: 1rem;
-    color: #cbd5e1;
-    font-weight: 500;
-}
-
-.separator-line {
-    width: 2px;
-    height: 60px;
-    background: linear-gradient(180deg, transparent 0%, #ffffff 20%, #ffffff 80%, transparent 100%);
-    opacity: 0.4;
-}
-
-.sportdeck-enhanced {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 1rem 1.5rem;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-}
-
-.sportdeck-icon-container {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.sportdeck-icon {
-    font-size: 2rem;
-    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
-    animation: iconBounce 2s ease-in-out infinite;
-}
-
-@keyframes iconBounce {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-.icon-pulse-ring {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 40px;
-    height: 40px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    animation: pulseRing 2s ease-in-out infinite;
-}
-
-@keyframes pulseRing {
-    0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
-    100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
-}
-
-.sportdeck-text-container {
-    display: flex;
-    flex-direction: column;
-}
-
-.sportdeck-main {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #ffffff;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.sportdeck-tagline {
-    font-size: 0.8rem;
-    color: #e2e8f0;
-    font-weight: 500;
-    opacity: 0.9;
-}
-
-.navbar-right {
-    display: flex;
-    align-items: center;
-}
-
-.nav-buttons-container {
-    display: flex;
-    gap: 1.5rem;
-    background: rgba(255, 255, 255, 0.08);
-    padding: 0.75rem;
-    border-radius: 25px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-}
-
-.nav-button-enhanced {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.3rem;
-    text-decoration: none;
-    color: #e2e8f0;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 1rem 1.5rem;
-    border-radius: 18px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    min-width: 100px;
-    overflow: hidden;
-}
-
-.nav-button-enhanced::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s ease;
-}
-
-.nav-button-enhanced:hover::before {
-    left: 100%;
-}
-
-.nav-icon {
-    font-size: 1.3rem;
-    transition: transform 0.3s ease;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-}
-
-.nav-button-enhanced:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.4);
-    color: #ffffff;
-}
-
-.nav-button-enhanced:hover .nav-icon {
-    transform: scale(1.2) rotate(5deg);
-}
-
-.nav-button-enhanced.active {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
-    color: #1e3a8a;
-    font-weight: 700;
-    box-shadow: 
-        0 8px 25px rgba(255, 255, 255, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.5);
-    border-color: rgba(255, 255, 255, 0.6);
-}
-
-.nav-button-enhanced.active .nav-icon {
-    filter: drop-shadow(0 2px 4px rgba(30, 58, 138, 0.3));
-}
-
-.nav-button-enhanced.logout-btn {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    border-color: #dc2626;
-    color: #ffffff;
-}
-
-.nav-button-enhanced.logout-btn:hover {
-    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
-    box-shadow: 0 12px 30px rgba(239, 68, 68, 0.4);
-    transform: translateY(-3px);
-}
-
-.nav-shine {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    border-radius: 18px;
-}
-
-.nav-button-enhanced:hover .nav-shine {
-    opacity: 1;
-}
-
-.navbar-bottom-glow {
-    height: 4px;
-    background: linear-gradient(90deg, 
-        transparent 0%, 
-        #60a5fa 25%, 
-        #3b82f6 50%, 
-        #2563eb 75%, 
-        transparent 100%);
-    animation: glowPulse 3s ease-in-out infinite;
-}
-
-@keyframes glowPulse {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; }
-}
-
-/* Secondary Navbar Styling */
-.navbar {
-    background: linear-gradient(90deg, #0ea5e9 0%, #2563eb 50%, #1e3a8a 100%);
-    color: #ffffff;
-    box-shadow: 0 10px 30px rgba(37, 99, 235, 0.25);
-    position: sticky;
-    top: 0;
-    z-index: 50;
-}
-
-.navbar-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem 1.5rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.navbar-links {
-    display: flex;
-    gap: 2rem;
-}
-
-.navbar-link {
-    display: inline-block;
-    text-decoration: none;
-    color: #e5edff;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 0.75rem 1.5rem;
-    border-radius: 999px;
-    transition: all 0.25s ease;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    font-weight: 600;
-    min-width: 140px;
-    text-align: center;
-}
-
-.navbar-link:hover {
-    color: #ffffff;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
-    background: rgba(255, 255, 255, 0.15);
-}
-
-.navbar-link.active {
-    background: #ffffff;
-    color: #1e3a8a;
-    font-weight: 700;
-}
-
-/* Rest of the original styling unchanged */
+/* Body & General Styles */
 * {
     margin: 0;
     padding: 0;
@@ -680,55 +215,139 @@ body {
     background: linear-gradient(135deg, #DBEAFE 0%, #EFF6FF 100%);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     min-height: 100vh;
-    background-attachment: fixed;
 }
 
-/* Decorative animated gradients */
-body::before, body::after {
+/* Dashboard Center */
+.dashboard-center {
+    width: 75%;                 /* full width */
+    max-width: none;
+    margin: 0 auto;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+
+    /* Background image for Django static files */
+    background-image: url("{% static 'images/VitGround1.jpg' %}");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    /* Fill more of the viewport */
+    padding: 10rem ;      /* increase top/bottom padding to make it taller */
+    border-radius: 12px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Optional overlay */
+.dashboard-center::before {
     content: '';
-    position: fixed;
-    width: 40vmax;
-    height: 40vmax;
-    border-radius: 50%;
-    filter: blur(60px);
-    z-index: -1;
-    opacity: 0.35;
+    position: absolute;
+    inset: 0;                 /* shorthand for top:0; right:0; bottom:0; left:0 */
+    background: rgba(0, 0, 0, 0.25); /* dark overlay for readability */
+    border-radius: 12px;
+    pointer-events: none;
 }
 
-body::before {
-    top: -10vmax;
-    left: -10vmax;
-    background: radial-gradient(circle at center, #93c5fd, transparent 60%);
-    animation: floatA 16s ease-in-out infinite;
+/* Ensure text is above overlay */
+.dashboard-center h2,
+.dashboard-center p {
+    position: relative;
+    z-index: 1;
+    color: #fff;  /* white text over image */
 }
 
-body::after {
-    bottom: -12vmax;
-    right: -8vmax;
-    background: radial-gradient(circle at center, #a5b4fc, transparent 60%);
-    animation: floatB 18s ease-in-out infinite;
+.welcome-text {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
 }
 
-@keyframes floatA { 0%, 100% { transform: translate(0, 0);} 50% { transform: translate(20px, 10px);} }
-@keyframes floatB { 0%, 100% { transform: translate(0, 0);} 50% { transform: translate(-16px, -8px);} }
+.welcome-subtext {
+    font-size: 1.2rem;
+    margin-bottom: 0;
+}
 
+
+.note-box {
+    position: relative;
+    max-width:820px;
+    width: min(92vw, 820px);
+    padding: 18px 22px;
+    margin: 2rem auto; /* for spacing */
+    border-radius: 16px;
+    background:
+        linear-gradient(#ffffff, #ffffff) padding-box,
+        linear-gradient(135deg, #e53935, #ffffff 50%, #1e88e5) border-box;
+    border: 2px solid transparent;
+    box-shadow:
+        0 10px 24px rgba(0, 0, 0, 0.1),
+        0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.note-box::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    background: linear-gradient(
+        135deg,
+        rgba(229, 57, 53, 0.06),
+        rgba(255, 255, 255, 0.5) 50%,
+        rgba(30, 136, 229, 0.06)
+    );
+    pointer-events: none;
+    z-index: 0;
+}
+
+.note-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.note-accent {
+    width: 6px;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #e53935, #1e88e5);
+    flex: 0 0 6px;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04) inset;
+}
+
+.note-text {
+    font-size: clamp(1rem, 2.2vw, 1.15rem);
+    line-height: 1.4;
+    color: #0f172a;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+.note-text-red {
+    color: red;
+}
+
+/* Booking Form */
 .booking-form {
     max-width: 1100px;
     margin: 2.5rem auto;
-    padding: 2rem; 
-    background: rgba(255, 255, 255, 0.6); 
-    border-radius: 20px; 
-    box-shadow: 0 25px 60px rgba(30, 58, 138, 0.15); 
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    box-shadow: 0 25px 60px rgba(30, 58, 138, 0.15);
     display: grid;
     gap: 2rem;
     backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
 }
 
 .form-section {
     position: relative;
     padding: 1.25rem 1.5rem;
-    border: 1px solid #e8eefc; 
+    border: 1px solid #e8eefc;
     border-radius: 16px;
     background: #ffffff;
     box-shadow: 0 8px 22px rgba(59, 130, 246, 0.08);
@@ -745,31 +364,14 @@ body::after {
     pointer-events: none;
 }
 
-.form-section.disabled::after {
-    content: '🔒 Please select date first';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(255, 255, 255, 0.95);
-    padding: 1rem 2rem;
-    border-radius: 10px;
-    border: 2px solid #e0e0e0;
-    font-weight: 600;
-    color: #666;
-    z-index: 10;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
 .section-title {
     font-size: 1.35rem;
-    color: #0f172a; 
+    color: #0f172a;
     margin-bottom: 1rem;
-    padding-bottom: 0.3rem;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    border-bottom: 2px solid #e2e8f0; 
+    border-bottom: 2px solid #e2e8f0;
 }
 
 .section-title::after {
@@ -782,6 +384,7 @@ body::after {
     margin-left: 0.5rem;
 }
 
+/* Date Picker */
 .date-picker input {
     width: 320px;
     padding: 1rem 1.25rem;
@@ -804,6 +407,7 @@ body::after {
     background: #ffffff;
 }
 
+/* Grounds Grid */
 .grounds-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -849,6 +453,7 @@ body::after {
     border: 1px solid rgba(255,255,255,0.35);
 }
 
+/* Sports Grid */
 .sports-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -879,6 +484,7 @@ body::after {
     transform: translateY(-2px);
 }
 
+/* Time Slots Grid */
 .time-slots-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -927,6 +533,7 @@ body::after {
     opacity: 0.7;
 }
 
+/* Booking Summary */
 .booking-summary {
     padding: 2rem;
     border-radius: 18px;
@@ -958,243 +565,36 @@ body::after {
     color: #4CAF50;
 }
 
+/* Confirm Button */
 .confirm-btn {
     width: 100%;
     background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
     color: white;
-    padding: 1.2rem;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
+    padding: 1rem;
     font-weight: 700;
-    letter-spacing: 0.2px;
-    box-shadow: 0 12px 28px rgba(16, 185, 129, 0.25);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    border-radius: 14px;
+    cursor: pointer;
+    border: 1px solid #16a34a;
+    transition: all 0.25s ease;
 }
 
-.confirm-btn:disabled {
-    background: #cccccc;
-    cursor: not-allowed;
-}
-
-.confirm-btn:not(:disabled):hover {
+.confirm-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 14px 32px rgba(16, 185, 129, 0.35);
-    filter: brightness(1.05);
+    box-shadow: 0 10px 26px rgba(22, 163, 74, 0.25);
 }
 
-.dashboard-center {
-    max-width: 900px;
-    margin: 3.5rem auto;
-    text-align: center;
-    padding: 2rem;
-}
-
-.welcome-text {
-    font-size: 2.6rem;
-    font-weight: 800;
-    color: #0f172a;
-    margin-bottom: 0.75rem;
-    text-shadow: 0 2px 0 rgba(255,255,255,0.6);
-}
-
-.welcome-subtext {
-    font-size: 1.15rem;
-    color: #334155;
-    margin-bottom: 2rem;
-}
-
-/* Enhanced Responsive Design for Main Navbar */
-@media (max-width: 1024px) {
-    .main-navbar-container {
-        padding: 1.2rem 2rem;
-    }
-    
-    .navbar-left {
-        gap: 2rem;
-    }
-    
-    .nav-buttons-container {
-        gap: 1rem;
-    }
-    
-    .nav-button-enhanced {
-        padding: 0.8rem 1.2rem;
-        font-size: 0.85rem;
-        min-width: 85px;
-    }
-    
-    .nav-icon {
-        font-size: 1.1rem;
-    }
-    
-    .vit-logo-circle {
-        width: 70px;
-        height: 70px;
-    }
-    
-    .vit-text-main {
-        font-size: 1.6rem;
-    }
-    
-    .vit-title {
-        font-size: 1.2rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .main-navbar-container {
-        flex-direction: column;
-        gap: 2rem;
-        padding: 2rem 1.5rem;
-    }
-    
-    .navbar-left {
-        flex-direction: column;
-        gap: 1.5rem;
-        text-align: center;
-    }
-    
-    .vit-logo-enhanced {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .separator-line {
-        width: 60px;
-        height: 2px;
-        background: linear-gradient(90deg, transparent 0%, #ffffff 20%, #ffffff 80%, transparent 100%);
-    }
-    
-    .sportdeck-enhanced {
-        justify-content: center;
-    }
-    
-    .nav-buttons-container {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 1rem;
-        padding: 1rem;
-    }
-    
-    .nav-button-enhanced {
-        padding: 0.9rem 1.3rem;
-        min-width: 95px;
-    }
-    
-    .vit-logo-circle {
-        width: 65px;
-        height: 65px;
-    }
-    
-    .vit-text-main {
-        font-size: 1.4rem;
-    }
-    
-    .vit-title {
-        font-size: 1.1rem;
-    }
-    
-    .vit-subtitle {
-        font-size: 0.9rem;
-    }
-    
-    .navbar-container {
-        padding: 0.9rem 1rem;
-    }
-    
-    .navbar-links {
-        gap: 1rem;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    
-    .navbar-link {
-        padding: 0.6rem 1.2rem;
-        font-size: 0.9rem;
-        min-width: 120px;
-    }
-    
-    .booking-form {
-        padding: 1rem;
-        border-radius: 16px;
-    }
-    
-    .grounds-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    .summary-grid {
+/* Responsive */
+@media screen and (max-width: 768px) {
+    .grounds-grid, .sports-grid, .time-slots-grid {
         grid-template-columns: 1fr;
     }
-    
-    .date-picker input {
-        width: 100%;
-    }
-}
-
-@media (max-width: 480px) {
-    .main-navbar-container {
-        padding: 1.5rem 1rem;
-        gap: 1.5rem;
-    }
-    
-    .navbar-left {
-        gap: 1rem;
-    }
-    
-    .vit-logo-enhanced {
-        gap: 0.75rem;
-    }
-    
-    .sportdeck-enhanced {
-        padding: 0.75rem 1rem;
-    }
-    
-    .sportdeck-main {
-        font-size: 1.2rem;
-    }
-    
-    .nav-buttons-container {
-        gap: 0.75rem;
-        padding: 0.75rem;
-    }
-    
-    .nav-button-enhanced {
-        padding: 0.7rem 1rem;
-        font-size: 0.8rem;
-        min-width: 80px;
-    }
-    
-    .nav-icon {
-        font-size: 1rem;
-    }
-    
-    .vit-logo-circle {
-        width: 55px;
-        height: 55px;
-    }
-    
-    .vit-text-main {
-        font-size: 1.2rem;
-    }
-    
-    .vit-title {
-        font-size: 1rem;
-    }
-    
     .navbar-links {
-        gap: 0.75rem;
-    }
-    
-    .navbar-link {
-        padding: 0.5rem 1rem;
-        font-size: 0.85rem;
-        min-width: 100px;
+        flex-direction: column;
+        gap: 1rem;
     }
 }
 </style>
 
 </body>
 </html>
+{% endblock %}
