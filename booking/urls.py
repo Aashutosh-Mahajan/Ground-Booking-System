@@ -20,4 +20,5 @@ urlpatterns = [
     path('approve-booking/<str:roll_no>/', views.approve_booking, name='approve_booking'),
     path('reject-booking/<str:roll_no>/', views.reject_booking, name='reject_booking'),
     path('check-availability/', views.check_availability, name='check_availability'),
+    
 ]
