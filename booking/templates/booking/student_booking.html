@@ -22,47 +22,37 @@
             <div class="grid grid-cols-3 gap-6">
                 <div class="form-group">
                     <label for="id_student_branch" class="form-label">Branch</label>
-                    {{ booking_form.student_branch }}
+                    <select name="student_branch" id="id_student_branch" class="form-select" required>
+                        <option value="">Select Branch</option>
+                        <option value="INFT">INFT</option>
+                        <option value="CMPN">CMPN</option>
+                        <option value="EXTC">EXTC</option>
+                        <option value="EXCS">EXCS</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="id_student_year" class="form-label">Year</label>
-                    {{ booking_form.student_year }}
+                    <select name="student_year" id="id_student_year" class="form-select" required>
+                        <option value="">Select Year</option>
+                        <option value="1st Year">1st Year</option>
+                        <option value="2nd Year">2nd Year</option>
+                        <option value="3rd Year">3rd Year</option>
+                        <option value="4th Year">4th Year</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="id_student_division" class="form-label">Division</label>
-                    {{ booking_form.student_division }}
+                    <select name="student_division" id="id_student_division" class="form-select" required>
+                        <option value="">Select Division</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                    </select>
                 </div>
             </div>
 
-            <!-- Ground and Date Selection -->
+            <!-- Number of Players -->
             <div class="grid grid-cols-2 gap-6">
-                <div class="form-group">
-                    <label for="id_ground" class="form-label">Ground Selection</label>
-                    <select name="ground" id="id_ground" class="form-select">
-                        <option value="">Select a ground</option>
-                        <option value="Ground A">Ground A</option>
-                        <option value="Ground B">Ground B</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="id_date" class="form-label">Date</label>
-                    {{ booking_form.date }}
-                </div>
-            </div>
-
-            <!-- Time Slot and Number of Players -->
-            <div class="grid grid-cols-2 gap-6">
-                <div class="form-group">
-                    <label for="id_time_slot" class="form-label">Time Slot</label>
-                    <select name="time_slot" id="id_time_slot" class="form-select">
-                        <option value="">Select time slot</option>
-                        <option value="9.00 - 11.00">9.00 - 11.00</option>
-                        <option value="11.00 - 13.00">11.00 - 13.00</option>
-                        <option value="13.00 - 15.00">13.00 - 15.00</option>
-                        <option value="15.00 - 17.00">15.00 - 17.00</option>
-                        <option value="17.00 - 19.00">17.00 - 19.00</option>
-                    </select>
-                </div>
                 <div class="form-group">
                     <label for="id_number_of_players" class="form-label">Number of Players</label>
                     <select name="number_of_players" id="id_number_of_players" class="form-select">
@@ -127,21 +117,20 @@ document.addEventListener('DOMContentLoaded', function() {
                         <label class="form-label">Branch</label>
                         <select name="player${i}_branch" class="form-select" required>
                             <option value="">Select Branch</option>
-                            <option value="CSE">CSE</option>
-                            <option value="IT">IT</option>
-                            <option value="EXCS">EXCS</option>
+                            <option value="INFT">INFT</option>
+                            <option value="CMPN">CMPN</option>
                             <option value="EXTC">EXTC</option>
-                            <option value="BIOM">BIOM</option>
+                            <option value="EXCS">EXCS</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Year</label>
                         <select name="player${i}_year" class="form-select" required>
                             <option value="">Select Year</option>
-                            <option value="FE">FE</option>
-                            <option value="SE">SE</option>
-                            <option value="TE">TE</option>
-                            <option value="BE">BE</option>
+                            <option value="1st Year">1st Year</option>
+                            <option value="2nd Year">2nd Year</option>
+                            <option value="3rd Year">3rd Year</option>
+                            <option value="4th Year">4th Year</option>
                         </select>
                     </div>
                     <div class="form-group">

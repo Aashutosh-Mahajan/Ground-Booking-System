@@ -6,7 +6,8 @@ from datetime import date, timedelta, datetime
 
 from .forms import BookingForm, PlayerForm
 from .models import Player, Booking
-
+from .models import StudentUser, AdminUser
+from django.contrib import messages
 
 # -------------------- HOME --------------------
 def home(request):
@@ -19,47 +20,48 @@ def student_login(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        # Dummy credentials (replace with Django auth later)
-        if email == 'student@college.edu' and password == 'student123':
-            request.session['student_email'] = email
-            request.session['student_name'] = 'John Doe'
-            return redirect('student_dashboard')
-        else:
-            return render(request, 'booking/student_login.html', {
-                'error': 'Invalid credentials'
-            })
+        try:
+            student = StudentUser.objects.get(email=email)
+            if student.password == password:   # 👉 plain text compare (you can later use hashing)
+                # ✅ store required details in session
+                request.session['student_email'] = student.email
+                request.session['student_name'] = getattr(student, 'name', 'Student')
+                request.session['student_id'] = student.id
 
+                return redirect('student_dashboard')
+            else:
+                messages.error(request, "Invalid password")
+        except StudentUser.DoesNotExist:
+            messages.error(request, "Student not found")
+    
     return render(request, 'booking/student_login.html')
-
-
 def student_logout(request):
     request.session.flush()
     return redirect('home')
 
 
 # -------------------- ADMIN LOGIN --------------------
-HARDCODED_ADMIN = {
-    'username': 'admin',
-    'password': 'admin123'
-}
 
 
 def custom_admin_login(request):
-    if 'is_admin_logged_in' in request.session:
-        del request.session['is_admin_logged_in']
-
     if request.method == "POST":
         username = request.POST.get('email')
         password = request.POST.get('password')
 
-        if username == HARDCODED_ADMIN['username'] and password == HARDCODED_ADMIN['password']:
-            request.session['is_admin_logged_in'] = True
-            return redirect('custom_admin_dashboard')
-        else:
-            return render(request, 'booking/admin_login.html', {'error': 'Invalid credentials'})
+        try:
+            admin = AdminUser.objects.get(username=username)
+
+            # For now assume plain text password (same style as student)
+            if admin.password == password:
+                request.session['is_admin_logged_in'] = True
+                request.session['admin_username'] = admin.username
+                return redirect('custom_admin_dashboard')
+            else:
+                messages.error(request, "Invalid password")
+        except AdminUser.DoesNotExist:
+            messages.error(request, "No admin found with this username")
 
     return render(request, 'booking/admin_login.html')
-
 
 def admin_logout(request):
     request.session.flush()
