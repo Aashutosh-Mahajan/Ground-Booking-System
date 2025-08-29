@@ -1,33 +1,94 @@
-\{% extends 'base.html' %}
-{% load static %}
-{% block title %}Student Dashboard{% endblock %}
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+</head>
+<body>
 
-<!-- Enhanced Navbar (Logo Removed) -->
+<!-- Ultra Enhanced Main Navbar -->
+<nav class="main-navbar">
+    <!-- Animated Background Elements -->
+    <div class="navbar-bg-animation">
+        <div class="floating-orb orb-1"></div>
+        <div class="floating-orb orb-2"></div>
+        <div class="floating-orb orb-3"></div>
+    </div>
+    
+    <div class="main-navbar-container">
+        <!-- Left: Enhanced VIT Logo and SportDeck -->
+        <div class="navbar-left">
+            <div class="vit-logo-enhanced">
+                <div class="vit-logo-circle">
+                    <span class="vit-text-main">VIT</span>
+                    <div class="vit-glow-ring"></div>
+                </div>
+                <div class="vit-text-container">
+                    <div class="vit-title">Vidyalankar Institute</div>
+                    <div class="vit-subtitle">of Technology</div>
+                </div>
+            </div>
+            
+            <div class="separator-line"></div>
+            
+            <div class="sportdeck-enhanced">
+                <div class="sportdeck-icon-container">
+                    <div class="sportdeck-icon">🏟️</div>
+                    <div class="icon-pulse-ring"></div>
+                </div>
+                <div class="sportdeck-text-container">
+                    <span class="sportdeck-main">SportDeck</span>
+                    <span class="sportdeck-tagline">Ground Management System</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right: Premium Navigation Links -->
+<div class="navbar-right">
+    <div class="nav-buttons-container">
+        <a href="{% url 'home' %}" class="nav-button-enhanced home-btn active">
+            <div class="nav-icon">🏠</div>
+            <span>Home</span>
+            <div class="nav-shine"></div>
+        </a>
+        <a href="{% url 'student_dashboard' %}" class="nav-button-enhanced dashboard-btn">
+            <div class="nav-icon">📊</div>
+            <span>Dashboard</span>
+            <div class="nav-shine"></div>
+        </a>
+        <a href="{% url 'student_logout' %}" class="nav-button-enhanced logout-btn">
+            <div class="nav-icon">🚪</div>
+            <span>Logout</span>
+            <div class="nav-shine"></div>
+        </a>
+    </div>
+</div>
+
+
+        
+
+    
+    <!-- Bottom gradient line -->
+    <div class="navbar-bottom-glow"></div>
+</nav>
+
+<!-- Secondary Navbar -->
 <nav class="navbar">
     <div class="navbar-container flex justify-between items-center px-6 py-4">
-
         <!-- Right: Navigation Links -->
         <div class="navbar-links">
-            <a href="{% url 'student_booking' %}" 
-               class="navbar-link {% if request.resolver_match.url_name == 'student_booking' %}active{% endif %}">
-                Booking
-            </a>
-            <a href="{% url 'rules_regulations' %}" 
-               class="navbar-link {% if request.resolver_match.url_name == 'rules_regulations' %}active{% endif %}">
-                Rules & Regulations
-            </a>
-            <a href="{% url 'student_history' %}" 
-               class="navbar-link {% if request.resolver_match.url_name == 'student_history' %}active{% endif %}">
-                History
-            </a>
+            <a href="{% url 'student_booking' %}" class="navbar-link active">Booking</a>
+            <a href="{% url 'rules_regulations' %}" class="navbar-link">Rules & Regulations</a>
+            <a href="{% url 'student_history' %}" class="navbar-link">History</a>
         </div>
     </div>
 </nav>
 
+
 <!-- Page Content -->
 <div class="dashboard-center">
-    <h2 class="welcome-text">Welcome, {{ student_name }}</h2>
+    <h2 class="welcome-text">Welcome, John Doe</h2>
     <p class="welcome-subtext">Here is your dashboard to manage your ground bookings.</p>
 </div>
 
@@ -102,7 +163,6 @@
         </div>
     </div>
     <!-- Ground Booking Form End -->
-
 </div>
 
 <!-- Scripts -->
@@ -203,9 +263,360 @@
     }
 </script>
 
-<!-- Booking Form CSS -->
 <style>
-/* Navbar Styling */
+/* Ultra Enhanced Main Navbar Styling */
+.main-navbar {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 25%, #1565c0 75%, #1e88e5 100%);
+    color: #ffffff;
+    box-shadow: 
+        0 8px 32px rgba(13, 71, 161, 0.4),
+        0 4px 16px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    overflow: hidden;
+    position: relative;
+}
+
+.navbar-bg-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.floating-orb {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.15;
+    animation: float 8s ease-in-out infinite;
+}
+
+.orb-1 {
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, #60a5fa, transparent);
+    top: -60px;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.orb-2 {
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, #a78bfa, transparent);
+    top: -40px;
+    right: 20%;
+    animation-delay: 2s;
+}
+
+.orb-3 {
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, #34d399, transparent);
+    bottom: -50px;
+    right: 5%;
+    animation-delay: 4s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    33% { transform: translateY(-10px) rotate(120deg); }
+    66% { transform: translateY(5px) rotate(240deg); }
+}
+
+.main-navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 3rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+}
+
+.vit-logo-enhanced {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.vit-logo-circle {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 
+        0 8px 32px rgba(255, 255, 255, 0.2),
+        inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    animation: logoGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes logoGlow {
+    0% { box-shadow: 0 8px 32px rgba(255, 255, 255, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.1); }
+    100% { box-shadow: 0 12px 40px rgba(255, 255, 255, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.1); }
+}
+
+.vit-glow-ring {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    animation: ringRotate 4s linear infinite;
+}
+
+@keyframes ringRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.vit-text-main {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #1e3a8a;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.vit-text-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.vit-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    margin-bottom: 0.2rem;
+}
+
+.vit-subtitle {
+    font-size: 1rem;
+    color: #cbd5e1;
+    font-weight: 500;
+}
+
+.separator-line {
+    width: 2px;
+    height: 60px;
+    background: linear-gradient(180deg, transparent 0%, #ffffff 20%, #ffffff 80%, transparent 100%);
+    opacity: 0.4;
+}
+
+.sportdeck-enhanced {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1rem 1.5rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.sportdeck-icon-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sportdeck-icon {
+    font-size: 2rem;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+    animation: iconBounce 2s ease-in-out infinite;
+}
+
+@keyframes iconBounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.icon-pulse-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulseRing 2s ease-in-out infinite;
+}
+
+@keyframes pulseRing {
+    0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+}
+
+.sportdeck-text-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.sportdeck-main {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.sportdeck-tagline {
+    font-size: 0.8rem;
+    color: #e2e8f0;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.nav-buttons-container {
+    display: flex;
+    gap: 1.5rem;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 0.75rem;
+    border-radius: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.nav-button-enhanced {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    text-decoration: none;
+    color: #e2e8f0;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1rem 1.5rem;
+    border-radius: 18px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-width: 100px;
+    overflow: hidden;
+}
+
+.nav-button-enhanced::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.nav-button-enhanced:hover::before {
+    left: 100%;
+}
+
+.nav-icon {
+    font-size: 1.3rem;
+    transition: transform 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.nav-button-enhanced:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: #ffffff;
+}
+
+.nav-button-enhanced:hover .nav-icon {
+    transform: scale(1.2) rotate(5deg);
+}
+
+.nav-button-enhanced.active {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+    color: #1e3a8a;
+    font-weight: 700;
+    box-shadow: 
+        0 8px 25px rgba(255, 255, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.nav-button-enhanced.active .nav-icon {
+    filter: drop-shadow(0 2px 4px rgba(30, 58, 138, 0.3));
+}
+
+.nav-button-enhanced.logout-btn {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border-color: #dc2626;
+    color: #ffffff;
+}
+
+.nav-button-enhanced.logout-btn:hover {
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    box-shadow: 0 12px 30px rgba(239, 68, 68, 0.4);
+    transform: translateY(-3px);
+}
+
+.nav-shine {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 18px;
+}
+
+.nav-button-enhanced:hover .nav-shine {
+    opacity: 1;
+}
+
+.navbar-bottom-glow {
+    height: 4px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        #60a5fa 25%, 
+        #3b82f6 50%, 
+        #2563eb 75%, 
+        transparent 100%);
+    animation: glowPulse 3s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+/* Secondary Navbar Styling */
 .navbar {
     background: linear-gradient(90deg, #0ea5e9 0%, #2563eb 50%, #1e3a8a 100%);
     color: #ffffff;
@@ -217,7 +628,7 @@
 
 .navbar-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     padding: 1rem 1.5rem;
     max-width: 1200px;
@@ -226,7 +637,7 @@
 
 .navbar-links {
     display: flex;
-    gap: 1rem;
+    gap: 2rem;
 }
 
 .navbar-link {
@@ -234,24 +645,31 @@
     text-decoration: none;
     color: #e5edff;
     background: rgba(255, 255, 255, 0.1);
-    padding: 0.5rem 0.9rem;
+    padding: 0.75rem 1.5rem;
     border-radius: 999px;
     transition: all 0.25s ease;
     border: 1px solid rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
+    font-weight: 600;
+    min-width: 140px;
+    text-align: center;
 }
 
 .navbar-link:hover {
     color: #ffffff;
     transform: translateY(-1px);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .navbar-link.active {
     background: #ffffff;
     color: #1e3a8a;
+    font-weight: 700;
 }
+
+/* Rest of the original styling unchanged */
 * {
     margin: 0;
     padding: 0;
@@ -294,7 +712,6 @@ body::after {
 @keyframes floatA { 0%, 100% { transform: translate(0, 0);} 50% { transform: translate(20px, 10px);} }
 @keyframes floatB { 0%, 100% { transform: translate(0, 0);} 50% { transform: translate(-16px, -8px);} }
 
-
 .booking-form {
     max-width: 1100px;
     margin: 2.5rem auto;
@@ -322,7 +739,6 @@ body::after {
     transform: translateY(-2px);
     box-shadow: 0 12px 26px rgba(59, 130, 246, 0.12);
 }
-
 
 .form-section.disabled {
     opacity: 0.5;
@@ -365,7 +781,6 @@ body::after {
     display: inline-block;
     margin-left: 0.5rem;
 }
-
 
 .date-picker input {
     width: 320px;
@@ -567,6 +982,7 @@ body::after {
     box-shadow: 0 14px 32px rgba(16, 185, 129, 0.35);
     filter: brightness(1.05);
 }
+
 .dashboard-center {
     max-width: 900px;
     margin: 3.5rem auto;
@@ -588,17 +1004,197 @@ body::after {
     margin-bottom: 2rem;
 }
 
-/* Responsive Tweaks */
-@media (max-width: 768px) {
-    .navbar-container { padding: 0.9rem 1rem; }
-    .navbar-links { gap: 0.6rem; }
-    .navbar-link { padding: 0.4rem 0.75rem; font-size: 0.95rem; }
-    .booking-form { padding: 1rem; border-radius: 16px; }
-    .grounds-grid { grid-template-columns: 1fr; gap: 1rem; }
-    .summary-grid { grid-template-columns: 1fr; }
-    .date-picker input { width: 100%; }
+/* Enhanced Responsive Design for Main Navbar */
+@media (max-width: 1024px) {
+    .main-navbar-container {
+        padding: 1.2rem 2rem;
+    }
+    
+    .navbar-left {
+        gap: 2rem;
+    }
+    
+    .nav-buttons-container {
+        gap: 1rem;
+    }
+    
+    .nav-button-enhanced {
+        padding: 0.8rem 1.2rem;
+        font-size: 0.85rem;
+        min-width: 85px;
+    }
+    
+    .nav-icon {
+        font-size: 1.1rem;
+    }
+    
+    .vit-logo-circle {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .vit-text-main {
+        font-size: 1.6rem;
+    }
+    
+    .vit-title {
+        font-size: 1.2rem;
+    }
 }
 
+@media (max-width: 768px) {
+    .main-navbar-container {
+        flex-direction: column;
+        gap: 2rem;
+        padding: 2rem 1.5rem;
+    }
+    
+    .navbar-left {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+    
+    .vit-logo-enhanced {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .separator-line {
+        width: 60px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent 0%, #ffffff 20%, #ffffff 80%, transparent 100%);
+    }
+    
+    .sportdeck-enhanced {
+        justify-content: center;
+    }
+    
+    .nav-buttons-container {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .nav-button-enhanced {
+        padding: 0.9rem 1.3rem;
+        min-width: 95px;
+    }
+    
+    .vit-logo-circle {
+        width: 65px;
+        height: 65px;
+    }
+    
+    .vit-text-main {
+        font-size: 1.4rem;
+    }
+    
+    .vit-title {
+        font-size: 1.1rem;
+    }
+    
+    .vit-subtitle {
+        font-size: 0.9rem;
+    }
+    
+    .navbar-container {
+        padding: 0.9rem 1rem;
+    }
+    
+    .navbar-links {
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .navbar-link {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+        min-width: 120px;
+    }
+    
+    .booking-form {
+        padding: 1rem;
+        border-radius: 16px;
+    }
+    
+    .grounds-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .date-picker input {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-navbar-container {
+        padding: 1.5rem 1rem;
+        gap: 1.5rem;
+    }
+    
+    .navbar-left {
+        gap: 1rem;
+    }
+    
+    .vit-logo-enhanced {
+        gap: 0.75rem;
+    }
+    
+    .sportdeck-enhanced {
+        padding: 0.75rem 1rem;
+    }
+    
+    .sportdeck-main {
+        font-size: 1.2rem;
+    }
+    
+    .nav-buttons-container {
+        gap: 0.75rem;
+        padding: 0.75rem;
+    }
+    
+    .nav-button-enhanced {
+        padding: 0.7rem 1rem;
+        font-size: 0.8rem;
+        min-width: 80px;
+    }
+    
+    .nav-icon {
+        font-size: 1rem;
+    }
+    
+    .vit-logo-circle {
+        width: 55px;
+        height: 55px;
+    }
+    
+    .vit-text-main {
+        font-size: 1.2rem;
+    }
+    
+    .vit-title {
+        font-size: 1rem;
+    }
+    
+    .navbar-links {
+        gap: 0.75rem;
+    }
+    
+    .navbar-link {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        min-width: 100px;
+    }
+}
 </style>
 
-{% endblock %}
+</body>
+</html>

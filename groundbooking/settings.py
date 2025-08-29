@@ -77,7 +77,8 @@ WSGI_APPLICATION = 'groundbooking.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=config("DATABASE_URL")
+        default=config("DATABASE_URL"),
+        conn_max_age=0
     )
 }
 
