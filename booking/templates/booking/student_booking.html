@@ -7,7 +7,7 @@
 
         <form method="POST" action="{% url 'student_booking' %}" class="space-y-6">
             {% csrf_token %}
-            
+
             <!-- Student Information -->
             <div class="grid grid-cols-2 gap-6">
                 <div class="form-group">
@@ -19,6 +19,7 @@
                     {{ booking_form.roll_number }}
                 </div>
             </div>
+
             <div class="grid grid-cols-3 gap-6">
                 <div class="form-group">
                     <label for="id_student_branch" class="form-label">Branch</label>
@@ -56,17 +57,9 @@
                 <div class="form-group">
                     <label for="id_number_of_players" class="form-label">Number of Players</label>
                     <select name="number_of_players" id="id_number_of_players" class="form-select">
-                        <option value="1" selected>1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-                        <option value="10">10</option>
-                        <option value="11">11</option>
+                        {% for i in number_options %}
+                        <option value="{{ i }}" {% if i == 1 %}selected{% endif %}>{{ i }}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
@@ -78,23 +71,16 @@
             </div>
 
             <!-- Player Information (Dynamic) -->
-            <div id="players-container" class="space-y-4">
-                <!-- Player forms will be generated here -->
-            </div>
+            <div id="players-container" class="space-y-4"></div>
 
             <button type="submit" class="btn btn-primary btn-full">
                 Submit Booking Request
             </button>
         </form>
-
-        {% if success %}
-            <div class="mt-6 text-green-600 text-center font-semibold">
-                {{ success }}
-            </div>
-        {% endif %}
     </div>
 </div>
 
+<!-- Dynamic Player Form Script -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const numPlayersSelect = document.getElementById('id_number_of_players');
@@ -102,7 +88,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function generatePlayerForms(count) {
         playersContainer.innerHTML = '';
-        
         for (let i = 1; i <= count; i++) {
             const playerForm = document.createElement('div');
             playerForm.className = 'player-form';
@@ -148,18 +133,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Ensure a default of 1 player displayed
-    if (!numPlayersSelect.value) {
-        numPlayersSelect.value = '1';
-    }
-    generatePlayerForms(parseInt(numPlayersSelect.value));
+    // Initialize first player form
+    generatePlayerForms(parseInt(numPlayersSelect.value) || 1);
 
-    // Update player forms when selection changes
     numPlayersSelect.addEventListener('change', function() {
-        const count = parseInt(this.value) || 0;
-        generatePlayerForms(count);
+        generatePlayerForms(parseInt(this.value) || 1);
     });
-
 });
 </script>
+
 {% endblock %}
