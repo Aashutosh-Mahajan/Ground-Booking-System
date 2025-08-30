@@ -21,7 +21,9 @@
         {% if request.session.student_email %}
           <!-- Show only for logged-in students -->
           <a href="{% url 'student_dashboard' %}" class="navbar-link">Dashboard</a>
+          <a href="{% url 'rules_regulations' %}" class="navbar-link">Rules & Regulations</a>
           <a href="{% url 'student_logout' %}" class="navbar-link">Logout</a>
+          
         {% else %}
           <!-- Show Login options if NOT logged in -->
           <a href="{% url 'student_login' %}" class="navbar-link">Student Login</a>
