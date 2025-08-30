@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password
+
+
 class Booking(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
@@ -48,20 +50,21 @@ class Player(models.Model):
         ('C', 'Division C'),
     ]
 
+    # Link each player to a booking
     booking = models.ForeignKey(
         Booking,
         on_delete=models.CASCADE,
-        related_name='players',
-        null=True,   # temporary fix for migration
-        blank=True
+        related_name="players"
     )
+
+    roll_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
     name = models.CharField(max_length=100)
     branch = models.CharField(max_length=50, choices=BRANCH_CHOICES)
     year = models.CharField(max_length=10, choices=YEAR_CHOICES)
     division = models.CharField(max_length=10, choices=DIVISION_CHOICES)
 
     def __str__(self):
-        return f"{self.name} ({self.branch} - {self.year}{self.division})"
+        return f"{self.name} ({self.roll_number} - {self.branch} - {self.year}{self.division})"
 
 
 class AdminUser(models.Model):
@@ -71,17 +74,23 @@ class AdminUser(models.Model):
     def __str__(self):
         return self.username
 
+
 class StudentUser(models.Model):
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=255)  # store hashed password
 
     def __str__(self):
         return self.email
-    
-booking = models.ForeignKey(
-    Booking,
-    on_delete=models.CASCADE,
-    related_name='players',
-    null=True,
-    blank=True
-)
+
+
+class AllotedGroundBooking(models.Model):
+    date = models.DateField()
+    ground = models.CharField(max_length=100)  
+    time_slot = models.CharField(max_length=50)  
+    allotted_to = models.CharField(max_length=100)  
+    roll_number = models.CharField(max_length=20)
+    purpose = models.TextField(blank=True, null=True)
+    players = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.date} | {self.ground} | {self.time_slot}"

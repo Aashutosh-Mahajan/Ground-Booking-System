@@ -1,19 +1,20 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
-from datetime import date, timedelta
+from django.forms import formset_factory
+from django.http import HttpResponse, JsonResponse
+from django.template.loader import render_to_string
+from datetime import date, timedelta, datetime
 
 from .forms import BookingForm, PlayerForm
-from .models import Player, Booking, StudentUser, AdminUser
+from .models import Player, Booking,AllotedGroundBooking
+from .models import StudentUser, AdminUser
 from django.contrib import messages
-from django.views.decorators.csrf import csrf_exempt
-
 
 # -------------------- HOME --------------------
 def home(request):
     return render(request, 'booking/home.html')
 
 
-# -------------------- STUDENT AUTH --------------------
+# -------------------- STUDENT LOGIN --------------------
 def student_login(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -21,33 +22,37 @@ def student_login(request):
 
         try:
             student = StudentUser.objects.get(email=email)
-            if student.password == password:  # plain text for now
+            if student.password == password:   # 👉 plain text compare (you can later use hashing)
+                # ✅ store required details in session
                 request.session['student_email'] = student.email
                 request.session['student_name'] = getattr(student, 'name', 'Student')
                 request.session['student_id'] = student.id
+
                 return redirect('student_dashboard')
             else:
                 messages.error(request, "Invalid password")
         except StudentUser.DoesNotExist:
             messages.error(request, "Student not found")
-
+    
     return render(request, 'booking/student_login.html')
-
-
 def student_logout(request):
     request.session.flush()
     return redirect('home')
 
 
-# -------------------- ADMIN AUTH --------------------
+# -------------------- ADMIN LOGIN --------------------
+
+
 def custom_admin_login(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         username = request.POST.get('email')
         password = request.POST.get('password')
 
         try:
             admin = AdminUser.objects.get(username=username)
-            if admin.password == password:  # plain text
+
+            # For now assume plain text password (same style as student)
+            if admin.password == password:
                 request.session['is_admin_logged_in'] = True
                 request.session['admin_username'] = admin.username
                 return redirect('custom_admin_dashboard')
@@ -58,32 +63,61 @@ def custom_admin_login(request):
 
     return render(request, 'booking/admin_login.html')
 
-
 def admin_logout(request):
     request.session.flush()
     return redirect('admin_login')
 
 
 # -------------------- ADMIN DASHBOARD --------------------
+# --------------------------
+# Admin Dashboard
+# --------------------------
 def custom_admin_dashboard(request):
     if not request.session.get('is_admin_logged_in'):
         return redirect('admin_login')
 
+    # Fetch from DB
+    all_bookings = Booking.objects.all().order_by('-created_at')
+    pending_bookings = Booking.objects.filter(status='Pending').order_by('-created_at')
+    approved_bookings = Booking.objects.filter(status='Approved').order_by('-created_at')
+    allotments = AllotedGroundBooking.objects.all().order_by('-date')
+
     context = {
-        'all_bookings': Booking.objects.all().order_by('-created_at'),
-        'pending_bookings': Booking.objects.filter(status='Pending').order_by('-created_at'),
-        'approved_bookings': Booking.objects.filter(status='Approved').order_by('-created_at'),
+        'all_bookings': all_bookings,
+        'pending_bookings': pending_bookings,
+        'approved_bookings': approved_bookings,
+        'allotments': allotments,
     }
     return render(request, 'booking/admin_dashboard.html', context)
 
-
+def get_booking_players(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+    players = Player.objects.filter(booking=booking)
+    return render(request, 'booking/admin_dashboard.html', {'booking': booking, 'players': players})
+# --------------------------
+# Approve Booking → Move to AllotedGroundBooking
+# --------------------------
 def approve_booking(request, roll_no):
     booking = get_object_or_404(Booking, roll_number=roll_no)
     booking.status = 'Approved'
     booking.save()
+
+    # Create entry in AllotedGroundBooking if not already there
+    AllotedGroundBooking.objects.get_or_create(
+        ground=booking.ground,
+        date=booking.date,
+        time_slot=booking.time_slot,
+        allotted_to=booking.student_name,
+        purpose=booking.purpose,
+        players=booking.number_of_players,
+    )
+
     return redirect('custom_admin_dashboard')
 
 
+# --------------------------
+# Reject Booking
+# --------------------------
 def reject_booking(request, roll_no):
     booking = get_object_or_404(Booking, roll_number=roll_no)
     booking.status = 'Rejected'
@@ -91,58 +125,56 @@ def reject_booking(request, roll_no):
     return redirect('custom_admin_dashboard')
 
 
-def create_sample_data(request):
-    if not request.session.get('is_admin_logged_in'):
-        return redirect('admin_login')
-
-    if Booking.objects.count() == 0:
-        # Sample bookings
-        Booking.objects.bulk_create([
-            Booking(student_name="John Smith", roll_number="CS2021001", ground="Ground A",
-                    date=date.today() + timedelta(days=1), time_slot="9.00 - 11.00",
-                    purpose="Football practice", number_of_players=8, status="Pending"),
-            Booking(student_name="Sarah Johnson", roll_number="EE2021045", ground="Ground B",
-                    date=date.today() + timedelta(days=2), time_slot="15.00 - 17.00",
-                    purpose="Basketball preparation", number_of_players=10, status="Approved"),
-            Booking(student_name="Mike Wilson", roll_number="ME2021078", ground="Ground A",
-                    date=date.today() + timedelta(days=3), time_slot="13.00 - 15.00",
-                    purpose="Cricket practice", number_of_players=11, status="Pending")
-        ])
-        # Sample players
-        Player.objects.bulk_create([
-            Player(name="John Smith", branch="CSE", year="TE", division="A"),
-            Player(name="Sarah Johnson", branch="EE", year="SE", division="B"),
-            Player(name="Mike Wilson", branch="ME", year="BE", division="C")
-        ])
-
-    return redirect('custom_admin_dashboard')
-
-
 # -------------------- STUDENT BOOKING --------------------
 def student_booking(request):
-    number_options = range(1, 6)  # adjust max players
     if request.method == 'POST':
         booking_form = BookingForm(request.POST)
+
         if booking_form.is_valid():
-            # Save the booking
-            booking_form.save()
-            # Redirect to success page
+            ground = booking_form.cleaned_data['ground']
+            date_selected = booking_form.cleaned_data['date']
+            time_slot = booking_form.cleaned_data['time_slot']
+
+            # Check for double booking
+            clash = Booking.objects.filter(
+                ground=ground,
+                date=date_selected,
+                time_slot=time_slot,
+                status__in=["Pending", "Approved"]
+            ).exists()
+
+            if clash:
+                return render(request, 'booking/student_booking.html', {
+                    'booking_form': booking_form,
+                    'error': f"❌ Slot already booked for {ground} on {date_selected} at {time_slot}"
+                })
+
+            booking = booking_form.save(commit=False)
+            booking.student_email = request.session.get('student_email')
+            booking.save()
+
+            # Save players
+            num_players = int(request.POST.get('number_of_players', 1))
+            for i in range(1, num_players + 1):
+                player_name = request.POST.get(f'player{i}_name')
+                player_branch = request.POST.get(f'player{i}_branch')
+                player_year = request.POST.get(f'player{i}_year')
+                player_division = request.POST.get(f'player{i}_division')
+                if player_name and player_branch and player_year and player_division:
+                    Player.objects.create(
+                        name=player_name,
+                        branch=player_branch,
+                        year=player_year,
+                        division=player_division
+                    )
+
             return redirect('booking_success')
     else:
         booking_form = BookingForm()
 
-    return render(request, 'booking/booking_success.html', {
+    return render(request, 'booking/student_booking.html', {
         'booking_form': booking_form,
-        'number_options': number_options
     })
-
-
-def booking_success(request):
-    """
-    Display booking success modal.
-    The "Book Another Ground" button links back to 'student_booking'.
-    """
-    return render(request, 'booking/booking_success.html')
 
 
 def booking_success(request):
@@ -155,12 +187,26 @@ def student_dashboard(request):
     if not student_email:
         return redirect('student_login')
 
+    student_name = request.session.get('student_name', 'Student')
+
+    # Fetch student's past bookings
     bookings = Booking.objects.filter(student_email=student_email).order_by('-date')
+
     return render(request, 'booking/student_dashboard.html', {
-        'student_name': request.session.get('student_name', 'Student'),
+        'student_name': student_name,
         'student_email': student_email,
         'bookings': bookings,
     })
+
+
+# -------------------- STUDENT HISTORY --------------------
+def student_history(request):
+    student_email = request.session.get('student_email')
+    if not student_email:
+        return redirect('student_login')
+
+    history = Booking.objects.filter(student_email=student_email).order_by('-date')
+    return render(request, 'booking/student_history.html', {'history': history})
 
 
 # -------------------- RULES --------------------
@@ -177,18 +223,23 @@ def check_availability(request):
     availability = []
 
     if ground and date_selected:
-        booked_slots = Booking.objects.filter(
+        bookings = Booking.objects.filter(
             ground=ground, date=date_selected, status__in=["Pending", "Approved"]
         ).values_list('time_slot', flat=True)
+
         for slot in time_slots:
-            availability.append({"time": slot, "status": "booked" if slot in booked_slots else "available"})
+            if slot in bookings:
+                availability.append({"time": slot, "status": "booked"})
+            else:
+                availability.append({"time": slot, "status": "available"})
     else:
         for slot in time_slots:
             availability.append({"time": slot, "status": "freeze"})
 
     return JsonResponse({'availability': availability})
 
-
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def get_slots(request):
     date_selected = request.GET.get("date")
@@ -204,6 +255,9 @@ def get_slots(request):
             time_slot=slot,
             status__in=["Pending", "Approved"]
         ).exists()
-        slots.append({"time": slot, "status": "booked" if booked else "available"})
+        slots.append({
+            "time": slot,
+            "status": "booked" if booked else "available"
+        })
 
     return JsonResponse({"slots": slots})
