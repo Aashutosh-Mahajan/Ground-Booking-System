@@ -151,6 +151,14 @@ h1, h2, h3, h4, h5, h6 {
     z-index: 50;
 }
 
+.navbar-secondary {
+    background-color: #ffffff;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 4rem;
+    z-index: 80; 
+}
+
 .navbar-container {
     max-width: 80rem;
     margin: 0 auto;
