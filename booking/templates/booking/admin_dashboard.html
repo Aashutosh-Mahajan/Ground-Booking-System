@@ -121,6 +121,7 @@
                             <td class="px-6 py-4">{{ allot.ground }}</td>
                             <td class="px-6 py-4">{{ allot.time_slot }}</td>
                             <td class="px-6 py-4">{{ allot.allotted_to }}</td>
+                            <td class="px-6 py-4">{{ allot.roll_number }}</td>
                             <td class="px-6 py-4">{{ allot.purpose }}</td>
                             <td class="px-6 py-4">
     {{ allot.players }}
@@ -148,30 +149,34 @@
             
         </div>
     </div>
-   <div id="players-dialog" class="z-50 hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-4">
+  <!-- Players Modal -->
+<!-- Players Dialog Box -->
+<div id="players-dialog"
+    class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+    <div id="players-dialog-box"
+         class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-4 transform scale-95 opacity-0 transition-all duration-300">
+        
         <!-- Header -->
-       <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
             <h3 id="players-dialog-title" class="text-lg font-semibold text-gray-800">Players</h3>
-            <button class="text-gray-500 hover:text-gray-700" onclick="closePlayersDialog()">✕</button>
+            <button class="text-gray-500 hover:text-gray-700 text-2xl" onclick="closePlayersDialog()">✕</button>
         </div>
-        <!-- Table -->
-        <div class="p-6">
+
+        <!-- Table Section -->
+        <div class="p-6 max-h-[65vh] overflow-y-auto">
             <div class="overflow-x-auto">
                 <table class="min-w-full border divide-y divide-gray-200 rounded-lg overflow-hidden">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">#</th>
-                            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
-                            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Roll No</th>
-                            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Branch</th>
-                            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Year</th>
-                            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Division</th>
-                            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Notes</th>
+                            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">#</th>
+                            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Name</th>
+                            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Branch</th>
+                            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Year</th>
+                            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Division</th>
                         </tr>
                     </thead>
                     <tbody id="players-dialog-body" class="bg-white divide-y divide-gray-200">
-                        <!-- rows injected dynamically -->
+                        <!-- Data will be added dynamically -->
                     </tbody>
                 </table>
             </div>
@@ -179,88 +184,91 @@
 
         <!-- Footer -->
         <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
-            <button class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow-md transition" onclick="closePlayersDialog()">Close</button>
+            <button class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow-md transition"
+                onclick="closePlayersDialog()">Close</button>
         </div>
     </div>
 </div>
 
+
     <script>
-function openPlayersDialog(players, bookingRoll, totalPlayers) {
-    // set dialog title dynamically
-    document.getElementById("players-dialog-title").innerText =
-        `Players for ${bookingRoll} (Total: ${totalPlayers})`;
+    // Open dialog
+    function openPlayersDialog() {
+        const dialog = document.getElementById("players-dialog");
+        const box = document.getElementById("players-dialog-box");
 
-    // clear old rows
-    const tbody = document.getElementById("players-dialog-body");
-    tbody.innerHTML = "";
+        dialog.classList.remove("hidden");
+        setTimeout(() => {
+            box.classList.remove("scale-95", "opacity-0");
+            box.classList.add("scale-100", "opacity-100");
+        }, 20);
+    }
 
-    // inject player rows (including Notes column)
-    players.forEach((player, idx) => {
-        tbody.innerHTML += `
-            <tr>
-                <td class="px-4 py-2">${idx + 1}</td>
-                <td class="px-4 py-2">${player.name}</td>
-                <td class="px-4 py-2">${player.roll_number}</td>
-                <td class="px-4 py-2">${player.branch}</td>
-                <td class="px-4 py-2">${player.year}</td>
-                <td class="px-4 py-2">${player.division}</td>
-                <td class="px-4 py-2">${player.notes || ''}</td>
-            </tr>
-        `;
+    // Close dialog
+    function closePlayersDialog() {
+        const dialog = document.getElementById("players-dialog");
+        const box = document.getElementById("players-dialog-box");
+
+        box.classList.remove("scale-100", "opacity-100");
+        box.classList.add("scale-95", "opacity-0");
+
+        setTimeout(() => {
+            dialog.classList.add("hidden");
+        }, 200);
+    }
+
+    // Fetch players for a booking
+    function fetchPlayers(bookingId) {
+        fetch(`/get-players/${bookingId}/`)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById("players-dialog-body");
+                tbody.innerHTML = "";
+
+                if (data.players.length > 0) {
+                    data.players.forEach((p, index) => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td class="px-4 py-2 text-sm text-gray-700">${index + 1}</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">${p.name}</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">${p.branch}</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">${p.year}</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">${p.division}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="px-4 py-4 text-center text-gray-500">
+                                No players found
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                openPlayersDialog();
+            })
+            .catch(err => {
+                console.error("Error loading players:", err);
+                alert("Failed to load players.");
+            });
+    }
+
+    // Attach click listeners to all "Show Players" buttons
+    document.querySelectorAll(".show-players-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const bookingId = btn.dataset.id;  // read from data-id
+            fetchPlayers(bookingId);
+        });
     });
 
-    // show dialog
-    const dialog = document.getElementById("players-dialog");
-    dialog.classList.remove("hidden");
-}
-
-function closePlayersDialog() {
-    const dialog = document.getElementById('players-dialog');
-    dialog.classList.add('hidden');   // only toggle hidden
-}
-
-function fetchPlayers(bookingId, bookingRoll, totalPlayers) {
-    fetch(`/get-players/${bookingId}/`) // Django JSON view
-        .then(response => response.json())
-        .then(data => {
-            openPlayersDialog(data.players, bookingRoll, totalPlayers);
-        })
-        .catch(error => console.error('Error:', error));
-}
-
-// Close on backdrop click
-document.addEventListener('click', (e) => {
-    const dialog = document.getElementById('players-dialog');
-    if (!dialog.classList.contains('hidden') && e.target === dialog) {
-        closePlayersDialog();
-    }
-});
-
-function markProcessed(action, buttonEl) {
-    const row = buttonEl.closest('tr');
-    if (!row) return;
-    const statusCell = row.querySelector('td:nth-child(8)');
-    const actionsCell = row.querySelector('td:nth-child(9)');
-
-    if (statusCell) {
-        if (action === 'approved') {
-            statusCell.innerHTML = '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Approved</span>';
-        } else {
-            statusCell.innerHTML = '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Rejected</span>';
+    // Close dialog when clicking outside the box
+    document.getElementById("players-dialog").addEventListener("click", (e) => {
+        if (e.target.id === "players-dialog") {
+            closePlayersDialog();
         }
-    }
-    if (actionsCell) {
-        actionsCell.innerHTML = '<span class="text-sm text-gray-500">Already processed</span>';
-    }
-}
-document.querySelectorAll('.show-players-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        fetchPlayers(
-            btn.dataset.id,
-            btn.dataset.roll,
-            btn.dataset.players
-        );
     });
-});
-    </script>
+</script>
+
 {% endblock %}

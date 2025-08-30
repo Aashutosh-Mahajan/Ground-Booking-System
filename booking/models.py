@@ -10,8 +10,11 @@ class Booking(models.Model):
     ]
 
     student_name = models.CharField(max_length=100)
-    student_email = models.EmailField(blank=True, null=True)
-    roll_number = models.CharField(max_length=20, unique=True)
+    student_branch = models.CharField(max_length=50, blank=True, null=True)  # new
+    student_year = models.CharField(max_length=20, blank=True, null=True)    # new
+    student_division = models.CharField(max_length=10, blank=True, null=True) # new
+    roll_number = models.CharField(max_length=20, blank=True, null=True)
+
     ground = models.CharField(max_length=100)
     date = models.DateField()
     time_slot = models.CharField(max_length=50)
@@ -26,7 +29,6 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"{self.student_name} - {self.ground} - {self.date}"
-
 
 class Player(models.Model):
     BRANCH_CHOICES = [
@@ -50,21 +52,19 @@ class Player(models.Model):
         ('C', 'Division C'),
     ]
 
-    # Link each player to a booking
     booking = models.ForeignKey(
         Booking,
         on_delete=models.CASCADE,
         related_name="players"
     )
 
-    roll_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
     name = models.CharField(max_length=100)
     branch = models.CharField(max_length=50, choices=BRANCH_CHOICES)
     year = models.CharField(max_length=10, choices=YEAR_CHOICES)
     division = models.CharField(max_length=10, choices=DIVISION_CHOICES)
 
     def __str__(self):
-        return f"{self.name} ({self.roll_number} - {self.branch} - {self.year}{self.division})"
+        return f"{self.name} ({self.branch} - {self.year}{self.division})"
 
 
 class AdminUser(models.Model):

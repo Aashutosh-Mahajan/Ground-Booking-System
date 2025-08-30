@@ -1,13 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}student_dashboard{% endblock %}
+{% block title %}Student Dashboard{% endblock %}
+
 {% block content %}
 
-
-
-<!-- Page Content -->
 <div class="dashboard-center">
-    <h2 class="welcome-text">Welcome, John Doe</h2>
+    <h2 class="welcome-text">Welcome, {{ student_email|default:"Student" }}</h2>
     <p class="welcome-subtext">Here is your dashboard to manage your ground bookings.</p>
 </div>
 
@@ -15,11 +13,10 @@
   <div class="note-content">
     <div class="note-accent"></div>
     <p class="note-text">
-      <p class="note-text-red">NOTE :</p> KNOW YOUR GROUND AVAILABILITY ACCORDING TO YOUR TIME,SPORT AND GROUND.
+      <span class="note-text-red">NOTE :</span> KNOW YOUR GROUND AVAILABILITY ACCORDING TO YOUR TIME, SPORT, AND GROUND.
     </p>
   </div>
 </div>
-
 
 <div>
     <!-- Ground Booking Form Start -->
@@ -36,14 +33,14 @@
         <div class="form-section disabled" id="groundSection">
             <h2 class="section-title">🏟️ Choose Ground</h2>
             <div class="grounds-grid">
-                <div class="ground-card" onclick="selectGround('A')">
+                <div class="ground-card" onclick="selectGround('A', event)">
                     <div class="ground-title">Ground A</div>
                     <div class="sports-list">
                         <span class="sport-tag">⚽ Football</span>
                         <span class="sport-tag">🤸 Kabaddi</span>
                     </div>
                 </div>
-                <div class="ground-card" onclick="selectGround('B')">
+                <div class="ground-card" onclick="selectGround('B', event)">
                     <div class="ground-title">Ground B</div>
                     <div class="sports-list">
                         <span class="sport-tag">🏏 Cricket</span>
@@ -91,138 +88,137 @@
             </button>
         </div>
     </div>
-    <!-- Ground Booking Form End -->
 </div>
 
-<!-- Scripts -->
-    <script>
-    let bookingData = { date: '', ground: '', sport: '', timeSlot: '' };
+<script>
+let bookingData = { date: '', ground: '', sport: '', timeSlot: '' };
 
-    const groundSports = {
-        'A': [{ name: 'Football', icon: '⚽' }, { name: 'Kabaddi', icon: '🤸' }],
-        'B': [{ name: 'Cricket', icon: '🏏' }, { name: 'Basketball', icon: '🏀' }, { name: 'Athletics', icon: '🏃' }]
-    };
+const groundSports = {
+    'A': [{ name: 'Football', icon: '⚽' }, { name: 'Kabaddi', icon: '🤸' }],
+    'B': [{ name: 'Cricket', icon: '🏏' }, { name: 'Basketball', icon: '🏀' }, { name: 'Athletics', icon: '🏃' }]
+};
 
-    // Separate time slots for each ground, but same range (7 AM to 6 PM)
-    const groundTimeSlots = {
-        'A': [
-            '07:00 - 08:00', '08:00 - 09:00',
-            '09:00 - 10:00', '10:00 - 11:00',
-            '11:00 - 12:00', '12:00 - 13:00',
-            '13:00 - 14:00', '14:00 - 15:00',
-            '15:00 - 16:00', '16:00 - 17:00',
-            '17:00 - 18:00'
-        ],
-        'B': [
-            '07:00 - 08:00', '08:00 - 09:00',
-            '09:00 - 10:00', '10:00 - 11:00',
-            '11:00 - 12:00', '12:00 - 13:00',
-            '13:00 - 14:00', '14:00 - 15:00',
-            '15:00 - 16:00', '16:00 - 17:00',
-            '17:00 - 18:00'
-        ]
-    };
+// Set minimum date to today
+document.getElementById('dateInput').min = new Date().toISOString().split('T')[0];
 
-    // Set minimum date to today
-    document.getElementById('dateInput').min = new Date().toISOString().split('T')[0];
+document.getElementById('dateInput').addEventListener('change', function () {
+    bookingData.date = this.value;
+    if (this.value) {
+        document.getElementById('groundSection').classList.remove('disabled');
+    } else {
+        document.getElementById('groundSection').classList.add('disabled');
+        document.getElementById('sportsSection').classList.add('disabled');
+        document.getElementById('timeSection').classList.add('disabled');
+        resetSelections();
+    }
+    updateSummary();
+});
 
-    document.getElementById('dateInput').addEventListener('change', function () {
-        bookingData.date = this.value;
-        if (this.value) {
-            document.getElementById('groundSection').classList.remove('disabled');
-        } else {
-            document.getElementById('groundSection').classList.add('disabled');
-            document.getElementById('sportsSection').classList.add('disabled');
-            document.getElementById('timeSection').classList.add('disabled');
-            resetSelections();
-        }
-        updateSummary();
+function selectGround(ground, event) {
+    bookingData.ground = ground;
+    bookingData.sport = '';
+    bookingData.timeSlot = '';
+
+    document.querySelectorAll('.ground-card').forEach(c => c.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+
+    document.getElementById('sportsSection').classList.remove('disabled');
+    populateSports(ground);
+
+    document.getElementById('timeSection').classList.remove('disabled');
+    fetchAvailability(ground);
+
+    document.querySelectorAll('.sport-option, .time-slot').forEach(el => el.classList.remove('selected'));
+
+    updateSummary();
+}
+
+function populateSports(ground) {
+    const grid = document.getElementById('sportsGrid');
+    grid.innerHTML = '';
+    groundSports[ground].forEach(s => {
+        const btn = document.createElement('button');
+        btn.className = 'sport-option';
+        btn.innerHTML = `${s.icon} ${s.name}`;
+        btn.onclick = (e) => selectSport(s.name, e);
+        grid.appendChild(btn);
     });
+}
 
-    function selectGround(ground) {
-        bookingData.ground = ground;
-        bookingData.sport = '';
-        bookingData.timeSlot = '';
+function selectSport(sport, event) {
+    bookingData.sport = sport;
+    document.querySelectorAll('.sport-option').forEach(o => o.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    updateSummary();
+}
 
-        document.querySelectorAll('.ground-card').forEach(c => c.classList.remove('selected'));
-        event.target.closest('.ground-card').classList.add('selected');
+async function fetchAvailability(ground) {
+    const dateInput = document.getElementById('dateInput');
+    const date = dateInput ? dateInput.value : null;
 
-        document.getElementById('sportsSection').classList.remove('disabled');
-        populateSports(ground);
+    if (!date) { alert("Please select a date first!"); return; }
 
-        document.getElementById('timeSection').classList.remove('disabled');
-        populateTimeSlots(ground);
+    try {
+        const res = await fetch("{% url 'check_availability' %}?date=" + date + "&ground=" + ground);
+        const data = await res.json();
 
-        document.querySelectorAll('.sport-option, .time-slot').forEach(el => el.classList.remove('selected'));
-        updateSummary();
-    }
-
-    function populateSports(ground) {
-        const grid = document.getElementById('sportsGrid');
-        grid.innerHTML = '';
-        groundSports[ground].forEach(s => {
-            const btn = document.createElement('button');
-            btn.className = 'sport-option';
-            btn.innerHTML = `${s.icon} ${s.name}`;
-            btn.onclick = () => selectSport(s.name);
-            grid.appendChild(btn);
-        });
-    }
-
-    function selectSport(sport) {
-        bookingData.sport = sport;
-        document.querySelectorAll('.sport-option').forEach(o => o.classList.remove('selected'));
-        event.target.classList.add('selected');
-        updateSummary();
-    }
-
-    function populateTimeSlots(ground) {
         const grid = document.getElementById('slotsGrid');
         grid.innerHTML = '';
 
-        groundTimeSlots[ground].forEach(slot => {
+        data.slots.forEach(slot => {
             const div = document.createElement('div');
             div.className = 'time-slot';
-            div.textContent = slot;
+            div.textContent = slot.time;
 
-            if (Math.random() < 0.25) { // Random booked slots for demo
+            if (slot.status === "booked") {
                 div.classList.add('booked');
                 div.title = 'This slot is already booked';
+            } else if (slot.status === "available") {
+                div.classList.add('available');
+                div.onclick = (e) => selectTimeSlot(slot.time, e);
             } else {
-                div.onclick = () => selectTimeSlot(slot);
+                div.classList.add('disabled');
+                div.title = 'Unavailable';
             }
 
             grid.appendChild(div);
         });
-    }
 
-    function selectTimeSlot(slot) {
-        bookingData.timeSlot = slot;
-        document.querySelectorAll('.time-slot:not(.booked)').forEach(s => s.classList.remove('selected'));
-        event.target.classList.add('selected');
-        updateSummary();
-    }
+    } catch (error) { console.error("Error fetching slots:", error); }
+}
 
-    function resetSelections() {
-        bookingData = { date: '', ground: '', sport: '', timeSlot: '' };
-        document.querySelectorAll('.ground-card,.sport-option,.time-slot').forEach(el => el.classList.remove('selected'));
-    }
+function selectTimeSlot(slot, event) {
+    bookingData.timeSlot = slot;
+    document.querySelectorAll('.time-slot:not(.booked)').forEach(s => s.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    updateSummary();
+}
 
-    function updateSummary() {
-        document.getElementById('summaryDate').textContent = bookingData.date ? new Date(bookingData.date).toDateString() : 'Not selected';
-        document.getElementById('summaryGround').textContent = bookingData.ground ? `Ground ${bookingData.ground}` : 'Not selected';
-        document.getElementById('summarySport').textContent = bookingData.sport || 'Not selected';
-        document.getElementById('summaryTime').textContent = bookingData.timeSlot || 'Not selected';
-        document.getElementById('confirmBtn').disabled = !(bookingData.date && bookingData.ground && bookingData.sport && bookingData.timeSlot);
-    }
+function resetSelections() {
+    bookingData = { date: '', ground: '', sport: '', timeSlot: '' };
+    document.querySelectorAll('.ground-card,.sport-option,.time-slot').forEach(el => el.classList.remove('selected'));
+}
 
-    function confirmBooking() {
-        if (bookingData.date && bookingData.ground && bookingData.sport && bookingData.timeSlot) {
-            window.location.href = "{% url 'student_booking' %}";
-        }
+function updateSummary() {
+    document.getElementById('summaryDate').textContent = bookingData.date ? new Date(bookingData.date).toDateString() : 'Not selected';
+    document.getElementById('summaryGround').textContent = bookingData.ground ? `Ground ${bookingData.ground}` : 'Not selected';
+    document.getElementById('summarySport').textContent = bookingData.sport || 'Not selected';
+    document.getElementById('summaryTime').textContent = bookingData.timeSlot || 'Not selected';
+    document.getElementById('confirmBtn').disabled = !(bookingData.date && bookingData.ground && bookingData.sport && bookingData.timeSlot);
+}
+
+function confirmBooking() {
+    if (bookingData.date && bookingData.ground && bookingData.sport && bookingData.timeSlot) {
+        // Redirect to booking page with query params
+        const params = new URLSearchParams({
+            date: bookingData.date,
+            ground: bookingData.ground,
+            sport: bookingData.sport,
+            time_slot: bookingData.timeSlot
+        }).toString();
+        window.location.href = `{% url 'student_booking' %}?${params}`;
     }
+}
 </script>
 
-</body>
-</html>
 {% endblock %}
