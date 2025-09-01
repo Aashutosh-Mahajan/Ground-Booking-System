@@ -10,6 +10,7 @@ class Booking(models.Model):
     ]
 
     student_name = models.CharField(max_length=100)
+    student_email = models.EmailField()
     student_branch = models.CharField(max_length=50, blank=True, null=True)  # new
     student_year = models.CharField(max_length=20, blank=True, null=True)    # new
     student_division = models.CharField(max_length=10, blank=True, null=True) # new

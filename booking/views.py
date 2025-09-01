@@ -9,6 +9,9 @@ from .models import Player, Booking,AllotedGroundBooking
 from .models import StudentUser, AdminUser
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
+from django.core.mail import send_mail
+from django.conf import settings
+
 # -------------------- HOME --------------------
 def home(request):
     return render(request, 'booking/home.html')
@@ -131,8 +134,18 @@ def approve_booking(request, booking_id):
         purpose=booking.purpose,
         players=booking.number_of_players,
     )
-
+    send_mail(
+        subject=f'Ground Booking Approved for {booking.ground}',
+        message=f'Hello {booking.student_name},\n\n'
+                f'Your booking for the ground "{booking.ground}" on {booking.date} '
+                f'during "{booking.time_slot}" has been approved.\n\n'
+                f'Thank you!',
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[booking.student_email],
+        fail_silently=False,
+    )
     return redirect('custom_admin_dashboard')
+
 def get_allotment_players(request, allot_id):
     allotment = get_object_or_404(AllotedGroundBooking, id=allot_id)
     players = allotment.booking.players.all()  # 👈 works now!
@@ -152,6 +165,17 @@ def reject_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
     booking.status = 'Rejected'
     booking.save()
+
+    send_mail(
+        subject=f'Ground Booking Rejected for {booking.ground}',
+        message=f'Hello {booking.student_name},\n\n'
+                f'Your booking for the ground "{booking.ground}" on {booking.date} '
+                f'during "{booking.time_slot}" has been rejected.\n\n'
+                f'Please contact admin for details.',
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[booking.student_email],
+        fail_silently=False,
+    )
     return redirect('custom_admin_dashboard')
 
 # -------------------- STUDENT BOOKING --------------------
@@ -165,6 +189,7 @@ def student_booking(request):
 
             # Assign student info from form
             booking.student_name = request.POST.get("student_name")
+            booking.student_email = request.POST.get("student_email")
             booking.student_branch = request.POST.get("student_branch")
             booking.student_year = request.POST.get("student_year")
             booking.student_division = request.POST.get("student_division")

@@ -8,6 +8,7 @@ class BookingForm(forms.ModelForm):
         model = Booking
         fields = [
             'student_name',
+            'student_email',
             'roll_number',
             'ground',
             'date',
@@ -19,6 +20,10 @@ class BookingForm(forms.ModelForm):
             'student_name': forms.TextInput(attrs={
                 'class': 'form-input',
                 'placeholder': 'Enter your full name'
+            }),
+            'student_email': forms.EmailInput(attrs={  
+                'class': 'form-input',
+                'placeholder': 'Enter your email address'
             }),
             'roll_number': forms.TextInput(attrs={
                 'class': 'form-input',
