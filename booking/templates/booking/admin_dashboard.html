@@ -72,21 +72,26 @@
         Show Players
     </button>
 </td>
-                            <td class="px-6 py-4">
-                                {% if booking.status == "Approved" %}
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Approved</span>
-                                {% elif booking.status == "Rejected" %}
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Rejected</span>
-                                {% else %}
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
-                                {% endif %}
-                                
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
-                                <a href="{% url 'approve_booking' booking.id %}" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs">Approve</a>
-                                <a href="{% url 'reject_booking' booking.id %}" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">Reject</a>
-                            </td>
-                        </tr>
+                           <td class="px-6 py-4">
+    {% if booking.status == "Approved" %}
+        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Approved</span>
+    {% elif booking.status == "Rejected" %}
+        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Rejected</span>
+    {% else %}
+        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+    {% endif %}
+</td>
+
+<td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+    {% if booking.status == "Pending" %}
+        <a href="{% url 'approve_booking' booking.id %}" 
+           class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs">Approve</a>
+        <a href="{% url 'reject_booking' booking.id %}" 
+           class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">Reject</a>
+    {% else %}
+        <span class="text-gray-500 text-xs italic">Action taken</span>
+    {% endif %}
+</td>
                         {% empty %}
                         <tr>
                             <td colspan="9" class="px-6 py-4 text-center text-gray-500">No booking requests found</td>
