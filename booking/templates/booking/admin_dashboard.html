@@ -1,38 +1,39 @@
 {% extends 'base.html' %}
 {% block title %}Admin Dashboard{% endblock %}
 {% block content %}
-<div id="admin-dashboard-page" class="page-content">
-        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-            <!-- Dashboard Header -->
-            <div class="flex justify-between items-center mb-8">
-                <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-            </div>
+<div id="admin-dashboard-page" class="page-content relative z-0">
+    <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
 
-            <!-- Filter Bar -->
-            <div class="bg-white rounded-lg shadow p-6 mb-8">
-                <h3 class="text-lg font-semibold mb-4">Filter Bookings</h3>
-                <div class="grid md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Date</label>
-                        <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Ground</label>
-                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
-                            <option value="">All Grounds</option>
-                            <option value="Ground A">Ground A</option>
-                            <option value="Ground B">Ground B</option>
-                        </select>
-                    </div>
-                    <div class="flex items-end">
-                        <button class="bg-secondary hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors">
-                            Apply Filter
-                        </button>
-                    </div>
+        <!-- Dashboard Header -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <h3 class="text-lg font-semibold mb-4">Filter Bookings</h3>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Date</label>
+                    <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Ground</label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="">All Grounds</option>
+                        <option value="Ground A">Ground A</option>
+                        <option value="Ground B">Ground B</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button class="bg-secondary hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors">
+                        Apply Filter
+                    </button>
                 </div>
             </div>
+        </div>
 
-            <!-- Booking Requests Table -->
+        <!-- Booking Requests Table -->
         <div class="bg-white rounded-lg shadow overflow-hidden mb-10">
             <div class="px-6 py-4 border-b border-gray-200">
                 <h3 class="text-lg font-semibold">Booking Requests</h3>
@@ -41,16 +42,15 @@
                 <table class="min-w-full divide-y divide-gray-200" style="min-width: 1100px;">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Roll No</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ground</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time Slot</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Purpose</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Players</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                            
+                            <th class="px-6 py-3">Name</th>
+                            <th class="px-6 py-3">Roll No</th>
+                            <th class="px-6 py-3">Ground</th>
+                            <th class="px-6 py-3">Date</th>
+                            <th class="px-6 py-3">Time Slot</th>
+                            <th class="px-6 py-3">Purpose</th>
+                            <th class="px-6 py-3">Players</th>
+                            <th class="px-6 py-3">Status</th>
+                            <th class="px-6 py-3">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -62,36 +62,35 @@
                             <td class="px-6 py-4">{{ booking.date }}</td>
                             <td class="px-6 py-4">{{ booking.time_slot }}</td>
                             <td class="px-6 py-4">{{ booking.purpose }}</td>
-<td class="px-6 py-4">
-    {{ booking.number_of_players }}
-    <button 
-        class="ml-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs show-players-btn"
-        data-id="{{ booking.id }}"
-        data-roll="{{ booking.roll_number|escapejs }}"
-        data-players="{{ booking.number_of_players|default:0 }}">
-        Show Players
-    </button>
-</td>
-                           <td class="px-6 py-4">
-    {% if booking.status == "Approved" %}
-        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Approved</span>
-    {% elif booking.status == "Rejected" %}
-        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Rejected</span>
-    {% else %}
-        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
-    {% endif %}
-</td>
-
-<td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
-    {% if booking.status == "Pending" %}
-        <a href="{% url 'approve_booking' booking.id %}" 
-           class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs">Approve</a>
-        <a href="{% url 'reject_booking' booking.id %}" 
-           class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">Reject</a>
-    {% else %}
-        <span class="text-gray-500 text-xs italic">Action taken</span>
-    {% endif %}
-</td>
+                            <td class="px-6 py-4">
+                                {{ booking.number_of_players }}
+                                <button 
+                                    class="ml-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs show-players-btn"
+                                    data-id="{{ booking.id }}"
+                                    data-type="booking">
+                                    Show Players
+                                </button>
+                            </td>
+                            <td class="px-6 py-4">
+                                {% if booking.status == "Approved" %}
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Approved</span>
+                                {% elif booking.status == "Rejected" %}
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Rejected</span>
+                                {% else %}
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+                                {% if booking.status == "Pending" %}
+                                    <a href="{% url 'approve_booking' booking.id %}" 
+                                       class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs">Approve</a>
+                                    <a href="{% url 'reject_booking' booking.id %}" 
+                                       class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">Reject</a>
+                                {% else %}
+                                    <span class="text-gray-500 text-xs italic">Action taken</span>
+                                {% endif %}
+                            </td>
+                        </tr>
                         {% empty %}
                         <tr>
                             <td colspan="9" class="px-6 py-4 text-center text-gray-500">No booking requests found</td>
@@ -101,22 +100,23 @@
                 </table>
             </div>
         </div>
-                    <!-- Allotted Ground Schedule -->
-       <div class="bg-white rounded-lg shadow overflow-hidden">
+
+        <!-- Allotted Grounds -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold">Alloted Grounds</h3>
+                <h3 class="text-lg font-semibold">Allotted Grounds</h3>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200" style="min-width: 1100px;">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ground</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time Slot</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Allotted To</th>
-                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Roll Number</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Purpose</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Players</th>
+                            <th class="px-6 py-3">Date</th>
+                            <th class="px-6 py-3">Ground</th>
+                            <th class="px-6 py-3">Time Slot</th>
+                            <th class="px-6 py-3">Allotted To</th>
+                            <th class="px-6 py-3">Roll Number</th>
+                            <th class="px-6 py-3">Purpose</th>
+                            <th class="px-6 py-3">Players</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -129,151 +129,131 @@
                             <td class="px-6 py-4">{{ allot.roll_number }}</td>
                             <td class="px-6 py-4">{{ allot.purpose }}</td>
                             <td class="px-6 py-4">
-    {{ allot.players }}
-    <button 
-        class="ml-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs show-players-btn"
-        data-id="{{ allot.id }}"
-        data-roll="{{ allot.allotted_to|escapejs }}"
-        data-players="{{ allot.players|default:0 }}">
-        Show Players
-    </button>
-</td>
+                                {{ allot.players }}
+                                <button 
+                                    class="ml-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs show-players-btn"
+                                    data-id="{{ allot.id }}"
+                                    data-type="allotment">
+                                    Show Players
+                                </button>
+                            </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">No allotments yet</td>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">No allotments yet</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
-
-    </div>
-</div>
-            
-        </div>
-    </div>
-  <!-- Players Modal -->
-<!-- Players Dialog Box -->
-<div id="players-dialog"
-    class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-    <div id="players-dialog-box"
-         class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-4 transform scale-95 opacity-0 transition-all duration-300">
-        
-        <!-- Header -->
-        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <h3 id="players-dialog-title" class="text-lg font-semibold text-gray-800">Players</h3>
-            <button class="text-gray-500 hover:text-gray-700 text-2xl" onclick="closePlayersDialog()">✕</button>
-        </div>
-
-        <!-- Table Section -->
-        <div class="p-6 max-h-[65vh] overflow-y-auto">
-            <div class="overflow-x-auto">
-                <table class="min-w-full border divide-y divide-gray-200 rounded-lg overflow-hidden">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">#</th>
-                            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Name</th>
-                            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Branch</th>
-                            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Year</th>
-                            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Division</th>
-                        </tr>
-                    </thead>
-                    <tbody id="players-dialog-body" class="bg-white divide-y divide-gray-200">
-                        <!-- Data will be added dynamically -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
-            <button class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow-md transition"
-                onclick="closePlayersDialog()">Close</button>
-        </div>
     </div>
 </div>
 
+<!-- Players Modal -->
+<!-- Players Modal -->
+<div id="players-dialog" class="modal">
+  <div class="modal-content">
+    <!-- Header -->
+    <div class="modal-header">
+      <h3 id="players-dialog-title">Players</h3>
+      <span class="close-btn" onclick="closePlayersDialog()">×</span>
+    </div>
 
-    <script>
-    // Open dialog
-    function openPlayersDialog() {
-        const dialog = document.getElementById("players-dialog");
-        const box = document.getElementById("players-dialog-box");
+    <!-- Table -->
+    <div class="modal-body">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Branch</th>
+            <th>Year</th>
+            <th>Division</th>
+          </tr>
+        </thead>
+        <tbody id="players-dialog-body">
+          <!-- Filled dynamically -->
+        </tbody>
+      </table>
+    </div>
 
-        dialog.classList.remove("hidden");
-        setTimeout(() => {
-            box.classList.remove("scale-95", "opacity-0");
-            box.classList.add("scale-100", "opacity-100");
-        }, 20);
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button onclick="closePlayersDialog()">Close</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+function openPlayersDialog() {
+    const dialog = document.getElementById("players-dialog");
+    dialog.style.display = "flex"; // use flex to center modal
+}
+
+function closePlayersDialog() {
+    const dialog = document.getElementById("players-dialog");
+    dialog.style.display = "none";
+}
+
+// Fetch players dynamically
+function fetchPlayers(id, type) {
+    let url = "";
+    if (type === "booking") {
+        url = `/get-players/${id}/`;
+    } else if (type === "allotment") {
+        url = `/get-allotment-players/${id}/`;
     }
 
-    // Close dialog
-    function closePlayersDialog() {
-        const dialog = document.getElementById("players-dialog");
-        const box = document.getElementById("players-dialog-box");
-
-        box.classList.remove("scale-100", "opacity-100");
-        box.classList.add("scale-95", "opacity-0");
-
-        setTimeout(() => {
-            dialog.classList.add("hidden");
-        }, 200);
-    }
-
-    // Fetch players for a booking
-    function fetchPlayers(bookingId) {
-        fetch(`/get-players/${bookingId}/`)
-            .then(res => res.json())
-            .then(data => {
-                const tbody = document.getElementById("players-dialog-body");
-                tbody.innerHTML = "";
-
-                if (data.players.length > 0) {
-                    data.players.forEach((p, index) => {
-                        tbody.innerHTML += `
-                            <tr>
-                                <td class="px-4 py-2 text-sm text-gray-700">${index + 1}</td>
-                                <td class="px-4 py-2 text-sm text-gray-700">${p.name}</td>
-                                <td class="px-4 py-2 text-sm text-gray-700">${p.branch}</td>
-                                <td class="px-4 py-2 text-sm text-gray-700">${p.year}</td>
-                                <td class="px-4 py-2 text-sm text-gray-700">${p.division}</td>
-                            </tr>
-                        `;
-                    });
-                } else {
-                    tbody.innerHTML = `
+    fetch(url)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return res.json();
+        })
+        .then(data => {
+            const tbody = document.getElementById("players-dialog-body");
+            tbody.innerHTML = "";
+            if (data.players && data.players.length > 0) {
+                data.players.forEach((p, i) => {
+                    tbody.innerHTML += `
                         <tr>
-                            <td colspan="5" class="px-4 py-4 text-center text-gray-500">
-                                No players found
-                            </td>
-                        </tr>
-                    `;
-                }
+                            <td class="px-4 py-2">${i + 1}</td>
+                            <td class="px-4 py-2">${p.name}</td>
+                            <td class="px-4 py-2">${p.branch}</td>
+                            <td class="px-4 py-2">${p.year}</td>
+                            <td class="px-4 py-2">${p.division}</td>
+                        </tr>`;
+                });
+            } else {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-4 py-4 text-center text-gray-500">No players found</td>
+                    </tr>`;
+            }
+            openPlayersDialog();
+        })
+        .catch(err => {
+            console.error("Error:", err);
+            alert("Failed to load players.");
+        });
+}
 
-                openPlayersDialog();
-            })
-            .catch(err => {
-                console.error("Error loading players:", err);
-                alert("Failed to load players.");
-            });
-    }
-
-    // Attach click listeners to all "Show Players" buttons
+// Attach click listeners
+document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".show-players-btn").forEach(btn => {
         btn.addEventListener("click", () => {
-            const bookingId = btn.dataset.id;  // read from data-id
-            fetchPlayers(bookingId);
+            fetchPlayers(btn.dataset.id, btn.dataset.type);
         });
     });
+});
 
-    // Close dialog when clicking outside the box
-    document.getElementById("players-dialog").addEventListener("click", (e) => {
-        if (e.target.id === "players-dialog") {
-            closePlayersDialog();
-        }
-    });
+// Close modal on outside click
+document.getElementById("players-dialog").addEventListener("click", e => {
+    if (e.target.id === "players-dialog") closePlayersDialog();
+});
 </script>
 
 {% endblock %}

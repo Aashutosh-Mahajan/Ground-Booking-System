@@ -84,6 +84,13 @@ class StudentUser(models.Model):
 
 
 class AllotedGroundBooking(models.Model):
+    booking = models.ForeignKey(
+        Booking,
+        on_delete=models.CASCADE,
+        related_name="alloted_bookings",
+        null=True,  # ✅ allow empty
+        blank=True  # ✅ allow empty in forms
+    )
     date = models.DateField()
     ground = models.CharField(max_length=100)  
     time_slot = models.CharField(max_length=50)  
@@ -94,3 +101,4 @@ class AllotedGroundBooking(models.Model):
 
     def __str__(self):
         return f"{self.date} | {self.ground} | {self.time_slot}"
+
