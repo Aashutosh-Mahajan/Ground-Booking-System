@@ -392,25 +392,27 @@ h1, h2, h3, h4, h5, h6 {
 /* Hero section with background slideshow */
 .hero {
     position: relative;
-    width: 100%;           /* full width */
-    height: 100vh;     /* full viewport height */
+    width: 100%;
+    height: 100vh;           /* full viewport height */
     text-align: center;
     color: #fff;
+    background-image: url('/static/images/VitGround1.jpg'); /* first image loaded immediately */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     transition: background-image 1s ease-in-out;
 
     display: flex;
-    align-items: center;       /* vertical center */
-    justify-content: center;   /* horizontal center */
+    align-items: center;
+    justify-content: center;
 }
 
 .hero .container {
-    max-width: 1200px;     /* keeps content aligned nicely */
-    width: 100%;           /* container fills hero width */
-    padding: 0 2rem;       /* optional padding */
+    max-width: 1200px;
+    width: 100%;
+    padding: 0 2rem;
 }
+
 
 
 

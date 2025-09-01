@@ -1,34 +1,142 @@
 {% extends 'base.html' %}
 {% block title %}Admin Login{% endblock %}
 {% block content %}
-<div id="admin-login-page" class="page-content">
-        <div class="min-h-screen flex items-center justify-center py-12 px-4">
-            <div class="max-w-md w-full space-y-8">
-                <div class="text-center">
-                    <h2 class="text-3xl font-bold text-gray-900">Admin Login</h2>
-                    <p class="mt-2 text-gray-600">Access the admin dashboard</p>
-                </div>
-                <form method="POST" action="{% url 'admin_login' %}" class="mt-8 space-y-6 card">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="admin-email" class="form-label">Username</label>
-                        <input id="admin-email" name="email" type="text" required
-                               class="form-input"
-                               placeholder="Enter admin email address">
-                    </div>
-                    <div class="form-group">
-                        <label for="admin-password" class="form-label">Password</label>
-                        <input id="admin-password" name="password" type="password" required 
-                               class="form-input"
-                               placeholder="Enter admin password">
-                    </div>
+<div class="login-container">
+  <div class="login-card">
+    <h2>Admin Login</h2>
+    <p class="subtitle">Access the admin dashboard</p>
 
-                    <button type="submit" class="btn btn-primary btn-full">
-                        Sign In as Admin
-                    </button>
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
 
-                </form>
-            </div>
-        </div>
-    </div>
+    <form method="POST" action="{% url 'admin_login' %}">
+      {% csrf_token %}
+
+      <!-- Username Field -->
+      <div class="form-group">
+        <label for="admin-email">Username</label>
+        <input id="admin-email" name="email" type="text" required placeholder="Enter admin email address">
+      </div>
+
+      <!-- Password Field with Eye -->
+      <div class="form-group password-wrapper">
+        <label for="admin-password">Password</label>
+        <input id="admin-password" name="password" type="password" required placeholder="Enter admin password">
+        <span class="toggle-password" onclick="toggleAdminPassword()">&#128065;</span>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="btn-submit">Sign In as Admin</button>
+    </form>
+  </div>
+</div>
+
+<script>
+function toggleAdminPassword() {
+  const pwd = document.getElementById('admin-password');
+  pwd.type = pwd.type === 'password' ? 'text' : 'password';
+}
+</script>
+
+<style>
+/* Layout */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #f3f4f6;
+}
+
+.login-card {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+h2 {
+  margin-bottom: 10px;
+  font-size: 24px;
+  color: #222;
+}
+
+.subtitle {
+  margin-bottom: 20px;
+  color: #555;
+}
+
+.error {
+  color: red;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+/* Form Styling */
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+
+.form-group input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* Password Eye Icon */
+.password-wrapper {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 38px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #666;
+}
+
+.toggle-password:hover {
+  color: #000;
+}
+
+/* Button Styling */
+.btn-submit {
+  width: 100%;
+  padding: 12px;
+  background: #2563eb;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-submit:hover {
+  background: #1e40af;
+}
+</style>
 {% endblock %}
