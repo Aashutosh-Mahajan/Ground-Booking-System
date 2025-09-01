@@ -104,10 +104,10 @@ def approve_booking(request, booking_id):
     booking.status = 'Approved'
     booking.save()
 
-    # Create entry in AllotedGroundBooking if not already there
     AllotedGroundBooking.objects.get_or_create(
-        ground=booking.ground,
+        booking=booking,   # 🔥 link booking here
         date=booking.date,
+        ground=booking.ground,
         time_slot=booking.time_slot,
         allotted_to=booking.student_name,
         roll_number=booking.roll_number,
@@ -116,7 +116,19 @@ def approve_booking(request, booking_id):
     )
 
     return redirect('custom_admin_dashboard')
-
+def get_allotment_players(request, allot_id):
+    allotment = get_object_or_404(AllotedGroundBooking, id=allot_id)
+    players = allotment.booking.players.all()  # 👈 works now!
+    data = [
+        {
+            "name": p.name,
+            "branch": p.branch,
+            "year": p.year,
+            "division": p.division,
+        }
+        for p in players
+    ]
+    return JsonResponse({"players": data})
 
 # Reject Booking
 def reject_booking(request, booking_id):
