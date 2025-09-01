@@ -74,12 +74,29 @@ def custom_admin_dashboard(request):
     if not request.session.get('is_admin_logged_in'):
         return redirect('admin_login')
 
-    bookings = Booking.objects.all().order_by('-created_at')
-    allotments = AllotedGroundBooking.objects.all().order_by('-date')
+    date_str = (request.GET.get('date') or '').strip()
+    ground   = (request.GET.get('ground') or '').strip()
+
+    bookings_qs = Booking.objects.all().order_by('-created_at')
+    allot_qs    = AllotedGroundBooking.objects.all().order_by('-date')
+
+    if date_str:
+        bookings_qs = bookings_qs.filter(date=date_str)
+        allot_qs    = allot_qs.filter(date=date_str)      # remove this line if you don't want to filter allotments
+
+    if ground:
+        bookings_qs = bookings_qs.filter(ground__iexact=ground)
+        allot_qs    = allot_qs.filter(ground__iexact=ground)  # same note as above
+
+    grounds = (Booking.objects.values_list('ground', flat=True)
+               .distinct().order_by('ground'))
 
     context = {
-        'bookings': bookings,
-        'allotments': allotments,
+        'bookings': bookings_qs,
+        'allotments': allot_qs,
+        'grounds': grounds,
+        'selected_date': date_str,
+        'selected_ground': ground,
     }
     return render(request, 'booking/admin_dashboard.html', context)
 
