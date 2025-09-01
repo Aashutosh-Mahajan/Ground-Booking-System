@@ -234,10 +234,13 @@ def student_dashboard(request):
     student_email = request.session.get('student_email')
     if not student_email:
         return redirect('student_login')
+    
+    first_name = student_email.split("@")[0].split(".")[0].capitalize()
 
     # No data fetched from DB — all info is manually entered
     return render(request, 'booking/student_dashboard.html', {
         'student_email': student_email,  # optional for welcome message
+        'first_name': first_name,
     })
 
 

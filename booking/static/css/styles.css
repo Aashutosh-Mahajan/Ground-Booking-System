@@ -1189,3 +1189,10 @@ body {
 .btn-secondary:hover {
   background: #e0e0e0;
 }
+
+.loading {
+    text-align: center;
+    font-weight: bold;
+    color: #1e88e5;
+    padding: 1rem;
+}
