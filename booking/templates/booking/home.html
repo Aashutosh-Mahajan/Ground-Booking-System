@@ -17,50 +17,141 @@
                         Reserve sports grounds, event spaces, and recreational areas with our easy-to-use booking system. 
                         Perfect for students, clubs, and college events.
                     </p>
+                    {% if request.session.student_email %}
+                    <a href="{% url 'student_dashboard' %}" class="btn btn-primary btn-lg">Book your Ground</a>
+                    {% else %}
                     <a href="{% url 'student_login' %}" class="btn btn-primary btn-lg">Book your Ground</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
 
         <!-- Features Section -->
-        <div class="features">
+        <div class="features py-12">
             <div class="container">
-                <div class="features-header">
-                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Why Choose GroundBook?</h2>
+                <div class="features-header text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Why Choose GroundBook?</h2>
                     <p class="text-gray-600">Simple, fast, and reliable ground booking for your college</p>
                 </div>
+
                 <div class="features-slider">
-                    <div class="features-slides" aria-live="polite">
-                        <div class="feature-slide">
-                            <div class="feature-card bg-blue-50">
-                                <div class="feature-icon">
-                                    <img src="{% static 'images/ground.png' %}" alt="Instant Booking" style="width:96px;height:96px;display:block;object-fit:contain;"/>
-                                </div>
-                                <h3 class="text-xl font-semibold mb-2">Instant Booking</h3>
-                                <p class="text-gray-600">Book your preferred ground in just a few clicks</p>
-                            </div>
+                    <div class="scroll-track">
+                        <!-- Original Cards -->
+                        <div class="feature-card bg-blue-50">
+                            <div class="feature-icon"><img src="{% static 'images/ground.png' %}" alt="Instant Booking"></div>
+                                <h3>Instant Booking</h3>
+                                <p>Book your preferred ground in just a few clicks</p>
                         </div>
-                        <div class="feature-slide">
-                            <div class="feature-card bg-green-50">
-                                <div class="feature-icon">
-                                    <img src="{% static 'images/calendar.png' %}" alt="Real-time Availability" style="width:96px;height:96px;display:block;object-fit:contain;"/>
-                                </div>
-                                <h3 class="text-xl font-semibold mb-2">Real-time Availability</h3>
-                                <p class="text-gray-600">See available time slots and dates instantly</p>
-                            </div>
+                        <div class="feature-card bg-green-50">
+                            <div class="feature-icon"><img src="{% static 'images/calendar.png' %}" alt="Real-time Availability"></div>
+                            <h3>Real-time Availability</h3>
+                            <p>See available time slots and dates instantly</p>
                         </div>
-                        <div class="feature-slide">
-                            <div class="feature-card bg-purple-50">
-                                <div class="feature-icon">
-                                    <img src="{% static 'images/management.png' %}" alt="Easy Management" style="width:96px;height:96px;display:block;object-fit:contain;"/>
-                                </div>
-                                <h3 class="text-xl font-semibold mb-2">Easy Management</h3>
-                                <p class="text-gray-600">Track your bookings and get instant approvals</p>
-                            </div>
+                        <div class="feature-card bg-purple-50">
+                            <div class="feature-icon"><img src="{% static 'images/management.png' %}" alt="Easy Management"></div>
+                            <h3>Easy Management</h3>
+                            <p>Track your bookings and get instant approvals</p>
                         </div>
+
+                        <!-- Duplicate Cards for seamless loop -->
+                    <div class="feature-card bg-blue-50">
+                    <div class="feature-icon"><img src="{% static 'images/ground.png' %}" alt="Instant Booking"></div>
+                    <h3>Instant Booking</h3>
+                    <p>Book your preferred ground in just a few clicks</p>
                     </div>
+                    <div class="feature-card bg-green-50">
+                    <div class="feature-icon"><img src="{% static 'images/calendar.png' %}" alt="Real-time Availability"></div>
+                    <h3>Real-time Availability</h3>
+                    <p>See available time slots and dates instantly</p>
+                    </div>
+                    <div class="feature-card bg-purple-50">
+                    <div class="feature-icon"><img src="{% static 'images/management.png' %}" alt="Easy Management"></div>
+                    <h3>Easy Management</h3>
+                    <p>Track your bookings and get instant approvals</p>
+                    </div>
+                </div>
                 </div>
             </div>
         </div>
-    </div>
+
+<style>
+.features {
+  padding: 4rem 0;
+  background-color: #ffffff;
+}
+
+.features-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.features-slider {
+  overflow: hidden;
+  width: 100%;
+}
+
+.scroll-track {
+  display: flex;
+  gap: 30px;
+  flex-wrap: nowrap;
+  animation: scroll-left 10s linear infinite;
+}
+
+/* Smooth infinite scroll to left */
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%); /* width of first 3 cards + gaps */
+  }
+}
+
+.feature-card {
+  min-width: 300px;
+  flex-shrink: 0;
+  text-align: center;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.06);
+}
+
+.feature-icon {
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0,0,0,0.03);
+  border-radius: 9999px;
+  margin-bottom: 1rem;
+}
+
+.feature-icon img {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+}
+
+.features-slider:hover .scroll-track {
+  animation-play-state: paused;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .scroll-track {
+    animation-duration: 15s;
+  }
+  .feature-card {
+    min-width: 250px;
+  }
+}
+</style>
+
+
 {% endblock %}
