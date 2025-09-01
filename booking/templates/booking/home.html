@@ -5,26 +5,28 @@
  <div id="home-page" class="page-content">
 
         
-
-        <div class="hero">
-            <div class="container">
-                <div class="hero-content">
-                    <h1 class="hero-title">
-                        Book Your College Ground
-                        <span class="text-primary">Instantly</span>
-                    </h1>
-                    <p class="hero-subtitle">
-                        Reserve sports grounds, event spaces, and recreational areas with our easy-to-use booking system. 
-                        Perfect for students, clubs, and college events.
-                    </p>
-                    {% if request.session.student_email %}
-                    <a href="{% url 'student_dashboard' %}" class="btn btn-primary btn-lg">Book your Ground</a>
-                    {% else %}
-                    <a href="{% url 'student_login' %}" class="btn btn-primary btn-lg">Book your Ground</a>
-                    {% endif %}
-                </div>
-            </div>
+        <div class="hero" id="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                Book Your College Ground
+                <span class="text-primary">Instantly</span>
+            </h1>
+            <p class="hero-subtitle">
+                Reserve sports grounds, event spaces, and recreational areas with our easy-to-use booking system.
+            </p>
+            {% if request.session.student_email %}
+            <a href="{% url 'student_dashboard' %}" class="btn btn-primary btn-lg">Book your Ground</a>
+            {% else %}
+            <a href="{% url 'student_login' %}" class="btn btn-primary btn-lg">Book your Ground</a>
+            {% endif %}
         </div>
+    </div>
+</div>
+
+
+        
+
 
         <!-- Features Section -->
         <div class="features py-12">
@@ -73,6 +75,22 @@
                 </div>
             </div>
         </div>
+
+        <script>
+    const hero = document.getElementById('hero');
+    const images = [
+        '/static/images/VitGround1.jpg',
+        '/static/images/VitGround2.jpg',
+        '/static/images/VitGround3.jpg',
+        '/static/images/VitGround4.jpg'
+    ];
+    let i = 0;
+
+    setInterval(() => {
+        i = (i + 1) % images.length;
+        hero.style.backgroundImage = `url('${images[i]}')`;
+    }, 4000);
+    </script>
 
 <style>
 .features {

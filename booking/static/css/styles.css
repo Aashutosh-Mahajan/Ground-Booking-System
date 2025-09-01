@@ -389,34 +389,29 @@ h1, h2, h3, h4, h5, h6 {
     color: #16a34a;
 }
 
-/* Hero section */
+/* Hero section with background slideshow */
 .hero {
     position: relative;
-    overflow: hidden;
-    padding: 5rem 0;
-}
-
-.hero-content {
+    width: 100%;           /* full width */
+    height: 100vh;     /* full viewport height */
     text-align: center;
-    max-width: 48rem;
-    margin: 0 auto;
+    color: #fff;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 1s ease-in-out;
+
+    display: flex;
+    align-items: center;       /* vertical center */
+    justify-content: center;   /* horizontal center */
 }
 
-.hero-title {
-    font-size: 2.25rem;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 1.5rem;
+.hero .container {
+    max-width: 1200px;     /* keeps content aligned nicely */
+    width: 100%;           /* container fills hero width */
+    padding: 0 2rem;       /* optional padding */
 }
 
-.hero-subtitle {
-    font-size: 1.125rem;
-    color: #4b5563;
-    margin-bottom: 2rem;
-    max-width: 48rem;
-    margin-left: auto;
-    margin-right: auto;
-}
 
 
 /* Utilities */
