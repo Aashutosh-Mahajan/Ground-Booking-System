@@ -14,6 +14,8 @@
             <input type="hidden" name="ground" value="{{ request.GET.ground }}">
             <input type="hidden" name="sport" value="{{ request.GET.sport }}">
             <input type="hidden" name="time_slot" value="{{ request.GET.time_slot }}">
+            <!-- equipment may come as 'equipment' or 'equipment_selected' depending on flow -->
+            <input type="hidden" name="equipment" value="{{ request.GET.equipment }}">
 
             <!-- Optional summary of Step 1 selections -->
             <div class="booking-summary">

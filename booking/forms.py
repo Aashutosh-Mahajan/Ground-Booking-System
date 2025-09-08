@@ -13,6 +13,7 @@ class BookingForm(forms.ModelForm):
             'ground',
             'date',
             'time_slot',
+            'equipment',
             'purpose',
             'number_of_players'
         ]
@@ -35,6 +36,7 @@ class BookingForm(forms.ModelForm):
                 'type': 'date'
             }),
             'time_slot': forms.Select(attrs={'class': 'form-select'}),
+            'equipment': forms.Textarea(attrs={'class': 'form-input', 'readonly': 'readonly', 'rows': 3}),
             'purpose': forms.Textarea(attrs={
                 'class': 'form-textarea',
                 'rows': 4,

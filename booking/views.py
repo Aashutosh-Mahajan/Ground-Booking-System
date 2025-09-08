@@ -80,7 +80,8 @@ def custom_admin_dashboard(request):
     date_str = (request.GET.get('date') or '').strip()
     ground   = (request.GET.get('ground') or '').strip()
 
-    bookings_qs = Booking.objects.all().order_by('-created_at')
+    # Show only pending booking requests in the Booking Requests table
+    bookings_qs = Booking.objects.filter(status='Pending').order_by('-created_at')
     allot_qs    = AllotedGroundBooking.objects.all().order_by('-date')
 
     if date_str:
@@ -115,6 +116,13 @@ def get_players(request, booking_id):
     return JsonResponse({
         "booking": booking.student_name,
         "players": list(players)
+    }, status=200)
+
+
+def get_equipment_for_booking(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+    return JsonResponse({
+        "equipment": booking.equipment or ""
     }, status=200)
 # --------------------------
 # Approve Booking → Move to AllotedGroundBooking
@@ -160,6 +168,12 @@ def get_allotment_players(request, allot_id):
     ]
     return JsonResponse({"players": data})
 
+
+def get_equipment_for_allotment(request, allot_id):
+    allotment = get_object_or_404(AllotedGroundBooking, id=allot_id)
+    equipment = allotment.booking.equipment if allotment.booking else ""
+    return JsonResponse({"equipment": equipment}, status=200)
+
 # Reject Booking
 def reject_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
@@ -199,6 +213,8 @@ def student_booking(request):
             booking.ground = request.POST.get("ground")
             booking.date = request.POST.get("date")
             booking.time_slot = request.POST.get("time_slot")
+            # equipment may come from student_booking form as 'equipment_selected' or from the quick flow as 'equipment'
+            booking.equipment = request.POST.get("equipment_selected") or request.POST.get('equipment') or ''
             booking.purpose = request.POST.get("purpose")
             booking.number_of_players = int(request.POST.get("number_of_players", 1))
 
@@ -260,10 +276,7 @@ def check_availability(request):
 
     # ✅ Standardized time slots
     time_slots = [
-        "07:00 - 08:00", "08:00 - 09:00", "09:00 - 10:00",
-        "10:00 - 11:00", "11:00 - 12:00", "12:00 - 13:00",
-        "13:00 - 14:00", "14:00 - 15:00", "15:00 - 16:00",
-        "16:00 - 17:00", "17:00 - 18:00"
+        "07:00 AM - 09:00 AM", "04:00 PM - 06:00 PM ",
     ]
 
     slots = []
@@ -274,14 +287,60 @@ def check_availability(request):
             slots.append({"time": slot, "status": "freeze"})
         return JsonResponse({"slots": slots}, status=200)
 
-    # ✅ Check bookings for each time slot
+    # ✅ Check bookings for each time slot. Book a slot if any Approved
+    # booking overlaps with the slot. We parse a variety of time formats so
+    # strings like "7:00 AM - 9:00 AM" and "07:00 - 09:00" both work.
+
+    def parse_time_to_minutes(tstr):
+        tstr = tstr.strip()
+        # try several formats
+        fmts = ["%I:%M %p", "%I:%M%p", "%H:%M", "%I %p"]
+        for fmt in fmts:
+            try:
+                dt = datetime.strptime(tstr, fmt)
+                return dt.hour * 60 + dt.minute
+            except Exception:
+                continue
+        # try simple numeric like '7:00'
+        try:
+            parts = tstr.split(':')
+            if len(parts) == 2:
+                h = int(parts[0])
+                m = int(''.join(ch for ch in parts[1] if ch.isdigit()))
+                return h * 60 + m
+        except Exception:
+            pass
+        return None
+
+    def parse_range(rng):
+        if not rng or '-' not in rng:
+            return (None, None)
+        a, b = rng.split('-', 1)
+        start = parse_time_to_minutes(a)
+        end = parse_time_to_minutes(b)
+        return (start, end)
+
+    # prepare approved booking ranges for this ground/date
+    approved_bookings = Booking.objects.filter(
+        ground=ground,
+        date=date_selected,
+        status__iexact='Approved'
+    )
+    approved_ranges = []
+    for b in approved_bookings:
+        s, e = parse_range(b.time_slot or '')
+        if s is not None and e is not None:
+            approved_ranges.append((s, e))
+
     for slot in time_slots:
-        booked = Booking.objects.filter(
-            ground=ground,
-            date=date_selected,
-            time_slot=slot,
-            status__in=["Pending", "Approved"]
-        ).exists()
+        slot_s, slot_e = parse_range(slot)
+        booked = False
+        if slot_s is not None and slot_e is not None:
+            for (bs, be) in approved_ranges:
+                # overlap if start < be and bs < slot_e
+                if bs < slot_e and slot_s < be:
+                    booked = True
+                    break
 
         slots.append({
             "time": slot,

@@ -20,4 +20,6 @@ path('reject-booking/<int:booking_id>/', views.reject_booking, name='reject_book
     path('check-availability/', views.check_availability, name='check_availability'),
     path('get-players/<int:booking_id>/', views.get_players, name='get_players'),
        path('get-allotment-players/<int:allot_id>/', views.get_allotment_players, name='get_allotment_players'),
+    path('get-equipment/<int:booking_id>/', views.get_equipment_for_booking, name='get_equipment_for_booking'),
+    path('get-allotment-equipment/<int:allot_id>/', views.get_equipment_for_allotment, name='get_allotment_equipment'),
 ]

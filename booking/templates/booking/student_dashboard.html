@@ -148,8 +148,8 @@ function selectGround(ground, event) {
     document.getElementById('sportsSection').classList.remove('disabled');
     populateSports(ground);
 
-    document.getElementById('timeSection').classList.remove('disabled');
-    fetchAvailability(ground);
+    // don't fetch time slots yet — wait for sport selection because slots depend on sport
+    document.getElementById('timeSection').classList.add('disabled');
 
     document.querySelectorAll('.sport-option, .time-slot').forEach(el => el.classList.remove('selected'));
 
@@ -193,6 +193,12 @@ function selectSport(sport, event) {
     document.getElementById('equipmentField').style.display = "block";
     bookingData.equipment = 'Yes';
     updateSummary();
+
+    // Now that sport is selected, enable time section and fetch availability for the chosen ground
+    if (bookingData.ground) {
+        document.getElementById('timeSection').classList.remove('disabled');
+        fetchAvailability(bookingData.ground);
+    }
 }
 
 // ✅ Toggle equipment field
@@ -222,23 +228,67 @@ async function fetchAvailability(ground) {
         const data = await res.json();
 
         grid.innerHTML = '';
-
-        // Always show these 2 slots
+        // Only show the two allowed combined slots. Use server small-slot
+        // statuses to determine if any part of the allowed slot is booked.
         const allowedSlots = ["7:00 AM - 9:00 AM", "4:00 PM - 6:00 PM"];
 
-        allowedSlots.forEach(time => {
-            const slot = data.slots.find(s => s.time === time);
+        function parseTimeToMinutesJS(tstr) {
+            tstr = tstr.trim();
+            // handle AM/PM
+            const ampmMatch = tstr.match(/(\d{1,2}:?\d{0,2})\s*(AM|PM)/i);
+            if (ampmMatch) {
+                let time = ampmMatch[1];
+                if (!time.includes(':')) time = time + ':00';
+                const [h, m] = time.split(':').map(x => parseInt(x, 10));
+                let hh = h % 12;
+                if (/PM/i.test(ampmMatch[2])) hh += 12;
+                return hh * 60 + (m || 0);
+            }
+            // handle 24h like 07:00
+            const parts = tstr.split(':');
+            if (parts.length === 2) {
+                const hh = parseInt(parts[0], 10);
+                const mm = parseInt(parts[1], 10) || 0;
+                return hh * 60 + mm;
+            }
+            return null;
+        }
+
+        function parseRangeJS(rng) {
+            const parts = rng.split('-');
+            if (parts.length < 2) return [null, null];
+            const a = parts[0].trim();
+            const b = parts[1].trim();
+            return [parseTimeToMinutesJS(a), parseTimeToMinutesJS(b)];
+        }
+
+        // build a small-slot map from server data for quick checking
+        const serverSlots = data.slots || [];
+
+        allowedSlots.forEach(allowed => {
             const div = document.createElement('div');
             div.className = 'time-slot';
-            div.textContent = time;
+            div.textContent = allowed;
 
-            if (slot && slot.status === "booked") {
+            const [allowedS, allowedE] = parseRangeJS(allowed);
+            let booked = false;
+            if (allowedS !== null && allowedE !== null) {
+                for (const s of serverSlots) {
+                    const [ss, se] = parseRangeJS(s.time);
+                    if (ss === null || se === null) continue;
+                    // overlap
+                    if (ss < allowedE && allowedS < se) {
+                        if (s.status === 'booked') { booked = true; break; }
+                    }
+                }
+            }
+
+            if (booked) {
                 div.classList.add('booked');
                 div.title = 'This slot is already booked';
             } else {
-                // Treat as available if not booked
                 div.classList.add('available');
-                div.onclick = (e) => selectTimeSlot(time, e);
+                div.onclick = (e) => selectTimeSlot(allowed, e);
             }
 
             grid.appendChild(div);
@@ -327,6 +377,38 @@ function confirmBooking() {
     background-color: #fff;
     resize: none;
 }
+
+/* Time slot states */
+.time-slot.booked {
+    background-color: #fecaca; /* light red */
+    border-color: #f87171;
+    color: #721c24;
+    cursor: not-allowed;
+    pointer-events: none; /* make unclickable */
+}
+.time-slot.freeze {
+    background-color: #e5e7eb; /* grey */
+    color: #6b7280;
+    cursor: not-allowed;
+}
+.time-slot.available {
+    cursor: pointer;
+}
+
+/* Larger green style for the allowed combined slots */
+.time-slot.available {
+    background-color: #bbf7d0; /* light green */
+    border: 1px solid #34d399;
+    color: #065f46;
+    padding: 12px 18px;
+    font-weight: 600;
+}
+.time-slot.booked {
+    background-color: #fecaca; /* light red */
+    border-color: #f87171;
+    color: #7f1d1d;
+}
+.time-slot { border-radius: 6px; display: inline-block; margin-right: 12px; }
 </style>
 
 {% endblock %}

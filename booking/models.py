@@ -20,6 +20,7 @@ class Booking(models.Model):
     date = models.DateField()
     time_slot = models.CharField(max_length=50)
     purpose = models.TextField()
+    equipment = models.TextField(blank=True, null=True)  # new: equipment requested/auto-filled
     number_of_players = models.PositiveIntegerField(default=1)
     status = models.CharField(
         max_length=20,
