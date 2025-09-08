@@ -49,6 +49,7 @@
                         <option value="CMPN">CMPN</option>
                         <option value="EXTC">EXTC</option>
                         <option value="EXCS">EXCS</option>
+                        <option value="BIOM">BIOM</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -70,6 +71,12 @@
                         <option value="C">C</option>
                     </select>
                 </div>
+            </div>
+
+            <!-- Equipment Selected -->
+            <div class="form-group" id="equipment-section" style="display: none;">
+                <label class="form-label">Equipment Selected</label>
+                <textarea id="equipmentField" name="equipment_selected" class="form-input" readonly rows="4"></textarea>
             </div>
 
             <!-- Number of Players -->
@@ -101,6 +108,43 @@
     </div>
 </div>
 
+<!-- Auto-fill Equipment Field -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sport = "{{ request.GET.sport|escapejs }}";
+    const equipmentField = document.getElementById('equipmentField');
+    const equipmentSection = document.getElementById('equipment-section');
+
+    // Map sport -> equipment
+    const equipmentMap = {
+        "Football": ["Football", "Cones and Marker"],   // special case: multiple
+        "Basketball": ["Basketball"],
+        "Volleyball": ["Volleyball"],
+        "Handball": ["Handball"],
+        "Cricket": ["Stumps"]
+    };
+
+    if (sport && equipmentMap[sport]) {
+        let equipmentList;
+
+        if (sport === "Football") {
+            // Special formatting for Football
+            equipmentList = equipmentMap[sport]
+                .map((item, index) => `${index + 1}. ${item}`)
+                .join("\n");
+        } else {
+            // Default: single equipment
+            equipmentList = equipmentMap[sport][0];
+        }
+
+        equipmentField.value = equipmentList;
+        equipmentSection.style.display = 'block';
+    } else {
+        equipmentSection.style.display = 'none';
+    }
+});
+</script>
+
 <!-- Dynamic Player Form Script -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -127,6 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <option value="CMPN">CMPN</option>
                             <option value="EXTC">EXTC</option>
                             <option value="EXCS">EXCS</option>
+                            <option value="BIOM">BIOM</option>
                         </select>
                     </div>
                     <div class="form-group">
