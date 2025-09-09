@@ -24,15 +24,21 @@ def student_login(request):
         email = request.POST.get("email")
         password = request.POST.get("password")
 
-        # ✅ Only require email/password for access — no DB fetch
-        if email and password:
-            # Save email in session to track login state
-            request.session['student_email'] = email
-
-            # Redirect to dashboard
-            return redirect('student_dashboard')
-        else:
+        if not email or not password:
             messages.error(request, "Please enter both email and password.")
+        else:
+            # Look up student in DB and verify password
+            try:
+                student = StudentUser.objects.get(email=email)
+                # Plain-text check from DB as requested
+                if student.password == password:
+                    request.session['student_email'] = student.email
+                    request.session['student_id'] = student.id
+                    return redirect('student_dashboard')
+                else:
+                    messages.error(request, "Invalid password")
+            except StudentUser.DoesNotExist:
+                messages.error(request, "No student found with this email")
 
     return render(request, "booking/student_login.html")
 
@@ -51,8 +57,7 @@ def custom_admin_login(request):
 
         try:
             admin = AdminUser.objects.get(username=username)
-
-            # For now assume plain text password (same style as student)
+            # Plain-text check from DB as requested
             if admin.password == password:
                 request.session['is_admin_logged_in'] = True
                 request.session['admin_username'] = admin.username
