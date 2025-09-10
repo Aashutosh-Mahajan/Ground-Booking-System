@@ -20,7 +20,7 @@ class Booking(models.Model):
     date = models.DateField()
     time_slot = models.CharField(max_length=50)
     purpose = models.TextField()
-    equipment = models.TextField(blank=True, null=True)  # new: equipment requested/auto-filled
+    equipment = models.TextField(blank=True, null=True)  
     number_of_players = models.PositiveIntegerField(default=1)
     status = models.CharField(
         max_length=20,
@@ -78,8 +78,13 @@ class AdminUser(models.Model):
 
 
 class StudentUser(models.Model):
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=255)  # store hashed password
+    full_name = models.CharField(max_length=100,null=True, blank=True)     # add this
+    email = models.EmailField(unique=True,null=True, blank=True)
+    roll_number = models.CharField(max_length=20,null=True, blank=True)     # add this
+    branch = models.CharField(max_length=50,null=True, blank=True)          # add this
+    year = models.CharField(max_length=20,null=True, blank=True)            # add this
+    division = models.CharField(max_length=10,null=True, blank=True)        # add this
+    password = models.CharField(max_length=255,null=True, blank=True)
 
     def __str__(self):
         return self.email

@@ -5,7 +5,7 @@ from django.template.loader import render_to_string
 from datetime import date, timedelta, datetime
 from django.views.decorators.csrf import csrf_exempt
 from .forms import BookingForm, PlayerForm
-from .models import Player, Booking,AllotedGroundBooking
+from .models import Player, Booking, AllotedGroundBooking
 from .models import StudentUser, AdminUser
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
@@ -16,9 +16,7 @@ from django.conf import settings
 def home(request):
     return render(request, 'booking/home.html')
 
-
 # -------------------- STUDENT LOGIN --------------------
-
 def student_login(request):
     if request.method == "POST":
         email = request.POST.get("email")
@@ -27,10 +25,8 @@ def student_login(request):
         if not email or not password:
             messages.error(request, "Please enter both email and password.")
         else:
-            # Look up student in DB and verify password
             try:
                 student = StudentUser.objects.get(email=email)
-                # Plain-text check from DB as requested
                 if student.password == password:
                     request.session['student_email'] = student.email
                     request.session['student_id'] = student.id
@@ -43,13 +39,10 @@ def student_login(request):
     return render(request, "booking/student_login.html")
 
 def student_logout(request):
-    # Clear all student-related session data
     request.session.flush()
     return redirect('student_login')
 
 # -------------------- ADMIN LOGIN --------------------
-
-
 def custom_admin_login(request):
     if request.method == "POST":
         username = request.POST.get('email')
@@ -57,7 +50,6 @@ def custom_admin_login(request):
 
         try:
             admin = AdminUser.objects.get(username=username)
-            # Plain-text check from DB as requested
             if admin.password == password:
                 request.session['is_admin_logged_in'] = True
                 request.session['admin_username'] = admin.username
@@ -73,11 +65,7 @@ def admin_logout(request):
     request.session.flush()
     return redirect('admin_login')
 
-
 # -------------------- ADMIN DASHBOARD --------------------
-# --------------------------
-# Admin Dashboard
-# --------------------------
 def custom_admin_dashboard(request):
     if not request.session.get('is_admin_logged_in'):
         return redirect('admin_login')
@@ -85,17 +73,16 @@ def custom_admin_dashboard(request):
     date_str = (request.GET.get('date') or '').strip()
     ground   = (request.GET.get('ground') or '').strip()
 
-    # Show only pending booking requests in the Booking Requests table
     bookings_qs = Booking.objects.filter(status='Pending').order_by('-created_at')
     allot_qs    = AllotedGroundBooking.objects.all().order_by('-date')
 
     if date_str:
         bookings_qs = bookings_qs.filter(date=date_str)
-        allot_qs    = allot_qs.filter(date=date_str)      # remove this line if you don't want to filter allotments
+        allot_qs    = allot_qs.filter(date=date_str)
 
     if ground:
         bookings_qs = bookings_qs.filter(ground__iexact=ground)
-        allot_qs    = allot_qs.filter(ground__iexact=ground)  # same note as above
+        allot_qs    = allot_qs.filter(ground__iexact=ground)
 
     grounds = (Booking.objects.values_list('ground', flat=True)
                .distinct().order_by('ground'))
@@ -110,35 +97,29 @@ def custom_admin_dashboard(request):
     return render(request, 'booking/admin_dashboard.html', context)
 
 def get_players(request, booking_id):
-    # Fetch booking
     booking = get_object_or_404(Booking, id=booking_id)
-
-    # Get players linked to this booking
     players = Player.objects.filter(booking=booking).values(
         "name", "branch", "year", "division",
     )
-
     return JsonResponse({
         "booking": booking.student_name,
         "players": list(players)
     }, status=200)
-
 
 def get_equipment_for_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
     return JsonResponse({
         "equipment": booking.equipment or ""
     }, status=200)
-# --------------------------
-# Approve Booking → Move to AllotedGroundBooking
-# --------------------------
+
+# -------------------- Approve / Reject Booking --------------------
 def approve_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
     booking.status = 'Approved'
     booking.save()
 
     AllotedGroundBooking.objects.get_or_create(
-        booking=booking,   # 🔥 link booking here
+        booking=booking,
         date=booking.date,
         ground=booking.ground,
         time_slot=booking.time_slot,
@@ -147,6 +128,7 @@ def approve_booking(request, booking_id):
         purpose=booking.purpose,
         players=booking.number_of_players,
     )
+
     send_mail(
         subject=f'Ground Booking Approved for {booking.ground}',
         message=f'Hello {booking.student_name},\n\n'
@@ -159,27 +141,6 @@ def approve_booking(request, booking_id):
     )
     return redirect('custom_admin_dashboard')
 
-def get_allotment_players(request, allot_id):
-    allotment = get_object_or_404(AllotedGroundBooking, id=allot_id)
-    players = allotment.booking.players.all()  # 👈 works now!
-    data = [
-        {
-            "name": p.name,
-            "branch": p.branch,
-            "year": p.year,
-            "division": p.division,
-        }
-        for p in players
-    ]
-    return JsonResponse({"players": data})
-
-
-def get_equipment_for_allotment(request, allot_id):
-    allotment = get_object_or_404(AllotedGroundBooking, id=allot_id)
-    equipment = allotment.booking.equipment if allotment.booking else ""
-    return JsonResponse({"equipment": equipment}, status=200)
-
-# Reject Booking
 def reject_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
     booking.status = 'Rejected'
@@ -204,37 +165,96 @@ def student_booking(request):
     if request.method == 'POST':
         booking_form = BookingForm(request.POST)
         if booking_form.is_valid():
+            # Get booking details
+            student_email = request.POST.get("student_email")
+            booking_date = request.POST.get("date")
+            
+            # Check 1-day restriction for main student
+            one_day_ago = datetime.now().date() - timedelta(days=1)
+            recent_bookings = Booking.objects.filter(
+                student_email=student_email,
+                date__gte=one_day_ago,
+                status='Approved'
+            )
+            
+            if recent_bookings.exists():
+                messages.error(request, f"You have already booked a ground within the last 24 hours. Please wait until {recent_bookings.first().date + timedelta(days=1)} to make another booking.")
+                return render(request, 'booking/student_booking.html', {
+                    'booking_form': booking_form,
+                    'number_options': number_options
+                })
+            
+            # Check 1-day restriction for selected players
+            num_players = int(request.POST.get("number_of_players", 1))
+            restricted_players = []
+            
+            for i in range(1, num_players + 1):
+                player_email = request.POST.get(f'player{i}_name')
+                if player_email:
+                    # Check if this player has booked within 1 day
+                    player_recent_bookings = Booking.objects.filter(
+                        student_email=player_email,
+                        date__gte=one_day_ago,
+                        status='Approved'
+                    )
+                    if player_recent_bookings.exists():
+                        try:
+                            player = StudentUser.objects.get(email=player_email)
+                            restricted_players.append(player.full_name)
+                        except StudentUser.DoesNotExist:
+                            restricted_players.append(player_email)
+            
+            if restricted_players:
+                players_list = ", ".join(restricted_players)
+                messages.error(request, f"The following players have already booked a ground within the last 24 hours and cannot be added: {players_list}")
+                return render(request, 'booking/student_booking.html', {
+                    'booking_form': booking_form,
+                    'number_options': number_options
+                })
+
             booking = booking_form.save(commit=False)
 
-            # Assign student info from form
+            # Organizer info
             booking.student_name = request.POST.get("student_name")
             booking.student_email = request.POST.get("student_email")
-            booking.student_branch = request.POST.get("student_branch")
-            booking.student_year = request.POST.get("student_year")
-            booking.student_division = request.POST.get("student_division")
-            booking.roll_number = request.POST.get("roll_number")
+            booking.roll_number = ''  # optional, can fetch if needed
 
             # Booking info
             booking.ground = request.POST.get("ground")
             booking.date = request.POST.get("date")
             booking.time_slot = request.POST.get("time_slot")
-            # equipment may come from student_booking form as 'equipment_selected' or from the quick flow as 'equipment'
             booking.equipment = request.POST.get("equipment_selected") or request.POST.get('equipment') or ''
             booking.purpose = request.POST.get("purpose")
-            booking.number_of_players = int(request.POST.get("number_of_players", 1))
+            booking.number_of_players = num_players
 
             booking.save()
 
-            # Save players dynamically
+            # Save players dynamically (auto-fetch branch/year/division)
             num_players = booking.number_of_players
             for i in range(1, num_players + 1):
-                Player.objects.create(
-                    booking=booking,
-                    name=request.POST.get(f'player{i}_name'),
-                    branch=request.POST.get(f'player{i}_branch'),
-                    year=request.POST.get(f'player{i}_year'),
-                    division=request.POST.get(f'player{i}_division')
-                )
+                player_name_or_email = request.POST.get(f'player{i}_name')
+                if not player_name_or_email:
+                    continue
+
+                # Fetch student from DB
+                try:
+                    student = StudentUser.objects.get(email=player_name_or_email)
+                    Player.objects.create(
+                        booking=booking,
+                        name=student.full_name,
+                        branch=student.branch,
+                        year=student.year,
+                        division=student.division
+                    )
+                except StudentUser.DoesNotExist:
+                    # If not found, create with only name
+                    Player.objects.create(
+                        booking=booking,
+                        name=player_name_or_email,
+                        branch='',
+                        year='',
+                        division=''
+                    )
 
             return redirect('booking_success')
     else:
@@ -248,57 +268,42 @@ def student_booking(request):
 def booking_success(request):
     return render(request, 'booking/booking_success.html')
 
-
 # -------------------- STUDENT DASHBOARD --------------------
 def student_dashboard(request):
-    # Check if student is "logged in"
     student_email = request.session.get('student_email')
     if not student_email:
         return redirect('student_login')
-    
+
     first_name = student_email.split("@")[0].split(".")[0].capitalize()
 
-    # No data fetched from DB — all info is manually entered
     return render(request, 'booking/student_dashboard.html', {
-        'student_email': student_email,  # optional for welcome message
+        'student_email': student_email,
         'first_name': first_name,
     })
-
-
-# -------------------- STUDENT HISTORY --------------------
 
 # -------------------- RULES --------------------
 def rules_regulations(request):
     return render(request, 'booking/rules_regulations.html')
 
-
 # -------------------- AJAX AVAILABILITY --------------------
-
 @csrf_exempt
 def check_availability(request):
     ground = request.GET.get("ground")
     date_selected = request.GET.get("date")
 
-    # ✅ Standardized time slots
     time_slots = [
-        "07:00 AM - 09:00 AM", "04:00 PM - 06:00 PM ",
+        "07:00 AM - 09:00 AM", "04:00 PM - 06:00 PM",
     ]
 
     slots = []
 
-    # ❌ If ground or date is missing → freeze slots
     if not ground or not date_selected:
         for slot in time_slots:
             slots.append({"time": slot, "status": "freeze"})
         return JsonResponse({"slots": slots}, status=200)
 
-    # ✅ Check bookings for each time slot. Book a slot if any Approved
-    # booking overlaps with the slot. We parse a variety of time formats so
-    # strings like "7:00 AM - 9:00 AM" and "07:00 - 09:00" both work.
-
     def parse_time_to_minutes(tstr):
         tstr = tstr.strip()
-        # try several formats
         fmts = ["%I:%M %p", "%I:%M%p", "%H:%M", "%I %p"]
         for fmt in fmts:
             try:
@@ -306,7 +311,6 @@ def check_availability(request):
                 return dt.hour * 60 + dt.minute
             except Exception:
                 continue
-        # try simple numeric like '7:00'
         try:
             parts = tstr.split(':')
             if len(parts) == 2:
@@ -325,7 +329,6 @@ def check_availability(request):
         end = parse_time_to_minutes(b)
         return (start, end)
 
-    # prepare approved booking ranges for this ground/date
     approved_bookings = Booking.objects.filter(
         ground=ground,
         date=date_selected,
@@ -342,7 +345,6 @@ def check_availability(request):
         booked = False
         if slot_s is not None and slot_e is not None:
             for (bs, be) in approved_ranges:
-                # overlap if start < be and bs < slot_e
                 if bs < slot_e and slot_s < be:
                     booked = True
                     break
@@ -353,3 +355,54 @@ def check_availability(request):
         })
 
     return JsonResponse({"slots": slots}, status=200)
+
+# -------------------- AJAX: Fetch Student Data --------------------
+def fetch_student_data(request):
+    """
+    AJAX endpoint to fetch student info by first name
+    """
+    q = request.GET.get("q", "")
+    if not q:
+        return JsonResponse([], safe=False)
+
+    # Search by first name (split full_name and check first part)
+    students = StudentUser.objects.filter(full_name__icontains=q)[:10]
+    data = []
+    for s in students:
+        if s.full_name:  # Only include students with names
+            data.append({
+                "full_name": s.full_name,
+                "email": s.email,
+                "roll_number": s.roll_number,
+                "branch": s.branch,
+                "year": s.year,
+                "division": s.division
+            })
+    return JsonResponse(data, safe=False)
+
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from .models import AllotedGroundBooking
+
+def get_allotment_players(request, allot_id):
+    allotment = get_object_or_404(AllotedGroundBooking, id=allot_id)
+    players = allotment.booking.players.all()  # get all players linked to this booking
+    data = [
+        {
+            "name": p.name,
+            "branch": p.branch,
+            "year": p.year,
+            "division": p.division,
+        }
+        for p in players
+    ]
+    return JsonResponse({"players": data})
+
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from .models import AllotedGroundBooking
+
+def get_equipment_for_allotment(request, allot_id):
+    allotment = get_object_or_404(AllotedGroundBooking, id=allot_id)
+    equipment = allotment.booking.equipment if allotment.booking else ""
+    return JsonResponse({"equipment": equipment})

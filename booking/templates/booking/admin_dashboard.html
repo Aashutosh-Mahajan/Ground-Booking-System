@@ -46,7 +46,6 @@
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3">Name</th>
-                            <th class="px-6 py-3">Roll No</th>
                             <th class="px-6 py-3">Ground</th>
                             <th class="px-6 py-3">Date</th>
                             <th class="px-6 py-3">Time Slot</th>
@@ -61,7 +60,6 @@
                         {% for booking in bookings %}
                         <tr>
                             <td class="px-6 py-4">{{ booking.student_name }}</td>
-                            <td class="px-6 py-4">{{ booking.roll_number }}</td>
                             <td class="px-6 py-4">{{ booking.ground }}</td>
                             <td class="px-6 py-4">{{ booking.date }}</td>
                             <td class="px-6 py-4">{{ booking.time_slot }}</td>
@@ -149,7 +147,6 @@
                             <th class="px-6 py-3">Time Slot</th>
                             <th class="px-6 py-3">Equipment</th>
                             <th class="px-6 py-3">Allotted To</th>
-                            <th class="px-6 py-3">Roll Number</th>
                             <th class="px-6 py-3">Purpose</th>
                             <th class="px-6 py-3">Players</th>
                         </tr>
@@ -169,7 +166,6 @@
                                 </button>
                             </td>
                             <td class="px-6 py-4">{{ allot.allotted_to }}</td>
-                            <td class="px-6 py-4">{{ allot.roll_number }}</td>
                             <td class="px-6 py-4">{{ allot.purpose }}</td>
                             <td class="px-6 py-4">
                                 {{ allot.players }}
