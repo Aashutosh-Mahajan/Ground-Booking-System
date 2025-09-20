@@ -142,13 +142,180 @@ h1, h2, h3, h4, h5, h6 {
     .lg\:px-8 { padding-left: 2rem; padding-right: 2rem; }
 }
 
-/* Navigation */
+/* Navigation - Exact Match Design */
+.main-navbar {
+    background: #ffffff;
+    height: 64px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.navbar-wrapper {
+    max-width: 100%;
+    height: 100%;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* VIT Section (Left) */
+.vit-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.vit-logo-box {
+    width: 48px;
+    height: 48px;
+    background: #8b5cf6;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.vit-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.vit-main {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1.2;
+}
+
+.vit-sub {
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.2;
+}
+
+/* SportDeck Section (Center) */
+.sportdeck-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.sportdeck-circle {
+    width: 36px;
+    height: 36px;
+    background: #10b981;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.sportdeck-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.sportdeck-main {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1.2;
+}
+
+.sportdeck-sub {
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.2;
+}
+
+/* Navigation Section (Right) */
+.nav-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.nav-button:hover {
+    text-decoration: none;
+}
+
+.nav-button.outline {
+    background: transparent;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+}
+
+.nav-button.outline:hover {
+    background: #f9fafb;
+    color: #374151;
+    border-color: #9ca3af;
+}
+
+.nav-button.filled {
+    background: #2563eb;
+    color: white;
+    border: 1px solid #2563eb;
+}
+
+.nav-button.filled:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    color: white;
+}
+
+.nav-icon {
+    font-size: 14px;
+}
+
+/* Legacy navbar styles for compatibility */
 .navbar {
     background-color: #ffffff;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     position: sticky;
     top: 0;
     z-index: 50;
+    padding: 0;
+}
+
+.navbar-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.navbar-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+    height: 64px;
+    gap: 32px;
 }
 
 .navbar-secondary {
@@ -157,39 +324,6 @@ h1, h2, h3, h4, h5, h6 {
     position: sticky;
     top: 4rem;
     z-index: 80; 
-}
-
-.navbar-container {
-    max-width: 80rem;
-    margin: 0 auto;
-    padding: 0 1rem;
-}
-
-.navbar-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between; 
-    height: 4rem;
-}
-
-/* Left side: Logo + center menu */
-.navbar-left {
-    display: flex;
-    align-items: center;
-}
-
-
-.navbar-center {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-/* Right side: Navigation links */
-.navbar-links {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
 }
 
 .navbar-link {
@@ -513,15 +647,72 @@ details ul {
     .hero-title { font-size: 2rem; }
     .hero-subtitle { font-size: 1rem; }
     
-    .navbar-content {
+    .navbar-wrapper {
+        padding: 0 16px;
         flex-direction: column;
         height: auto;
-        padding: 1rem 0;
+        min-height: 64px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+        gap: 12px;
     }
     
-    .navbar-links {
-        margin-top: 1rem;
-        gap: 1rem;
+    .sportdeck-section {
+        position: static;
+        transform: none;
+        order: -1;
+    }
+    
+    .vit-section,
+    .sportdeck-section {
+        justify-content: center;
+    }
+    
+    .nav-section {
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .nav-button {
+        padding: 6px 12px;
+        font-size: 13px;
+        flex: 1;
+        min-width: 80px;
+        justify-content: center;
+    }
+    
+    .vit-main {
+        font-size: 16px;
+    }
+    
+    .vit-sub {
+        font-size: 11px;
+    }
+    
+    .sportdeck-main {
+        font-size: 16px;
+    }
+    
+    .sportdeck-sub {
+        font-size: 11px;
+    }
+    
+    .vit-logo-box {
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
+    }
+    
+    .sportdeck-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+    
+    .nav-icon {
+        font-size: 12px;
     }
     
     .grid-cols-2,

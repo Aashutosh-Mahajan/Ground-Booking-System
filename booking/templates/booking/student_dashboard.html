@@ -3,155 +3,388 @@
 {% block title %}Student Dashboard{% endblock %}
 
 {% block content %}
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">Student Dashboard</h1>
+        <p class="dashboard-subtitle">Book your sports facilities with ease</p>
+    </div>
 
-<div class="dashboard-center">
-    <h2 class="welcome-text">Welcome, {{ first_name }}</h2>
-    <p class="welcome-subtext">Here is your dashboard to manage your ground bookings.</p>
-</div>
-
-<div class="note-box">
-  <div class="note-content">
-    <div class="note-accent"></div>
-    <p class="note-text">
-      <span class="note-text-red">NOTE :</span> KNOW YOUR GROUND AVAILABILITY ACCORDING TO YOUR TIME, SPORT, AND GROUND.
-    </p>
-  </div>
-</div>
-
-<div>
-    <!-- Ground Booking Form Start -->
-    <div class="booking-form">
-        <!-- Date Selection -->
-        <div class="form-section date-section">
-            <h2 class="section-title">📅 Select Date</h2>
-            <div class="date-picker">
-                <input type="date" id="dateInput" min="" />
+    <!-- Progress Steps -->
+    <div class="progress-steps">
+        <div class="step-item active" id="step1">
+            <div class="step-circle">1</div>
+            <div class="step-content">
+                <h3 class="step-title">Select Date</h3>
+                <p class="step-description">Choose your preferred booking date</p>
             </div>
         </div>
+        
+        <div class="step-item" id="step2">
+            <div class="step-circle">2</div>
+            <div class="step-content">
+                <h3 class="step-title">Choose Ground</h3>
+                <p class="step-description">Pick from available facilities</p>
+            </div>
+        </div>
+        
+        <div class="step-item" id="step3">
+            <div class="step-circle">3</div>
+            <div class="step-content">
+                <h3 class="step-title">Sport & Time</h3>
+                <p class="step-description">Select sport and time slot</p>
+            </div>
+        </div>
+        
+        <div class="step-item" id="step4">
+            <div class="step-circle">4</div>
+            <div class="step-content">
+                <h3 class="step-title">Confirm</h3>
+                <p class="step-description">Review and submit booking</p>
+            </div>
+        </div>
+    </div>
 
-        <!-- Ground Selection -->
-        <div class="form-section disabled" id="groundSection">
-            <h2 class="section-title">🏟️ Choose Ground</h2>
+    <!-- Booking Form Card -->
+    <div class="booking-card">
+        <!-- Date Selection Section -->
+        <div class="form-section active" id="dateSection">
+            <div class="section-header">
+                <div class="calendar-icon">📅</div>
+                <h2 class="section-title">Select Booking Date</h2>
+                <p class="section-subtitle">Choose your preferred date for the booking</p>
+            </div>
+            
+      <div class="date-picker">
+        <label for="dateInput" class="date-label">Booking Date</label>
+        <div class="date-input-wrapper">
+          <span class="calendar-icon-small">📅</span>
+          <input type="date" id="dateInput" class="native-date-input" aria-label="Select booking date" />
+        </div>
+                <!-- Custom calendar fallback -->
+                <div id="customCalendar" class="custom-calendar hidden" aria-hidden="true">
+                  <div class="cal-header">
+                    <button type="button" class="cal-nav" id="calPrev" aria-label="Previous Month">‹</button>
+                    <div class="cal-month-year" id="calMonthLabel"></div>
+                    <button type="button" class="cal-nav" id="calNext" aria-label="Next Month">›</button>
+                  </div>
+                  <div class="cal-weekdays" id="calWeekdays"></div>
+                  <div class="cal-days" id="calDays"></div>
+                </div>
+      </div>
+        </div>
+
+        <!-- Ground Selection Section -->
+        <div class="form-section hidden" id="groundSection">
+            <div class="section-header">
+                <div class="ground-icon">FIELD</div>
+                <h2 class="section-title">Choose Ground</h2>
+                <p class="section-subtitle">Pick from available facilities</p>
+            </div>
+            
             <div class="grounds-grid">
                 <div class="ground-card" onclick="selectGround('A', event)">
                     <div class="ground-title">Ground A</div>
                     <div class="sports-list">
-                        <span class="sport-tag">🤾 Handball</span>
-                        <span class="sport-tag">🏐 Volleyball</span>
-                        <span class="sport-tag">🏏 Cricket</span>
-                        <span class="sport-tag">🏀 Basketball</span>
+                        <span class="sport-tag">Handball</span>
+                        <span class="sport-tag">Volleyball</span>
+                        <span class="sport-tag">Cricket</span>
+                        <span class="sport-tag">Basketball</span>
                     </div>
                 </div>
                 <div class="ground-card" onclick="selectGround('B', event)">
                     <div class="ground-title">Ground B</div>
                     <div class="sports-list">
-                        <span class="sport-tag">⚽ Football</span>
+                        <span class="sport-tag">Football</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Sport Selection -->
-        <div class="form-section sports-section disabled" id="sportsSection">
-            <h2 class="section-title">🏃 Select Sport</h2>
-            <div class="sports-grid" id="sportsGrid"></div>
+        <!-- Sport & Time Selection Section -->
+        <div class="form-section hidden" id="sportTimeSection">
+            <div class="section-header">
+                <div class="sport-icon">SPORT</div>
+                <h2 class="section-title">Sport & Time</h2>
+                <p class="section-subtitle">Select sport and time slot</p>
+            </div>
+            
+            <div class="sport-time-container">
+                <div class="sports-section">
+                    <h3>Available Sports</h3>
+                    <div class="sports-grid" id="sportsGrid"></div>
+                </div>
+                
+                <div class="time-section">
+                    <h3>Available Time Slots</h3>
+                    <div class="time-slots-grid" id="slotsGrid"></div>
+                </div>
+            </div>
 
-            <!-- ✅ Equipment Card -->
-            <div id="equipmentSection" class="equipment-card hidden">
-                <label class="equipment-label">
+            <!-- Equipment Section -->
+            <div id="equipmentSection" class="equipment-section hidden">
+                <h3>Equipment Requirements</h3>
+                <label class="equipment-checkbox">
                     <input type="checkbox" id="equipmentCheckbox" checked>
+                    <span class="checkmark"></span>
                     Need equipment? (Yes/No)
                 </label>
                 <div id="equipmentField" class="equipment-field">
-                    <textarea id="equipmentInput" readonly></textarea>
+                    <textarea id="equipmentInput" placeholder="Specify equipment needed..." readonly></textarea>
                 </div>
             </div>
         </div>
 
-        <!-- Time Slots -->
-        <div class="form-section disabled" id="timeSection">
-            <h2 class="section-title">⏰ Choose Time Slot</h2>
-            <div class="time-slots-grid" id="slotsGrid"></div>
-        </div>
-
-        <!-- Booking Summary -->
-        <div class="booking-summary">
-            <div class="summary-grid">
-                <div class="summary-item">
-                    <span>📅 Date:</span>
-                    <strong id="summaryDate">Not selected</strong>
-                </div>
-                <div class="summary-item">
-                    <span>🏟️ Ground:</span>
-                    <strong id="summaryGround">Not selected</strong>
-                </div>
-                <div class="summary-item">
-                    <span>🏃 Sport:</span>
-                    <strong id="summarySport">Not selected</strong>
-                </div>
-                <div class="summary-item">
-                    <span>⏰ Time:</span>
-                    <strong id="summaryTime">Not selected</strong>
-                </div>
-                <div class="summary-item">
-                    <span>🎒 Equipment:</span>
-                    <strong id="summaryEquipment">Yes (default)</strong>
-                </div>
+        <!-- Confirmation Section -->
+        <div class="form-section hidden confirm-section" id="confirmSection">
+            <div class="section-header">
+                <div class="confirm-icon">✓</div>
+                <h2 class="section-title">Confirm Your Booking</h2>
+                <p class="section-subtitle">Review your booking details before submitting</p>
             </div>
-            <button class="confirm-btn" id="confirmBtn" onclick="confirmBooking()" disabled>
-                Confirm Booking
-            </button>
+            
+            <div class="booking-summary confirm-wrapper">
+                <h3 class="booking-summary-title">Booking Summary</h3>
+                <div class="summary-card">
+                    <div class="summary-item">
+                        <span class="summary-label">Date:</span>
+                        <strong id="summaryDate" class="summary-value">Not selected</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Facility:</span>
+                        <strong id="summaryGround" class="summary-value">Not selected</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Sport:</span>
+                        <strong id="summarySport" class="summary-value">Not selected</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Time Slot:</span>
+                        <strong id="summaryTime" class="summary-value">Not selected</strong>
+                    </div>
+                </div>
+                
+                <button class="submit-booking-btn" onclick="submitBooking()">
+                    <span>Proceed to Book</span>
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
 let bookingData = { date: '', ground: '', sport: '', timeSlot: '', equipment: 'Yes' };
+let currentStep = 1;
 
 const groundSports = {
     'A': [
-        { name: 'Handball', icon: '🤾' },
-        { name: 'Volleyball', icon: '🏐' },
-        { name: 'Cricket', icon: '🏏' },
-        { name: 'Basketball', icon: '🏀' }
+        { name: 'Handball', icon: 'HB' },
+        { name: 'Volleyball', icon: 'VB' },
+        { name: 'Cricket', icon: 'CR' },
+        { name: 'Basketball', icon: 'BB' }
     ],
     'B': [
-        { name: 'Football', icon: '⚽' }
+        { name: 'Football', icon: 'FB' }
     ]
 };
 
-// Set minimum date to today
-document.getElementById('dateInput').min = new Date().toISOString().split('T')[0];
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+  const dateInput = document.getElementById('dateInput');
+  const cal = document.getElementById('customCalendar');
+  const calMonthLabel = document.getElementById('calMonthLabel');
+  const calDays = document.getElementById('calDays');
+  const calWeekdays = document.getElementById('calWeekdays');
+  const calPrev = document.getElementById('calPrev');
+  const calNext = document.getElementById('calNext');
+  const today = new Date();
+  let viewYear = today.getFullYear();
+  let viewMonth = today.getMonth();
+  const minDateStr = today.toISOString().split('T')[0];
+  if (dateInput) dateInput.min = minDateStr;
 
-document.getElementById('dateInput').addEventListener('change', function () {
-    bookingData.date = this.value;
-    if (this.value) {
-        document.getElementById('groundSection').classList.remove('disabled');
-    } else {
-        document.getElementById('groundSection').classList.add('disabled');
-        document.getElementById('sportsSection').classList.add('disabled');
-        document.getElementById('timeSection').classList.add('disabled');
-        resetSelections();
+  const weekdayLabels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  if (calWeekdays && !calWeekdays.dataset.built) {
+    weekdayLabels.forEach(d => {
+      const div = document.createElement('div');
+      div.textContent = d;
+      calWeekdays.appendChild(div);
+    });
+    calWeekdays.dataset.built = '1';
+  }
+
+  function renderCalendar() {
+    if (!calDays) return;
+    calDays.innerHTML = '';
+    const firstOfMonth = new Date(viewYear, viewMonth, 1);
+    const startDay = firstOfMonth.getDay();
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+    const prevMonthDays = new Date(viewYear, viewMonth, 0).getDate();
+
+    if (calMonthLabel) {
+      calMonthLabel.textContent = firstOfMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     }
-    updateSummary();
+
+    // Fill leading days from previous month
+    for (let i = 0; i < startDay; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = String(prevMonthDays - startDay + 1 + i);
+      btn.className = 'other';
+      btn.tabIndex = -1;
+      btn.disabled = true;
+      calDays.appendChild(btn);
+    }
+    // Current month days
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateObj = new Date(viewYear, viewMonth, d);
+      const dateStr = dateObj.toISOString().split('T')[0];
+      const btn = document.createElement('button');
+      btn.textContent = d;
+      const todayObj = new Date();
+      if (dateObj.getFullYear() === todayObj.getFullYear() && dateObj.getMonth() === todayObj.getMonth() && dateObj.getDate() === todayObj.getDate()) {
+        btn.classList.add('today');
+      }
+      if (dateStr < minDateStr) {
+        btn.classList.add('disabled');
+        btn.disabled = true;
+      }
+      if (dateInput && dateInput.value === dateStr) {
+        btn.classList.add('selected');
+      }
+      btn.addEventListener('click', () => {
+        if (btn.disabled) return;
+        if (dateInput) {
+          dateInput.value = dateStr;
+          bookingData.date = dateStr;
+          hideCalendar();
+          nextStep();
+          updateSummary();
+        }
+      });
+      calDays.appendChild(btn);
+    }
+  }
+
+  function showCalendar() {
+    if (!cal) return;
+    cal.classList.remove('hidden');
+    cal.setAttribute('aria-hidden', 'false');
+    renderCalendar();
+    document.addEventListener('click', outsideHandler, { capture: true });
+  }
+  function hideCalendar() {
+    if (!cal) return;
+    cal.classList.add('hidden');
+    cal.setAttribute('aria-hidden', 'true');
+    document.removeEventListener('click', outsideHandler, { capture: true });
+  }
+  function outsideHandler(e) {
+    if (!cal) return;
+    if (!cal.contains(e.target) && e.target !== dateInput) {
+      hideCalendar();
+    }
+  }
+  // positioning handled purely by CSS now (calendar shows above input)
+
+  if (calPrev) calPrev.addEventListener('click', () => { viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; } renderCalendar(); });
+  if (calNext) calNext.addEventListener('click', () => { viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; } renderCalendar(); });
+
+  if (dateInput) {
+    dateInput.addEventListener('focus', showCalendar);
+    dateInput.addEventListener('click', (e) => { e.preventDefault(); showCalendar(); });
+    dateInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') hideCalendar();
+    });
+    dateInput.addEventListener('change', function() {
+      // In browsers where native picker works, selecting triggers change
+      bookingData.date = this.value;
+      if (this.value) { nextStep(); }
+      updateSummary();
+    });
+  }
+
+    // Equipment checkbox listener
+    const equipmentCheckbox = document.getElementById('equipmentCheckbox');
+    if (equipmentCheckbox) {
+        equipmentCheckbox.addEventListener('change', function() {
+            const field = document.getElementById('equipmentField');
+            if (this.checked) {
+                field.style.display = "block";
+                bookingData.equipment = 'Yes';
+            } else {
+                field.style.display = "none";
+                bookingData.equipment = 'No';
+            }
+            updateSummary();
+        });
+    }
 });
+
+function updateStepIndicators() {
+    // Update step indicators
+    for (let i = 1; i <= 4; i++) {
+        const stepElement = document.getElementById(`step${i}`);
+        if (i <= currentStep) {
+            stepElement.classList.add('active');
+        } else {
+            stepElement.classList.remove('active');
+        }
+    }
+
+    // Update form sections
+    const sections = ['dateSection', 'groundSection', 'sportTimeSection', 'confirmSection'];
+    sections.forEach((sectionId, index) => {
+        const section = document.getElementById(sectionId);
+        if (index + 1 === currentStep) {
+            section.classList.remove('hidden');
+        } else {
+            section.classList.add('hidden');
+        }
+    });
+}
+
+function nextStep() {
+    if (currentStep < 4) {
+        currentStep++;
+        updateStepIndicators();
+    }
+}
+
+function resetToStep(step) {
+    currentStep = step;
+    updateStepIndicators();
+    
+    // Reset subsequent data
+  if (step <= 1) {
+    bookingData = { date: '', ground: '', sport: '', timeSlot: '', equipment: 'Yes' };
+    } else if (step <= 2) {
+        bookingData.ground = '';
+        bookingData.sport = '';
+        bookingData.timeSlot = '';
+    } else if (step <= 3) {
+        bookingData.sport = '';
+        bookingData.timeSlot = '';
+    }
+    
+    updateSummary();
+}
 
 function selectGround(ground, event) {
     bookingData.ground = ground;
     bookingData.sport = '';
     bookingData.timeSlot = '';
-    bookingData.equipment = 'Yes';
 
+    // Update UI
     document.querySelectorAll('.ground-card').forEach(c => c.classList.remove('selected'));
     event.currentTarget.classList.add('selected');
 
-    document.getElementById('sportsSection').classList.remove('disabled');
+    // Populate sports for this ground
     populateSports(ground);
-
-    // don't fetch time slots yet — wait for sport selection because slots depend on sport
-    document.getElementById('timeSection').classList.add('disabled');
-
-    document.querySelectorAll('.sport-option, .time-slot').forEach(el => el.classList.remove('selected'));
+    
+    // Move to next step
+    setTimeout(() => {
+        nextStep();
+    }, 500);
 
     updateSummary();
 }
@@ -172,14 +405,13 @@ function selectSport(sport, event) {
     bookingData.sport = sport;
     document.querySelectorAll('.sport-option').forEach(o => o.classList.remove('selected'));
     event.currentTarget.classList.add('selected');
-    updateSummary();
 
-    // ✅ Show equipment section
+    // Show equipment section
     const equipSection = document.getElementById('equipmentSection');
     const equipInput = document.getElementById('equipmentInput');
     equipSection.classList.remove('hidden');
 
-    // ✅ Autofill equipment text rules
+    // Autofill equipment text
     if (sport === "Football") {
         equipInput.value = "1. Football\n2. Cones and Marker";
     } else if (sport === "Cricket") {
@@ -188,227 +420,689 @@ function selectSport(sport, event) {
         equipInput.value = sport;
     }
 
-    // Default checked
-    document.getElementById('equipmentCheckbox').checked = true;
-    document.getElementById('equipmentField').style.display = "block";
-    bookingData.equipment = 'Yes';
-    updateSummary();
-
-    // Now that sport is selected, enable time section and fetch availability for the chosen ground
-    if (bookingData.ground) {
-        document.getElementById('timeSection').classList.remove('disabled');
+    // Fetch available time slots
+    if (bookingData.ground && bookingData.date) {
         fetchAvailability(bookingData.ground);
     }
-}
 
-// ✅ Toggle equipment field
-document.getElementById('equipmentCheckbox').addEventListener('change', function() {
-    const field = document.getElementById('equipmentField');
-    if (this.checked) {
-        field.style.display = "block";
-        bookingData.equipment = 'Yes';
-    } else {
-        field.style.display = "none";
-        bookingData.equipment = 'No';
-    }
     updateSummary();
-});
-
-async function fetchAvailability(ground) {
-    const dateInput = document.getElementById('dateInput');
-    const date = dateInput ? dateInput.value : null;
-
-    if (!date) { alert("Please select a date first!"); return; }
-
-    const grid = document.getElementById('slotsGrid');
-    grid.innerHTML = '<div class="loading">Loading...</div>';
-
-    try {
-        const res = await fetch("{% url 'check_availability' %}?date=" + date + "&ground=" + ground);
-        const data = await res.json();
-
-        grid.innerHTML = '';
-        // Only show the two allowed combined slots. Use server small-slot
-        // statuses to determine if any part of the allowed slot is booked.
-        const allowedSlots = ["7:00 AM - 9:00 AM", "4:00 PM - 6:00 PM"];
-
-        function parseTimeToMinutesJS(tstr) {
-            tstr = tstr.trim();
-            // handle AM/PM
-            const ampmMatch = tstr.match(/(\d{1,2}:?\d{0,2})\s*(AM|PM)/i);
-            if (ampmMatch) {
-                let time = ampmMatch[1];
-                if (!time.includes(':')) time = time + ':00';
-                const [h, m] = time.split(':').map(x => parseInt(x, 10));
-                let hh = h % 12;
-                if (/PM/i.test(ampmMatch[2])) hh += 12;
-                return hh * 60 + (m || 0);
-            }
-            // handle 24h like 07:00
-            const parts = tstr.split(':');
-            if (parts.length === 2) {
-                const hh = parseInt(parts[0], 10);
-                const mm = parseInt(parts[1], 10) || 0;
-                return hh * 60 + mm;
-            }
-            return null;
-        }
-
-        function parseRangeJS(rng) {
-            const parts = rng.split('-');
-            if (parts.length < 2) return [null, null];
-            const a = parts[0].trim();
-            const b = parts[1].trim();
-            return [parseTimeToMinutesJS(a), parseTimeToMinutesJS(b)];
-        }
-
-        // build a small-slot map from server data for quick checking
-        const serverSlots = data.slots || [];
-
-        allowedSlots.forEach(allowed => {
-            const div = document.createElement('div');
-            div.className = 'time-slot';
-            div.textContent = allowed;
-
-            const [allowedS, allowedE] = parseRangeJS(allowed);
-            let booked = false;
-            if (allowedS !== null && allowedE !== null) {
-                for (const s of serverSlots) {
-                    const [ss, se] = parseRangeJS(s.time);
-                    if (ss === null || se === null) continue;
-                    // overlap
-                    if (ss < allowedE && allowedS < se) {
-                        if (s.status === 'booked') { booked = true; break; }
-                    }
-                }
-            }
-
-            if (booked) {
-                div.classList.add('booked');
-                div.title = 'This slot is already booked';
-            } else {
-                div.classList.add('available');
-                div.onclick = (e) => selectTimeSlot(allowed, e);
-            }
-
-            grid.appendChild(div);
-        });
-
-    } catch (error) {
-        console.error("Error fetching slots:", error);
-        grid.innerHTML = '<div class="error">Failed to load slots</div>';
-    }
 }
 
 function selectTimeSlot(slot, event) {
     bookingData.timeSlot = slot;
-    document.querySelectorAll('.time-slot:not(.booked)').forEach(s => s.classList.remove('selected'));
+    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
     event.currentTarget.classList.add('selected');
+    
     updateSummary();
+    
+    // Move to confirmation step
+    setTimeout(() => {
+        nextStep();
+    }, 500);
 }
 
-function resetSelections() {
-    bookingData = { date: '', ground: '', sport: '', timeSlot: '', equipment: 'Yes' };
-    document.querySelectorAll('.ground-card,.sport-option,.time-slot').forEach(el => el.classList.remove('selected'));
+async function fetchAvailability(ground) {
+  const date = bookingData.date;
+  const sport = bookingData.sport;
+  if (!date || !sport) return;
+
+  const grid = document.getElementById('slotsGrid');
+  grid.innerHTML = '<div class="loading">Loading available slots...</div>';
+
+  try {
+  const params = new URLSearchParams({ ground, date, sport });
+    const res = await fetch(`/check-availability/?${params.toString()}`);
+    if (!res.ok) throw new Error('Network error');
+    const data = await res.json();
+
+    grid.innerHTML = '';
+    (data.slots || []).forEach(({ time, status }) => {
+      const slotDiv = document.createElement('div');
+      slotDiv.className = `time-slot ${status}`; // available | booked | freeze
+      slotDiv.textContent = time.replace(/^0/, ''); // light fmt tweak
+      if (status === 'available') {
+        slotDiv.onclick = (e) => selectTimeSlot(time, e);
+      } else {
+        slotDiv.setAttribute('aria-disabled', 'true');
+        slotDiv.style.opacity = '0.6';
+        slotDiv.style.cursor = 'not-allowed';
+      }
+      grid.appendChild(slotDiv);
+    });
+  } catch (error) {
+    console.error('Error fetching availability:', error);
+    grid.innerHTML = '<div class="loading">Error loading slots. Please try again.</div>';
+  }
 }
 
 function updateSummary() {
-    document.getElementById('summaryDate').textContent = bookingData.date ? new Date(bookingData.date).toDateString() : 'Not selected';
-    document.getElementById('summaryGround').textContent = bookingData.ground ? `Ground ${bookingData.ground}` : 'Not selected';
+    document.getElementById('summaryDate').textContent = bookingData.date || 'Not selected';
+    document.getElementById('summaryGround').textContent = bookingData.ground ? `Premium Sports Complex ${bookingData.ground}` : 'Not selected';
     document.getElementById('summarySport').textContent = bookingData.sport || 'Not selected';
-    document.getElementById('summaryTime').textContent = bookingData.timeSlot || 'Not selected';
-    document.getElementById('summaryEquipment').textContent = bookingData.equipment;
-    document.getElementById('confirmBtn').disabled = !(bookingData.date && bookingData.ground && bookingData.sport && bookingData.timeSlot);
+    document.getElementById('summaryTime').textContent = bookingData.timeSlot ? `Morning Session (${bookingData.timeSlot})` : 'Not selected';
 }
 
-function confirmBooking() {
-    if (bookingData.date && bookingData.ground && bookingData.sport && bookingData.timeSlot) {
-        const params = new URLSearchParams({
-            date: bookingData.date,
-            ground: bookingData.ground,
-            sport: bookingData.sport,
-            time_slot: bookingData.timeSlot,
-            equipment: bookingData.equipment
-        }).toString();
-        window.location.href = `{% url 'student_booking' %}?${params}`;
+async function submitBooking() {
+    if (!bookingData.date || !bookingData.ground || !bookingData.sport || !bookingData.timeSlot) {
+        alert('Please complete all required fields before submitting.');
+        return;
+    }
+
+    try {
+    // Redirect to Django student booking form with prefilled details via query params
+    const params = new URLSearchParams({
+      date: bookingData.date,
+      ground: bookingData.ground,
+      sport: bookingData.sport,
+      time_slot: bookingData.timeSlot,
+      equipment: bookingData.equipment
+    });
+    window.location.href = `/student/booking/?${params.toString()}`;
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error submitting booking. Please try again.');
     }
 }
+
+// Initialize the dashboard
+updateStepIndicators();
 </script>
 
 <style>
-.hidden { display: none; }
-
-/* Equipment Card */
-.equipment-card {
-    margin-top: 20px;
-    padding: 15px;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    background-color: #f9fafb;
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.equipment-label {
-    font-size: 16px;
-    font-weight: 500;
-    color: #374151;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: #f8fafc;
+  color: #334155;
+  line-height: 1.6;
 }
 
-.equipment-card input[type="checkbox"] {
-    transform: scale(1.2);
-    accent-color: #2563eb;
-    cursor: pointer;
+/* Dashboard Container */
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px;
 }
 
-.equipment-field {
-    margin-top: 12px;
+/* Header */
+.dashboard-header {
+  margin-bottom: 48px;
+}
+
+.dashboard-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.dashboard-subtitle {
+  font-size: 16px;
+  color: #64748b;
+  font-weight: 400;
+}
+
+/* Progress Steps - Exact match to image */
+.progress-steps {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 48px;
+  padding: 0 40px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  max-width: 180px;
+}
+
+.step-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  border: 3px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #94a3b8;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.step-item.active .step-circle {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.step-content {
+  text-align: center;
+}
+
+.step-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.step-description {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* Main Booking Card - Exact match to image */
+.booking-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  overflow: visible; /* allow calendar popup */
+  position: relative; /* establish stacking context */
+  max-width: 900px;
+  margin: 0 auto;
+  z-index: 1;
+}
+
+/* Form Sections */
+.form-section {
+  padding: 48px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.form-section:last-child {
+  border-bottom: none;
+}
+
+.form-section.hidden {
+  display: none;
+}
+
+/* Section Header - Exact match to image */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.calendar-icon, .ground-icon, .sport-icon, .confirm-icon {
+  font-size: 14px;
+  font-weight: 600;
+  background: #3b82f6;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  min-width: 50px;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.section-subtitle {
+  font-size: 16px;
+  color: #64748b;
+  margin: 0;
+  margin-left: auto;
+}
+
+/* Date Picker - Exact match to image */
+.date-picker {
+  margin-top: 16px;
+  position: relative; /* ensure overlay is positioned relative to this container */
+  display: inline-block;
+}
+
+/* Overlay input sits on top of the visible button and receives pointer events */
+/* New native date input styling */
+.date-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  width: 240px;
+  transition: border-color .25s, background .25s;
+}
+
+.date-input-wrapper:hover {
+  border-color: #3b82f6;
+  background: #ffffff;
+}
+
+.native-date-input {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: none;
+  font-size: 15px;
+  color: #475569;
+  width: 100%;
+  cursor: pointer;
+  outline: none;
+}
+
+.native-date-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0; /* Hide default icon; we use our own */
+}
+
+.native-date-input:focus {
+  outline: none;
+}
+
+/* Custom calendar fallback */
+.custom-calendar {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  margin-bottom: 8px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+  border-radius: 12px;
+  padding: 12px;
+  width: 240px; /* match wrapper width */
+  z-index: 500;
+  animation: slideUp .18s ease;
+}
+.custom-calendar.hidden { display: none; }
+.cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.cal-month-year { font-weight: 600; font-size: 15px; color: #1e293b; }
+.cal-nav { background: #f1f5f9; border: 1px solid #e2e8f0; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 18px; line-height: 1; display: flex; align-items: center; justify-content: center; color: #334155; }
+.cal-nav:hover { background:#e2e8f0; }
+.cal-weekdays, .cal-days { display: grid; grid-template-columns: repeat(7, 1fr); }
+.cal-weekdays { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color:#64748b; margin-bottom: 4px; }
+.cal-weekdays div { text-align: center; padding:4px 0; }
+.cal-days button { border:none; background:none; padding:6px 0; font-size:13px; cursor:pointer; border-radius:6px; color:#334155; position:relative; min-height:32px; }
+.cal-days button.other { opacity:.35; cursor:default; }
+.cal-days button:focus { outline:2px solid #3b82f6; outline-offset:2px; }
+.cal-days button:not(.other):hover { background:#eff6ff; }
+.cal-days button.selected { background:#3b82f6; color:#fff; font-weight:600; }
+.cal-days button.today:not(.selected) { box-shadow: 0 0 0 2px #3b82f6 inset; font-weight:600; }
+.cal-days button.disabled { color:#94a3b8; cursor:not-allowed; opacity:.5; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(4px);} to { opacity:1; transform:translateY(0);} }
+@keyframes slideUp { from { opacity:0; transform:translateY(6px);} to { opacity:1; transform:translateY(0);} }
+
+.calendar-icon-small {
+  font-size: 12px;
+  font-weight: 600;
+  background: #f3f4f6;
+  color: #374151;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+}
+
+/* Grounds Grid */
+.grounds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.ground-card {
+  padding: 24px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ground-card:hover {
+  border-color: #3b82f6;
+  background: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.ground-card.selected {
+  border-color: #3b82f6;
+  background: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.ground-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 12px;
+}
+
+.sports-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sport-tag {
+  padding: 6px 12px;
+  background: #dbeafe;
+  color: #1e40af;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Sport & Time Container */
+.sport-time-container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin-top: 32px;
+}
+
+.sports-section h3, .time-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 16px;
+}
+
+.sports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.sport-option {
+  padding: 14px 18px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.sport-option:hover {
+  border-color: #3b82f6;
+  background: white;
+}
+
+.sport-option.selected {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #1e3a8a;
+  box-shadow: 0 4px 12px rgba(37,99,235,0.18);
+}
+
+.time-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 16px;
+  max-width: 540px;
+}
+
+.time-slot {
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.time-slot.available {
+  background: #dcfce7;
+  border-color: #16a34a;
+  color: #15803d;
+}
+
+.time-slot.available:hover {
+  background: #bbf7d0;
+}
+
+.time-slot.selected {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.time-slot.booked {
+  background: #fecaca;
+  border-color: #ef4444;
+  color: #dc2626;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.time-slot.freeze {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+/* Equipment Section */
+.equipment-section {
+  margin-top: 32px;
+  padding: 24px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.equipment-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 16px;
+}
+
+.equipment-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+.equipment-checkbox input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #3b82f6;
+  cursor: pointer;
 }
 
 .equipment-field textarea {
-    width: 100%;
-    height: 80px;
-    padding: 12px 14px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 16px;
-    color: #111827;
-    background-color: #fff;
-    resize: none;
+  width: 100%;
+  height: 100px;
+  padding: 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 14px;
+  background: white;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.3s ease;
 }
 
-/* Time slot states */
-.time-slot.booked {
-    background-color: #fecaca; /* light red */
-    border-color: #f87171;
-    color: #721c24;
-    cursor: not-allowed;
-    pointer-events: none; /* make unclickable */
-}
-.time-slot.freeze {
-    background-color: #e5e7eb; /* grey */
-    color: #6b7280;
-    cursor: not-allowed;
-}
-.time-slot.available {
-    cursor: pointer;
+.equipment-field textarea:focus {
+  border-color: #3b82f6;
 }
 
-/* Larger green style for the allowed combined slots */
-.time-slot.available {
-    background-color: #bbf7d0; /* light green */
-    border: 1px solid #34d399;
-    color: #065f46;
-    padding: 12px 18px;
-    font-weight: 600;
+/* Booking Summary */
+.booking-summary {
+  margin-top: 32px;
 }
-.time-slot.booked {
-    background-color: #fecaca; /* light red */
-    border-color: #f87171;
-    color: #7f1d1d;
+
+.booking-summary-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 16px;
+  padding-left: 4px;
 }
-.time-slot { border-radius: 6px; display: inline-block; margin-right: 12px; }
+
+.confirm-section {
+  padding: 48px;
+}
+
+.confirm-wrapper {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.summary-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: none;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: none;
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+}
+
+.summary-label {
+  font-size: 16px;
+  color: #6b7280;
+  font-weight: 400;
+}
+
+.summary-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Submit Button */
+.submit-booking-btn {
+  width: 100%;
+  padding: 14px 24px;
+  background: #1e40af;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: none;
+}
+
+.submit-booking-btn:hover {
+  background: #1e3a8a;
+}
+
+.submit-arrow {
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+.submit-booking-btn:hover .submit-arrow {
+  transform: translateX(4px);
+}
+
+/* Loading State */
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #64748b;
+  font-size: 16px;
+}
+
+/* Hidden Elements */
+.hidden {
+  display: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 16px;
+  }
+  
+  .progress-steps {
+    flex-direction: column;
+    gap: 24px;
+    padding: 0;
+  }
+  
+  .step-item {
+    flex-direction: row;
+    text-align: left;
+    max-width: none;
+  }
+  
+  .step-circle {
+    margin-bottom: 0;
+    margin-right: 16px;
+  }
+  
+  .form-section {
+    padding: 24px;
+  }
+  
+  .sport-time-container {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .grounds-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
 </style>
 
 {% endblock %}

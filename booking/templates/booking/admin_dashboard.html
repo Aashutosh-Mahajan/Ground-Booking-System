@@ -1,109 +1,152 @@
 {% extends 'base.html' %}
-{% block title %}Admin Dashboard{% endblock %}
-{% block content %}
-<div id="admin-dashboard-page" class="page-content relative z-0">
-    <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+{% load static %}
 
-        <!-- Dashboard Header -->
-        <div class="flex justify-between items-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="admin-dashboard">
+    <div class="dashboard-container">
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-header">
+                <svg class="filter-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46 22,3"></polygon>
+                </svg>
+                <h3>Filter Bookings</h3>
+            </div>
+            <form method="GET" class="filter-form">
+                <div class="filter-group">
+                    <label>Filter by Date</label>
+                    <div class="date-input-wrapper">
+                        <input type="text" name="date_display" placeholder="dd-mm-yyyy" value="" id="date-filter" readonly onclick="openDatePicker()">
+                        <input type="hidden" name="date" id="date-filter-iso" value="{{ request.GET.date }}">
+                        <svg class="calendar-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" onclick="openDatePicker()">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label>Filter by Ground</label>
+                    <select name="ground">
+                        <option value="">All Grounds</option>
+                        <option value="A" {% if request.GET.ground == "A" %}selected{% endif %}>A</option>
+                        <option value="B" {% if request.GET.ground == "B" %}selected{% endif %}>B</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Search Students</label>
+                    <div class="search-input">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="21 21l-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" name="search" placeholder="Search by name or ID..." value="{{ request.GET.search }}">
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="apply-btn">Apply Filter</button>
+                    <a href="{% url 'custom_admin_dashboard' %}" class="clear-btn">Clear</a>
+                </div>
+            </form>
         </div>
 
-        <!-- Filter Bar -->
-<div class="filter-box">
-  <h3>Filter Bookings</h3>
-
-  <form id="filter-form" method="get" action="{% url 'custom_admin_dashboard' %}">
-    <div class="filter-grid">
-      <div class="filter-field">
-        <label>Filter by Date</label>
-        <input type="date" name="date" value="{{ selected_date }}">
-      </div>
-
-      <div class="filter-field">
-        <label>Filter by Ground</label>
-        <select name="ground">
-          <option value="">All Grounds</option>
-          <option value="A" {% if selected_ground == "A" %}selected{% endif %}>Ground A</option>
-          <option value="B" {% if selected_ground == "B" %}selected{% endif %}>Ground B</option>
-        </select>
-      </div>
-
-      <div class="filter-actions">
-        <button type="submit" class="btn-primary">Apply Filter</button>
-        <a href="{% url 'custom_admin_dashboard' %}" class="btn-secondary">Clear</a>
-      </div>
-    </div>
-  </form>
-</div>
-        <!-- Booking Requests Table -->
-        <div class="bg-white rounded-lg shadow overflow-hidden mb-10">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold">Booking Requests</h3>
+        <!-- Booking Requests Section -->
+        <div class="table-section">
+            <div class="section-header">
+                <svg class="section-icon warning" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <h2>Booking Requests</h2>
+                <div class="section-count">{{ bookings|length }} Pending</div>
+                <button class="view-all">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    View All
+                </button>
             </div>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 admin-table" style="min-width: 1100px;">
-                    <thead class="bg-gray-50">
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
                         <tr>
-                            <th class="px-6 py-3">Name</th>
-                            <th class="px-6 py-3">Ground</th>
-                            <th class="px-6 py-3">Date</th>
-                            <th class="px-6 py-3">Time Slot</th>
-                            <th class="px-6 py-3">Equipment</th>
-                            <th class="px-6 py-3">Purpose</th>
-                            <th class="px-6 py-3">Players</th>
-                            <th class="px-6 py-3">Status</th>
-                            <th class="px-6 py-3">Actions</th>
+                            <th>Name</th>
+                            <th>Ground</th>
+                            <th>Date</th>
+                            <th>Time Slot</th>
+                            <th>Equipment</th>
+                            <th>Sport</th>
+                            <th>Purpose</th>
+                            <th>Players</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody>
                         {% for booking in bookings %}
                         <tr>
-                            <td class="px-6 py-4">{{ booking.student_name }}</td>
-                            <td class="px-6 py-4">{{ booking.ground }}</td>
-                            <td class="px-6 py-4">{{ booking.date }}</td>
-                            <td class="px-6 py-4">{{ booking.time_slot }}</td>
-                            <td class="px-6 py-4">
-                                <button
-                                    class="ml-2 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-xs show-equipment-btn"
-                                    data-id="{{ booking.id }}"
-                                    data-type="booking">
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                    </div>
+                                    <div class="user-details">
+                                        <div class="user-name">{{ booking.student_name }}</div>
+                                        <div class="user-id">VIT{{ booking.id|stringformat:"07d" }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="ground-cell">{{ booking.ground }}</td>
+                            <td>{{ booking.date|date:"M. d, Y" }}</td>
+                            <td>{{ booking.time_slot }}</td>
+                            <td>
+                                <button class="show-equipment-btn" data-id="{{ booking.id }}" data-type="booking">
                                     Show Equipment
                                 </button>
                             </td>
-                            <td class="px-6 py-4">{{ booking.purpose }}</td>
-                            <td class="px-6 py-4">
-                                {{ booking.number_of_players }}
-                                <button 
-                                    class="ml-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs show-players-btn"
-                                    data-id="{{ booking.id }}"
-                                    data-type="booking">
-                                    Show Players
+                            <td>{{ booking.sport }}</td>
+                            <td>{{ booking.purpose }}</td>
+                            <td>
+                                <button class="players-btn" data-id="{{ booking.id }}" data-type="booking">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                    <span class="player-count">{{ booking.number_of_players }}</span>
                                 </button>
                             </td>
-                            <td class="px-6 py-4">
-                                {% if booking.status == "Approved" %}
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Approved</span>
-                                {% elif booking.status == "Rejected" %}
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Rejected</span>
-                                {% else %}
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
-                                {% endif %}
+                            <td>
+                                <span class="status-badge {% if booking.status == 'Approved' %}approved{% elif booking.status == 'Rejected' %}rejected{% else %}pending{% endif %}">
+                                    {{ booking.status }}
+                                </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+                            <td class="actions-cell">
                                 {% if booking.status == "Pending" %}
-                                    <a href="{% url 'approve_booking' booking.id %}" 
-                                       class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs">Approve</a>
-                                    <a href="{% url 'reject_booking' booking.id %}" 
-                                       class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">Reject</a>
+                                    <a href="{% url 'approve_booking' booking.id %}" class="action-btn accept-btn">Accept</a>
+                                    <button class="action-btn reject-btn">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
+                                    </button>
                                 {% else %}
-                                    <span class="text-gray-500 text-xs italic">Action taken</span>
+                                    <span class="action-taken">Action taken</span>
                                 {% endif %}
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="9" class="px-6 py-4 text-center text-gray-500">No booking requests found</td>
+                            <td colspan="10" class="no-data">No booking requests found</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -111,140 +154,1175 @@
             </div>
         </div>
 
-        <!-- Allotted Grounds -->
-        <div class="bg-white rounded-lg shadow overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold">Allotted Grounds</h3>
+        <!-- Allotted Grounds Section -->
+        <div class="table-section">
+            <div class="section-header">
+                <svg class="section-icon success" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22,4 12,14.01 9,11.01"></polyline>
+                </svg>
+                <h2>Allotted Grounds</h2>
+                <div class="section-count">{{ allotments_paginator.count }} Active</div>
             </div>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 admin-table" style="min-width: 1100px;">
-                    <thead class="bg-gray-50">
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
                         <tr>
-                            <th class="px-6 py-3">Date</th>
-                                    <style>
-                                    /* Improve horizontal spacing in admin tables so cells don't appear cramped */
-                                    .admin-table th,
-                                    .admin-table td {
-                                        padding-left: 1.25rem; /* increases left/right padding */
-                                        padding-right: 1.25rem;
-                                        vertical-align: middle;
-                                    }
-
-                                    /* Add spacing between action buttons and inline controls */
-                                    .admin-table .show-players-btn,
-                                    .admin-table .show-equipment-btn {
-                                        margin-left: 0.5rem;
-                                    }
-
-                                    .admin-table td > button {
-                                        margin-right: 0.5rem;
-                                    }
-
-                                    /* Ensure status and action cells have breathing room */
-                                    .admin-table td .px-2 { margin-right: 0.5rem; }
-                                    </style>
-                            <th class="px-6 py-3">Ground</th>
-                            <th class="px-6 py-3">Time Slot</th>
-                            <th class="px-6 py-3">Equipment</th>
-                            <th class="px-6 py-3">Allotted To</th>
-                            <th class="px-6 py-3">Purpose</th>
-                            <th class="px-6 py-3">Players</th>
+                            <th>Date</th>
+                            <th>Ground</th>
+                            <th>Time Slot</th>
+                            <th>Equipment</th>
+                            <th>Allotted To</th>
+                            <th>Sport</th>
+                            <th>Purpose</th>
+                            <th>Players</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody>
                         {% for allot in allotments %}
                         <tr>
-                            <td class="px-6 py-4">{{ allot.date }}</td>
-                            <td class="px-6 py-4">{{ allot.ground }}</td>
-                            <td class="px-6 py-4">{{ allot.time_slot }}</td>
-                            <td class="px-6 py-4">
-                                <button
-                                    class="ml-2 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-xs show-equipment-btn"
-                                    data-id="{{ allot.id }}"
-                                    data-type="allotment">
+                            <td>{{ allot.date|date:"M. d, Y" }}</td>
+                            <td class="ground-cell">{{ allot.ground }}</td>
+                            <td>{{ allot.time_slot }}</td>
+                            <td>
+                                <button class="show-equipment-btn" data-id="{{ allot.id }}" data-type="allotment">
                                     Show Equipment
                                 </button>
                             </td>
-                            <td class="px-6 py-4">{{ allot.allotted_to }}</td>
-                            <td class="px-6 py-4">{{ allot.purpose }}</td>
-                            <td class="px-6 py-4">
-                                {{ allot.players }}
-                                <button 
-                                    class="ml-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs show-players-btn"
-                                    data-id="{{ allot.id }}"
-                                    data-type="allotment">
-                                    Show Players
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                    </div>
+                                    <span class="allotted-name">{{ allot.allotted_to }}</span>
+                                </div>
+                            </td>
+                            <td>{% if allot.booking %}{{ allot.booking.sport }}{% endif %}</td>
+                            <td>{{ allot.purpose }}</td>
+                            <td>
+                                <button class="players-btn" data-id="{{ allot.id }}" data-type="allotment">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                    <span class="player-count">{{ allot.players }}</span>
                                 </button>
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">No allotments yet</td>
+                            <td colspan="8" class="no-data">No allotments yet</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
+            
+            <!-- Pagination Controls for Allotted Grounds -->
+            {% if allotments_paginator.num_pages > 1 %}
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    <span>Showing {{ allotments.start_index }} to {{ allotments.end_index }} of {{ allotments_paginator.count }} entries</span>
+                </div>
+                <div class="pagination-controls">
+                    {% if allotments.has_previous %}
+                        <a href="?{% if request.GET.date %}date={{ request.GET.date }}&{% endif %}{% if request.GET.ground %}ground={{ request.GET.ground }}&{% endif %}{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}page=1" class="pagination-btn">First</a>
+                        <a href="?{% if request.GET.date %}date={{ request.GET.date }}&{% endif %}{% if request.GET.ground %}ground={{ request.GET.ground }}&{% endif %}{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}page={{ allotments.previous_page_number }}" class="pagination-btn">‹ Previous</a>
+                    {% endif %}
+                    
+                    {% for num in allotments.paginator.page_range %}
+                        {% if num == allotments.number %}
+                            <span class="pagination-btn current">{{ num }}</span>
+                        {% elif num > allotments.number|add:'-3' and num < allotments.number|add:'3' %}
+                            <a href="?{% if request.GET.date %}date={{ request.GET.date }}&{% endif %}{% if request.GET.ground %}ground={{ request.GET.ground }}&{% endif %}{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}page={{ num }}" class="pagination-btn">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if allotments.has_next %}
+                        <a href="?{% if request.GET.date %}date={{ request.GET.date }}&{% endif %}{% if request.GET.ground %}ground={{ request.GET.ground }}&{% endif %}{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}page={{ allotments.next_page_number }}" class="pagination-btn">Next ›</a>
+                        <a href="?{% if request.GET.date %}date={{ request.GET.date }}&{% endif %}{% if request.GET.ground %}ground={{ request.GET.ground }}&{% endif %}{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}page={{ allotments_paginator.num_pages }}" class="pagination-btn">Last</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
 
-<!-- Players Modal -->
+<!-- Calendar Widget -->
+<div id="calendar-widget" class="calendar-widget" style="display: none;">
+    <div class="calendar-header">
+        <button type="button" class="nav-btn" onclick="previousMonth()">‹</button>
+        <span class="month-year" id="monthYear"></span>
+        <button type="button" class="nav-btn" onclick="nextMonth()">›</button>
+    </div>
+    <div class="calendar-weekdays">
+        <div>Sun</div>
+        <div>Mon</div>
+        <div>Tue</div>
+        <div>Wed</div>
+        <div>Thu</div>
+        <div>Fri</div>
+        <div>Sat</div>
+    </div>
+    <div class="calendar-dates" id="calendarDates"></div>
+    <div class="calendar-footer">
+        <button type="button" onclick="clearDate()">Clear</button>
+        <button type="button" onclick="closeCalendar()">Close</button>
+    </div>
+</div>
+
 <!-- Players Modal -->
 <div id="players-dialog" class="modal">
-  <div class="modal-content">
-    <!-- Header -->
-    <div class="modal-header">
-      <h3 id="players-dialog-title">Players</h3>
-      <span class="close-btn" onclick="closePlayersDialog()">×</span>
-    </div>
-
-    <!-- Table -->
-    <div class="modal-body">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Branch</th>
-            <th>Year</th>
-            <th>Division</th>
-          </tr>
-        </thead>
-        <tbody id="players-dialog-body">
-          <!-- Filled dynamically -->
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Footer -->
-    <div class="modal-footer">
-      <button onclick="closePlayersDialog()">Close</button>
-    </div>
-  </div>
-</div>
-
-    <!-- Equipment Modal -->
-    <div id="equipment-dialog" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="equipment-dialog-title">Equipment</h3>
-                <span class="close-btn" onclick="closeEquipmentDialog()">×</span>
-            </div>
-            <div class="modal-body">
-                <pre id="equipment-dialog-body" style="white-space:pre-wrap">No equipment information</pre>
-            </div>
-            <div class="modal-footer">
-                <button onclick="closeEquipmentDialog()">Close</button>
-            </div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="players-dialog-title">Players</h3>
+            <span class="close-btn" onclick="closePlayersDialog()">×</span>
+        </div>
+        <div class="modal-body">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Branch</th>
+                        <th>Year</th>
+                        <th>Division</th>
+                    </tr>
+                </thead>
+                <tbody id="players-dialog-body">
+                    <!-- Filled dynamically -->
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closePlayersDialog()">Close</button>
         </div>
     </div>
+</div>
+
+<!-- Equipment Modal -->
+<div id="equipment-dialog" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="equipment-dialog-title">Equipment</h3>
+            <span class="close-btn" onclick="closeEquipmentDialog()">×</span>
+        </div>
+        <div class="modal-body">
+            <pre id="equipment-dialog-body" style="white-space:pre-wrap">No equipment information</pre>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeEquipmentDialog()">Close</button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Global Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.admin-dashboard {
+    background-color: #f3f4f6;
+    min-height: 100vh;
+    padding: 24px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Filter Section */
+.filter-section {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+}
+
+.filter-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.filter-icon {
+    color: #4b5563;
+    width: 20px;
+    height: 20px;
+}
+
+.filter-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.filter-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 2fr auto;
+    gap: 24px;
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.filter-group label {
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.filter-group input,
+.filter-group select {
+    padding: 12px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #f9fafb;
+    color: #111827;
+    transition: all 0.2s ease;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+    outline: none;
+    border-color: #2563eb;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.filter-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 48px;
+}
+
+.date-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.date-input-wrapper input {
+    width: 100%;
+    padding-right: 48px;
+    cursor: pointer;
+}
+
+.calendar-icon {
+    position: absolute;
+    right: 12px;
+    color: #6b7280;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+.search-input {
+    position: relative;
+}
+
+.search-input input {
+    padding-left: 48px;
+    width: 100%;
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    width: 16px;
+    height: 16px;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.apply-btn {
+    background: #2563eb;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.apply-btn:hover {
+    background: #1d4ed8;
+}
+
+.clear-btn {
+    background: #f9fafb;
+    color: #6b7280;
+    padding: 12px 20px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s ease;
+}
+
+.clear-btn:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+/* Table Sections */
+.table-section {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 24px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.section-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.section-icon.warning {
+    color: #f59e0b;
+}
+
+.section-icon.success {
+    color: #10b981;
+}
+
+.section-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+    flex: 1;
+}
+
+.section-count {
+    background: #fef3c7;
+    color: #d97706;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.view-all {
+    color: #6b7280;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.view-all:hover {
+    background: #f9fafb;
+    color: #374151;
+}
+
+/* Table Styles */
+.table-container {
+    overflow-x: auto;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.admin-table thead {
+    background-color: #f9fafb;
+}
+
+.admin-table th {
+    padding: 16px 24px;
+    text-align: left;
+    font-weight: 600;
+    color: #6b7280;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-table td {
+    padding: 16px 24px;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+    color: #111827;
+}
+
+.admin-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+/* User Info */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    background: #2563eb;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #111827;
+    font-size: 14px;
+}
+
+.user-id {
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.allotted-name {
+    font-weight: 500;
+    color: #111827;
+}
+
+/* Ground Cell */
+.ground-cell {
+    font-weight: 600;
+    color: #111827;
+    text-align: center;
+}
+
+/* Equipment Button */
+.show-equipment-btn {
+    background: #dbeafe;
+    color: #2563eb;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.show-equipment-btn:hover {
+    background: #bfdbfe;
+}
+
+/* Players Info */
+.players-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6b7280;
+}
+
+/* Players Button */
+.players-btn {
+    background: #f0f9ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.players-btn:hover {
+    background: #dbeafe;
+    border-color: #93c5fd;
+}
+
+.player-count {
+    font-weight: 600;
+    color: #2563eb;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-badge.pending {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.status-badge.approved {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.status-badge.rejected {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+/* Action Buttons */
+.actions-cell {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.action-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+}
+
+.accept-btn {
+    background: #10b981;
+    color: white;
+}
+
+.accept-btn:hover {
+    background: #059669;
+}
+
+.reject-btn {
+    background: #ef4444;
+    color: white;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+}
+
+.reject-btn:hover {
+    background: #dc2626;
+}
+
+.action-taken {
+    color: #6b7280;
+    font-size: 12px;
+    font-style: italic;
+}
+
+/* No Data */
+.no-data {
+    text-align: center;
+    color: #9ca3af;
+    padding: 48px 24px;
+    font-style: italic;
+}
+
+/* Pagination */
+.pagination-container {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    padding: 20px 24px;
+    border-top: 1px solid #f3f4f6;
+    background: #f9fafb;
+}
+
+.pagination-info {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.pagination-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.pagination-btn {
+    padding: 8px 12px;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    color: #374151;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.pagination-btn:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.pagination-btn.current {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .filter-form {
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+    
+    .filter-actions {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-dashboard {
+        padding: 16px;
+    }
+    
+    .filter-form {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-actions {
+        grid-column: span 1;
+    }
+    
+    .section-header {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .admin-table th,
+    .admin-table td {
+        padding: 12px 16px;
+    }
+}
+</style>
+
+.players-btn .player-icon {
+<!-- Calendar Widget -->
+<div id="calendar-widget" class="calendar-widget" style="display: none;">
+    <div class="calendar-header">
+        <button type="button" class="nav-btn" onclick="previousMonth()">‹</button>
+        <span class="month-year" id="monthYear"></span>
+        <button type="button" class="nav-btn" onclick="nextMonth()">›</button>
+    </div>
+    <div class="calendar-weekdays">
+        <div>Sun</div>
+        <div>Mon</div>
+        <div>Tue</div>
+        <div>Wed</div>
+        <div>Thu</div>
+        <div>Fri</div>
+        <div>Sat</div>
+    </div>
+    <div class="calendar-dates" id="calendarDates"></div>
+    <div class="calendar-footer">
+        <button type="button" onclick="clearDate()">Clear</button>
+        <button type="button" onclick="closeCalendar()">Close</button>
+    </div>
+</div>
+
+<!-- Players Modal -->
+<div id="players-dialog" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="players-dialog-title">Players</h3>
+            <span class="close-btn" onclick="closePlayersDialog()">×</span>
+        </div>
+        <div class="modal-body">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Branch</th>
+                        <th>Year</th>
+                        <th>Division</th>
+                    </tr>
+                </thead>
+                <tbody id="players-dialog-body">
+                    <!-- Filled dynamically -->
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closePlayersDialog()">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Equipment Modal -->
+<div id="equipment-dialog" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="equipment-dialog-title">Equipment</h3>
+            <span class="close-btn" onclick="closeEquipmentDialog()">×</span>
+        </div>
+        <div class="modal-body">
+            <pre id="equipment-dialog-body" style="white-space:pre-wrap">No equipment information</pre>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeEquipmentDialog()">Close</button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80%;
+    overflow: hidden;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f9fafb;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.close-btn {
+    cursor: pointer;
+    font-size: 24px;
+    color: #6b7280;
+    background: none;
+    border: none;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+    background: #f3f4f6;
+}
+
+.modal-body {
+    padding: 24px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.modal-body table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.modal-body th,
+.modal-body td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.modal-body th {
+    background: #f9fafb;
+    font-weight: 600;
+    color: #111827;
+}
+
+.modal-footer {
+    padding: 20px 24px;
+    border-top: 1px solid #e5e7eb;
+    text-align: right;
+    background: #f9fafb;
+}
+
+.modal-footer button {
+    padding: 10px 20px;
+    background: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.modal-footer button:hover {
+    background: #4b5563;
+}
+
+/* Calendar Widget Styles */
+.calendar-widget {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 280px;
+    margin-top: 4px;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f3f4f6;
+    background: #f9fafb;
+    border-radius: 8px 8px 0 0;
+}
+
+.calendar-header .nav-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.calendar-header .nav-btn:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.month-year {
+    font-weight: 600;
+    color: #111827;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: #f3f4f6;
+    padding: 8px;
+}
+
+.calendar-weekdays div {
+    padding: 8px 4px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    background: white;
+}
+
+.calendar-dates {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: #f3f4f6;
+    padding: 8px;
+}
+
+.calendar-dates div {
+    padding: 8px 4px;
+    text-align: center;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.calendar-dates div:hover {
+    background: #f3f4f6;
+}
+
+.calendar-dates div.selected {
+    background: #2563eb;
+    color: white;
+}
+
+.calendar-dates div.today {
+    background: #fef3c7;
+    color: #d97706;
+    font-weight: 600;
+}
+
+.calendar-footer {
+    padding: 12px 16px;
+    border-top: 1px solid #f3f4f6;
+    background: #f9fafb;
+    display: flex;
+    justify-content: space-between;
+    border-radius: 0 0 8px 8px;
+}
+
+.calendar-footer button {
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #374151;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.calendar-footer button:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+</style>
 
 
 <script>
+// Calendar functionality
+let currentDate = new Date();
+let selectedDate = null;
+
+// Helper: parse ISO YYYY-MM-DD into Date or null
+function parseISODate(iso) {
+    if (!iso) return null;
+    const parts = iso.split('-');
+    if (parts.length !== 3) return null;
+    const y = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10) - 1;
+    const d = parseInt(parts[2], 10);
+    return new Date(y, m, d);
+}
+
+function openDatePicker() {
+    const calendar = document.getElementById('calendar-widget');
+    const dateInput = document.getElementById('date-filter');
+    
+    // Position calendar relative to date input
+    const rect = dateInput.getBoundingClientRect();
+    calendar.style.position = 'fixed';
+    calendar.style.top = rect.bottom + window.scrollY + 'px';
+    calendar.style.left = rect.left + window.scrollX + 'px';
+    calendar.style.display = 'block';
+    
+    generateCalendar();
+}
+
+function closeCalendar() {
+    document.getElementById('calendar-widget').style.display = 'none';
+}
+
+function generateCalendar() {
+    const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    
+    const monthYear = document.getElementById('monthYear');
+    monthYear.textContent = monthNames[currentDate.getMonth()] + ' ' + currentDate.getFullYear();
+    
+    const calendarDates = document.getElementById('calendarDates');
+    calendarDates.innerHTML = '';
+    
+    const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDay.getDay());
+    
+    const today = new Date();
+    // read ISO hidden value for preselection if available
+    const isoValue = document.getElementById('date-filter-iso').value;
+    const inputValue = isoValue ? isoValue : document.getElementById('date-filter').value;
+    
+    for (let i = 0; i < 42; i++) {
+        const date = new Date(startDate);
+        date.setDate(startDate.getDate() + i);
+        
+        const dateElement = document.createElement('div');
+        dateElement.className = 'calendar-date';
+        dateElement.textContent = date.getDate();
+        
+        if (date.getMonth() !== currentDate.getMonth()) {
+            dateElement.classList.add('other-month');
+        }
+        
+        if (date.toDateString() === today.toDateString()) {
+            dateElement.classList.add('today');
+        }
+        
+        // Check if this date matches the input value
+        // compare by ISO (YYYY-MM-DD)
+        const dateIso = formatDateISO(date);
+        if (inputValue && inputValue === dateIso) {
+            dateElement.classList.add('selected');
+        }
+        
+        dateElement.addEventListener('click', function() {
+            selectDate(date);
+        });
+        
+        calendarDates.appendChild(dateElement);
+    }
+}
+
+function selectDate(date) {
+    selectedDate = date;
+    // Set display value in dd-mm-yyyy and hidden ISO in YYYY-MM-DD
+    const formattedDisplay = formatDate(date);
+    const formattedIso = formatDateISO(date);
+    document.getElementById('date-filter').value = formattedDisplay;
+    document.getElementById('date-filter-iso').value = formattedIso;
+    
+    // Update selected appearance
+    document.querySelectorAll('.calendar-date').forEach(el => {
+        el.classList.remove('selected');
+    });
+    event.target.classList.add('selected');
+    
+    closeCalendar();
+}
+
+function formatDate(date) {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+}
+
+function formatDateISO(date) {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
+}
+
+function previousMonth() {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    generateCalendar();
+}
+
+function nextMonth() {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    generateCalendar();
+}
+
+function clearDate() {
+    document.getElementById('date-filter').value = '';
+    selectedDate = null;
+    document.getElementById('date-filter-iso').value = '';
+    closeCalendar();
+}
+
+// Close calendar when clicking outside
+document.addEventListener('click', function(event) {
+    const calendar = document.getElementById('calendar-widget');
+    const dateInput = document.getElementById('date-filter');
+    const calendarIcon = document.querySelector('.calendar-icon');
+    
+    if (!calendar.contains(event.target) && 
+        event.target !== dateInput && 
+        event.target !== calendarIcon) {
+        closeCalendar();
+    }
+});
+
+// Initialize display input from ISO value (if present) on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const iso = document.getElementById('date-filter-iso').value;
+    if (iso) {
+        const dt = parseISODate(iso);
+        if (dt) {
+            document.getElementById('date-filter').value = formatDate(dt);
+            // set currentDate so calendar opens on the correct month
+            currentDate = new Date(dt.getFullYear(), dt.getMonth(), 1);
+        }
+    }
+});
+
+// Players Modal Functions
 function openPlayersDialog() {
     const dialog = document.getElementById("players-dialog");
-    dialog.style.display = "flex"; // use flex to center modal
+    dialog.style.display = "flex";
 }
 
 function closePlayersDialog() {
@@ -252,7 +1330,6 @@ function closePlayersDialog() {
     dialog.style.display = "none";
 }
 
-// Fetch players dynamically
 function fetchPlayers(id, type) {
     let url = "";
     if (type === "booking") {
@@ -275,17 +1352,17 @@ function fetchPlayers(id, type) {
                 data.players.forEach((p, i) => {
                     tbody.innerHTML += `
                         <tr>
-                            <td class="px-4 py-2">${i + 1}</td>
-                            <td class="px-4 py-2">${p.name}</td>
-                            <td class="px-4 py-2">${p.branch}</td>
-                            <td class="px-4 py-2">${p.year}</td>
-                            <td class="px-4 py-2">${p.division}</td>
+                            <td>${i + 1}</td>
+                            <td>${p.name}</td>
+                            <td>${p.branch}</td>
+                            <td>${p.year}</td>
+                            <td>${p.division}</td>
                         </tr>`;
                 });
             } else {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="5" class="px-4 py-4 text-center text-gray-500">No players found</td>
+                        <td colspan="5" style="text-align: center; color: #6c757d;">No players found</td>
                     </tr>`;
             }
             openPlayersDialog();
@@ -296,24 +1373,11 @@ function fetchPlayers(id, type) {
         });
 }
 
-// Attach click listeners
-document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".show-players-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-            fetchPlayers(btn.dataset.id, btn.dataset.type);
-        });
-    });
-});
-
-// Close modal on outside click
-document.getElementById("players-dialog").addEventListener("click", e => {
-    if (e.target.id === "players-dialog") closePlayersDialog();
-});
-
-// Equipment modal handlers
+// Equipment Modal Functions
 function openEquipmentDialog() {
     document.getElementById('equipment-dialog').style.display = 'flex';
 }
+
 function closeEquipmentDialog() {
     document.getElementById('equipment-dialog').style.display = 'none';
 }
@@ -333,70 +1397,36 @@ function fetchEquipment(id, type) {
             body.textContent = data.equipment || 'No equipment information';
             openEquipmentDialog();
         })
-        .catch(err => { console.error(err); alert('Failed to load equipment.'); });
+        .catch(err => { 
+            console.error(err); 
+            alert('Failed to load equipment.'); 
+        });
 }
 
-// Attach equipment button listeners
+// Initialize Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
+    // Players button listeners
+    document.querySelectorAll('.players-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            fetchPlayers(btn.dataset.id, btn.dataset.type);
+        });
+    });
+
+    // Equipment button listeners
     document.querySelectorAll('.show-equipment-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             fetchEquipment(btn.dataset.id, btn.dataset.type);
         });
     });
 
-    // Close equipment modal on outside click
+    // Close modals on outside click
+    document.getElementById('players-dialog').addEventListener('click', e => {
+        if (e.target.id === 'players-dialog') closePlayersDialog();
+    });
+
     document.getElementById('equipment-dialog').addEventListener('click', e => {
         if (e.target.id === 'equipment-dialog') closeEquipmentDialog();
     });
 });
 </script>
-
-<style>
-/* Admin dashboard table clean layout */
-.admin-table { width: 100%; border-collapse: collapse; }
-.admin-table thead th { background: #f8fafc; color: #111827; font-weight: 700; padding: 14px 18px; text-align: left; border-bottom: none; }
-.admin-table tbody tr { background: #ffffff; }
-.admin-table th, .admin-table td { padding: 12px 16px; vertical-align: middle; text-align: left; }
-
-/* Column width hints (keeps columns stable) */
-.admin-table th:nth-child(1), .admin-table td:nth-child(1) { width: 180px; }
-.admin-table th:nth-child(2), .admin-table td:nth-child(2) { width: 130px; }
-.admin-table th:nth-child(3), .admin-table td:nth-child(3) { width: 60px; }
-.admin-table th:nth-child(4), .admin-table td:nth-child(4) { width: 150px; }
-.admin-table th:nth-child(5), .admin-table td:nth-child(5) { width: 220px; }
-.admin-table th:nth-child(6), .admin-table td:nth-child(6) { width: 140px; }
-.admin-table th:nth-child(7), .admin-table td:nth-child(7) { width: 180px; }
-.admin-table th:nth-child(8), .admin-table td:nth-child(8) { width: 110px; }
-.admin-table th:nth-child(9), .admin-table td:nth-child(9) { width: 120px; }
-.admin-table th:nth-child(10), .admin-table td:nth-child(10) { width: 180px; }
-
-/* Keep all row data on a single line; allow horizontal scrolling if needed */
-.admin-table td {
-    white-space: nowrap;
-}
-
-/* Buttons and inline controls: use inline-flex to center text and avoid wrapping */
-.admin-table a, .admin-table button { display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
-.admin-table .show-players-btn, .admin-table .show-equipment-btn { margin-left: 0.5rem; margin-top: 0; white-space: nowrap; }
-.admin-table .show-equipment-btn { color: #000 !important; background-color: #f3f4f6 !important; border: 1px solid #111 !important; padding: 8px 12px; height: 36px; border-radius:6px; }
-.admin-table .show-players-btn { background:#2563eb; color:#fff; border-radius:6px; padding:8px 12px; height:36px; border:none; }
-
-/* Action links/buttons (Approve/Reject) should be inline and not wrap */
-.admin-table td a { white-space: nowrap; margin-right: 6px; }
-
-/* Status badges spacing */
-.admin-table .status-badge { display:inline-block; margin-right: .5rem; }
-
-/* Make sections have breathing room */
-.bg-white.rounded-lg { padding: 8px; }
-.overflow-x-auto { overflow-x: auto; }
-
-/* Responsive adjustments */
-@media (max-width: 900px) {
-    .admin-table th, .admin-table td { padding: 8px 10px; font-size: 13px; }
-    .admin-table th:nth-child(1), .admin-table td:nth-child(1) { width: auto; }
-    .admin-table td:nth-child(2), .admin-table td:nth-child(8), .admin-table td:nth-child(9), .admin-table td:nth-child(10) { white-space: normal; }
-}
-</style>
-
 {% endblock %}

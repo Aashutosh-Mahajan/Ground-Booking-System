@@ -277,6 +277,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add hidden inputs for selected players before form submission
     document.querySelector('form').addEventListener('submit', function(e) {
+        // Ensure number_of_players matches selected list length
+        const numSelect = document.getElementById('id_number_of_players');
+        if (numSelect) {
+            numSelect.value = String(selectedPlayersList.length);
+        }
+
         // Remove any existing player inputs
         document.querySelectorAll('input[name^="player"]').forEach(input => input.remove());
         

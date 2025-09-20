@@ -4,12 +4,14 @@ from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
 from datetime import date, timedelta, datetime
 from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator
 from .forms import BookingForm, PlayerForm
 from .models import Player, Booking, AllotedGroundBooking
 from .models import StudentUser, AdminUser
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.core.mail import send_mail
+from django.utils.html import strip_tags
 from django.conf import settings
 
 # -------------------- HOME --------------------
@@ -23,7 +25,8 @@ def student_login(request):
         password = request.POST.get("password")
 
         if not email or not password:
-            messages.error(request, "Please enter both email and password.")
+            context = {'error': 'Please enter both email and password.'}
+            return render(request, "booking/student_login.html", context)
         else:
             try:
                 student = StudentUser.objects.get(email=email)
@@ -32,9 +35,11 @@ def student_login(request):
                     request.session['student_id'] = student.id
                     return redirect('student_dashboard')
                 else:
-                    messages.error(request, "Invalid password")
+                    context = {'error': 'Invalid password'}
+                    return render(request, "booking/student_login.html", context)
             except StudentUser.DoesNotExist:
-                messages.error(request, "No student found with this email")
+                context = {'error': 'No student found with this email address'}
+                return render(request, "booking/student_login.html", context)
 
     return render(request, "booking/student_login.html")
 
@@ -74,7 +79,7 @@ def custom_admin_dashboard(request):
     ground   = (request.GET.get('ground') or '').strip()
 
     bookings_qs = Booking.objects.filter(status='Pending').order_by('-created_at')
-    allot_qs    = AllotedGroundBooking.objects.all().order_by('-date')
+    allot_qs    = AllotedGroundBooking.objects.select_related('booking').all().order_by('-date')
 
     if date_str:
         bookings_qs = bookings_qs.filter(date=date_str)
@@ -84,12 +89,18 @@ def custom_admin_dashboard(request):
         bookings_qs = bookings_qs.filter(ground__iexact=ground)
         allot_qs    = allot_qs.filter(ground__iexact=ground)
 
+    # Implement pagination for allotments (10 entries per page)
+    allotments_paginator = Paginator(allot_qs, 10)
+    page_number = request.GET.get('page', 1)
+    allotments_page = allotments_paginator.get_page(page_number)
+
     grounds = (Booking.objects.values_list('ground', flat=True)
                .distinct().order_by('ground'))
 
     context = {
         'bookings': bookings_qs,
-        'allotments': allot_qs,
+        'allotments': allotments_page,
+        'allotments_paginator': allotments_paginator,
         'grounds': grounds,
         'selected_date': date_str,
         'selected_ground': ground,
@@ -118,25 +129,38 @@ def approve_booking(request, booking_id):
     booking.status = 'Approved'
     booking.save()
 
-    AllotedGroundBooking.objects.get_or_create(
+    # Ensure allotted record reflects actual saved players
+    players_count = booking.players.count()
+    AllotedGroundBooking.objects.update_or_create(
         booking=booking,
         date=booking.date,
         ground=booking.ground,
         time_slot=booking.time_slot,
-        allotted_to=booking.student_name,
-        roll_number=booking.roll_number,
-        purpose=booking.purpose,
-        players=booking.number_of_players,
+        defaults={
+            'allotted_to': booking.student_name,
+            'roll_number': booking.roll_number,
+            'purpose': booking.purpose,
+            'players': players_count,
+        }
     )
 
+    # Build HTML email
+    html = render_to_string(
+        'booking/emails/booking_status_email.html',
+        {
+            'site_name': 'SportDeck',
+            'status': 'Approved',
+            'booking': booking,
+            'players': list(booking.players.all().values('name', 'branch', 'year', 'division')),
+        }
+    )
+    plain = strip_tags(html)
     send_mail(
-        subject=f'Ground Booking Approved for {booking.ground}',
-        message=f'Hello {booking.student_name},\n\n'
-                f'Your booking for the ground "{booking.ground}" on {booking.date} '
-                f'during "{booking.time_slot}" has been approved.\n\n'
-                f'Thank you!',
+        subject=f'Booking Approved — {booking.ground} on {booking.date}',
+        message=plain,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[booking.student_email],
+        html_message=html,
         fail_silently=False,
     )
     return redirect('custom_admin_dashboard')
@@ -146,14 +170,23 @@ def reject_booking(request, booking_id):
     booking.status = 'Rejected'
     booking.save()
 
+    # Build HTML email
+    html = render_to_string(
+        'booking/emails/booking_status_email.html',
+        {
+            'site_name': 'SportDeck',
+            'status': 'Rejected',
+            'booking': booking,
+            'players': list(booking.players.all().values('name', 'branch', 'year', 'division')),
+        }
+    )
+    plain = strip_tags(html)
     send_mail(
-        subject=f'Ground Booking Rejected for {booking.ground}',
-        message=f'Hello {booking.student_name},\n\n'
-                f'Your booking for the ground "{booking.ground}" on {booking.date} '
-                f'during "{booking.time_slot}" has been rejected.\n\n'
-                f'Please contact admin for details.',
+        subject=f'Booking Rejected — {booking.ground} on {booking.date}',
+        message=plain,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[booking.student_email],
+        html_message=html,
         fail_silently=False,
     )
     return redirect('custom_admin_dashboard')
@@ -221,6 +254,7 @@ def student_booking(request):
 
             # Booking info
             booking.ground = request.POST.get("ground")
+            booking.sport = request.POST.get("sport") or ''
             booking.date = request.POST.get("date")
             booking.time_slot = request.POST.get("time_slot")
             booking.equipment = request.POST.get("equipment_selected") or request.POST.get('equipment') or ''
@@ -251,6 +285,26 @@ def student_booking(request):
                     Player.objects.create(
                         booking=booking,
                         name=player_name_or_email,
+                        branch='',
+                        year='',
+                        division=''
+                    )
+
+            # Ensure at least one player exists (include organizer if none selected)
+            if booking.players.count() == 0:
+                try:
+                    organizer = StudentUser.objects.get(email=booking.student_email)
+                    Player.objects.create(
+                        booking=booking,
+                        name=organizer.full_name or booking.student_name,
+                        branch=organizer.branch or '',
+                        year=organizer.year or '',
+                        division=organizer.division or ''
+                    )
+                except StudentUser.DoesNotExist:
+                    Player.objects.create(
+                        booking=booking,
+                        name=booking.student_name or (booking.student_email or 'Organizer'),
                         branch='',
                         year='',
                         division=''
@@ -290,6 +344,7 @@ def rules_regulations(request):
 def check_availability(request):
     ground = request.GET.get("ground")
     date_selected = request.GET.get("date")
+    sport = (request.GET.get("sport") or '').strip()
 
     time_slots = [
         "07:00 AM - 09:00 AM", "04:00 PM - 06:00 PM",
@@ -297,7 +352,7 @@ def check_availability(request):
 
     slots = []
 
-    if not ground or not date_selected:
+    if not ground or not date_selected or not sport:
         for slot in time_slots:
             slots.append({"time": slot, "status": "freeze"})
         return JsonResponse({"slots": slots}, status=200)
@@ -332,7 +387,8 @@ def check_availability(request):
     approved_bookings = Booking.objects.filter(
         ground=ground,
         date=date_selected,
-        status__iexact='Approved'
+        status__iexact='Approved',
+        sport__iexact=sport,
     )
     approved_ranges = []
     for b in approved_bookings:
@@ -386,6 +442,9 @@ from .models import AllotedGroundBooking
 
 def get_allotment_players(request, allot_id):
     allotment = get_object_or_404(AllotedGroundBooking, id=allot_id)
+    # Some legacy/allotment entries may not be linked to a Booking
+    if not allotment.booking:
+        return JsonResponse({"players": []})
     players = allotment.booking.players.all()  # get all players linked to this booking
     data = [
         {

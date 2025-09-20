@@ -17,6 +17,8 @@ class Booking(models.Model):
     roll_number = models.CharField(max_length=20, blank=True, null=True)
 
     ground = models.CharField(max_length=100)
+    # Selected sport for this booking (e.g., Football, Basketball, etc.)
+    sport = models.CharField(max_length=50, blank=True, null=True)
     date = models.DateField()
     time_slot = models.CharField(max_length=50)
     purpose = models.TextField()
