@@ -11,11 +11,7 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 
 # ⚠️ Important for deployment:
 # Render automatically assigns your app a .onrender.com domain
-ALLOWED_HOSTS = [
-    '.onrender.com',  # allow your Render domain
-    'localhost', 
-    '127.0.0.1'
-]
+ALLOWED_HOSTS = ['*']
 
 # ✅ Apps
 INSTALLED_APPS = [
