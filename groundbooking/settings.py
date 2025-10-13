@@ -11,7 +11,12 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 
 # ⚠️ Important for deployment:
 # Render automatically assigns your app a .onrender.com domain
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default=".onrender.com,localhost,127.0.0.1").split(",")
+
+# CSRF protection for Render deployment
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.onrender.com',
+]
 
 # ✅ Apps
 INSTALLED_APPS = [
@@ -80,7 +85,9 @@ USE_TZ = True
 # ✅ Static files setup for Render
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# WhiteNoise configuration - use simpler storage for better compatibility
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # (Optional) if you have media uploads:
 MEDIA_URL = '/media/'
