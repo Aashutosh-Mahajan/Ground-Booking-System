@@ -128,6 +128,7 @@ def get_equipment_for_booking(request, booking_id):
 
 # -------------------- Approve / Reject Booking --------------------
 def approve_booking(request, booking_id):
+    """Approve booking with graceful email error handling"""
     booking = get_object_or_404(Booking, id=booking_id)
 
     # Enforce FCFS and auto-reject conflicting pending requests atomically
@@ -228,6 +229,7 @@ def approve_booking(request, booking_id):
     return redirect('custom_admin_dashboard')
 
 def reject_booking(request, booking_id):
+    """Reject booking with graceful email error handling"""
     booking = get_object_or_404(Booking, id=booking_id)
     booking.status = 'Rejected'
     booking.save()
