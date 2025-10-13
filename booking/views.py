@@ -174,25 +174,32 @@ def approve_booking(request, booking_id):
             }
         )
 
-    # Email approved
-    html = render_to_string(
-        'booking/emails/booking_status_email.html',
-        {
-            'site_name': 'SportDeck',
-            'status': 'Approved',
-            'booking': to_approve,
-            'players': list(to_approve.players.all().values('name', 'branch', 'year', 'division')),
-        }
-    )
-    plain = strip_tags(html)
-    send_mail(
-        subject=f'Booking Approved — {to_approve.ground} on {to_approve.date}',
-        message=plain,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[to_approve.student_email],
-        html_message=html,
-        fail_silently=False,
-    )
+    # Email approved - mandatory email sending
+    try:
+        html = render_to_string(
+            'booking/emails/booking_status_email.html',
+            {
+                'site_name': 'SportDeck',
+                'status': 'Approved',
+                'booking': to_approve,
+                'players': list(to_approve.players.all().values('name', 'branch', 'year', 'division')),
+            }
+        )
+        plain = strip_tags(html)
+        send_mail(
+            subject=f'Booking Approved — {to_approve.ground} on {to_approve.date}',
+            message=plain,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[to_approve.student_email],
+            html_message=html,
+            fail_silently=False,
+        )
+        messages.success(request, f'Booking approved and confirmation email sent to {to_approve.student_email}')
+    except Exception as e:
+        # Email failed - log error and show warning but booking is still approved
+        print(f"ERROR: Failed to send approval email to {to_approve.student_email}: {e}")
+        messages.warning(request, f'Booking approved, but email notification failed. Please inform student manually.')
+        pass
 
     # Email auto-rejected
     for rej in conflicts:
@@ -225,25 +232,33 @@ def reject_booking(request, booking_id):
     booking.status = 'Rejected'
     booking.save()
 
-    # Build HTML email
-    html = render_to_string(
-        'booking/emails/booking_status_email.html',
-        {
-            'site_name': 'SportDeck',
-            'status': 'Rejected',
-            'booking': booking,
-            'players': list(booking.players.all().values('name', 'branch', 'year', 'division')),
-        }
-    )
-    plain = strip_tags(html)
-    send_mail(
-        subject=f'Booking Rejected — {booking.ground} on {booking.date}',
-        message=plain,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[booking.student_email],
-        html_message=html,
-        fail_silently=False,
-    )
+    # Build HTML email and send - mandatory email sending
+    try:
+        html = render_to_string(
+            'booking/emails/booking_status_email.html',
+            {
+                'site_name': 'SportDeck',
+                'status': 'Rejected',
+                'booking': booking,
+                'players': list(booking.players.all().values('name', 'branch', 'year', 'division')),
+            }
+        )
+        plain = strip_tags(html)
+        send_mail(
+            subject=f'Booking Rejected — {booking.ground} on {booking.date}',
+            message=plain,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[booking.student_email],
+            html_message=html,
+            fail_silently=False,
+        )
+        messages.success(request, f'Booking rejected and notification email sent to {booking.student_email}')
+    except Exception as e:
+        # Email failed - log error and show warning but booking is still rejected
+        print(f"ERROR: Failed to send rejection email to {booking.student_email}: {e}")
+        messages.warning(request, f'Booking rejected, but email notification failed. Please inform student manually.')
+        pass
+    
     return redirect('custom_admin_dashboard')
 def student_booking(request):
     number_options = range(1, 12)
