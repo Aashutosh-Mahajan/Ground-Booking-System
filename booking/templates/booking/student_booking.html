@@ -2,8 +2,8 @@
 {% block title %}Book Ground{% endblock %}
 {% block content %}
 
-<div class="max-w-4xl mx-auto py-12 px-4">
-    <div class="card">
+<div class="mx-auto py-12 px-8" style="max-width: 1600px;">
+    <div class="card w-full">
         <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Book a Ground</h2>
 
         <!-- Display Messages -->
@@ -35,7 +35,7 @@
             </div>
 
             <!-- Student Information -->
-            <div class="grid grid-cols-2 gap-6">
+            <div class="grid grid-cols-3 gap-6">
                 <div class="form-group">
                     <label class="form-label">Main Student Name</label>
                     {{ booking_form.student_name }}
@@ -44,16 +44,6 @@
                     <label class="form-label">Email Address</label>
                     {{ booking_form.student_email }}
                 </div>
-            </div>
-
-            <!-- Equipment Selected -->
-            <div class="form-group" id="equipment-section" style="display: none;">
-                <label class="form-label">Equipment Selected</label>
-                <textarea id="equipmentField" name="equipment_selected" class="form-input" readonly rows="4"></textarea>
-            </div>
-
-            <!-- Number of Players -->
-            <div class="grid grid-cols-2 gap-6">
                 <div class="form-group">
                     <label class="form-label">Number of Players</label>
                     <select name="number_of_players" id="id_number_of_players" class="form-select">
@@ -62,6 +52,12 @@
                         {% endfor %}
                     </select>
                 </div>
+            </div>
+
+            <!-- Equipment Selected -->
+            <div class="form-group" id="equipment-section" style="display: none;">
+                <label class="form-label">Equipment Selected</label>
+                <textarea id="equipmentField" name="equipment_selected" class="form-input" readonly rows="3"></textarea>
             </div>
 
             <!-- Purpose -->

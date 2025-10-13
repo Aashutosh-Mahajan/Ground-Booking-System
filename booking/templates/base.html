@@ -5,12 +5,89 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>{% block title %}Ground Booking{% endblock %}</title>
   {% load static %}
-  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=1.2">
 </head>
 <body>
-  {% include "partials/navbar.html" %}
+  <div class="page-wrapper">
+    {% include "partials/navbar.html" %}
 
-  {% block content %}
-  {% endblock %}
+    <main class="main-content">
+      {% block content %}
+      {% endblock %}
+    </main>
+
+    {% block footer %}
+    <!-- Footer Section -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <!-- Company Info -->
+                <div class="footer-section">
+                    <div class="footer-brand">
+                        <div class="footer-logo">
+                            <div class="footer-logo-box">SD</div>
+                            <div class="footer-text">
+                                <h3>SportDeck</h3>
+                                <p>VIT Ground Booking System</p>
+                            </div>
+                        </div>
+                        <p class="footer-description">
+                            Simplifying ground booking for educational institutions. 
+                            Book sports grounds, event spaces, and recreational areas with ease.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'rules_regulations' %}">Rules & Regulations</a></li>
+                        {% if request.session.student_email %}
+                            <li><a href="{% url 'student_dashboard' %}">Dashboard</a></li>
+                        {% else %}
+                            <li><a href="{% url 'student_login' %}">Student Login</a></li>
+                            <li><a href="{% url 'admin_login' %}">Admin Login</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="footer-section">
+                    <h4>Contact Us</h4>
+                    <div class="footer-contact">
+                        <p><i class="icon">📧</i> sportdeckvit@gmail.com</p>
+                        <p><i class="icon">📞</i> +91 9876543210</p>
+                        <p><i class="icon">📍</i> VIT Campus, Academic Block</p>
+                    </div>
+                </div>
+
+                <!-- Social Links -->
+                <div class="footer-section">
+                    <h4>Follow Us</h4>
+                    <div class="social-links">
+                        <a href="#" class="social-link">Facebook</a>
+                        <a href="#" class="social-link">Twitter</a>
+                        <a href="#" class="social-link">Instagram</a>
+                        <a href="#" class="social-link">LinkedIn</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <p>&copy; 2025 SportDeck. All rights reserved.</p>
+                    <div class="footer-bottom-links">
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    {% endblock %}
+  </div>
 </body>
 </html>

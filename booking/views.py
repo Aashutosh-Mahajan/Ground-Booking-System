@@ -13,6 +13,8 @@ from django.contrib.auth import authenticate, login
 from django.core.mail import send_mail
 from django.utils.html import strip_tags
 from django.conf import settings
+from django.db import transaction
+from django.db.models import Q
 
 # -------------------- HOME --------------------
 def home(request):
@@ -78,7 +80,8 @@ def custom_admin_dashboard(request):
     date_str = (request.GET.get('date') or '').strip()
     ground   = (request.GET.get('ground') or '').strip()
 
-    bookings_qs = Booking.objects.filter(status='Pending').order_by('-created_at')
+    # FCFS: show oldest pending first
+    bookings_qs = Booking.objects.filter(status='Pending').order_by('created_at')
     allot_qs    = AllotedGroundBooking.objects.select_related('booking').all().order_by('-date')
 
     if date_str:
@@ -126,43 +129,95 @@ def get_equipment_for_booking(request, booking_id):
 # -------------------- Approve / Reject Booking --------------------
 def approve_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
-    booking.status = 'Approved'
-    booking.save()
 
-    # Ensure allotted record reflects actual saved players
-    players_count = booking.players.count()
-    AllotedGroundBooking.objects.update_or_create(
-        booking=booking,
-        date=booking.date,
-        ground=booking.ground,
-        time_slot=booking.time_slot,
-        defaults={
-            'allotted_to': booking.student_name,
-            'roll_number': booking.roll_number,
-            'purpose': booking.purpose,
-            'players': players_count,
-        }
-    )
+    # Enforce FCFS and auto-reject conflicting pending requests atomically
+    with transaction.atomic():
+        # Lock the queue for this slot
+        same_slot = (
+            Booking.objects
+            .select_for_update()
+            .filter(
+                date=booking.date,
+                sport__iexact=(booking.sport or ''),
+                time_slot=booking.time_slot,
+            )
+        )
 
-    # Build HTML email
+        # Oldest pending wins for FCFS
+        oldest_pending = same_slot.filter(status='Pending').order_by('created_at').first()
+        to_approve = oldest_pending or booking
+
+        # Set approved
+        to_approve.status = 'Approved'
+        to_approve.save()
+
+        # Auto-reject all other pending for this exact slot (same date/sport/time)
+        conflicts_qs = same_slot.filter(status='Pending').exclude(id=to_approve.id)
+        conflicts = list(conflicts_qs)
+        for c in conflicts:
+            c.status = 'Rejected'
+        if conflicts:
+            Booking.objects.bulk_update(conflicts, ['status'])
+
+        # Reflect in AllotedGroundBooking
+        players_count = to_approve.players.count()
+        AllotedGroundBooking.objects.update_or_create(
+            booking=to_approve,
+            date=to_approve.date,
+            ground=to_approve.ground,
+            time_slot=to_approve.time_slot,
+            defaults={
+                'allotted_to': to_approve.student_name,
+                'roll_number': to_approve.roll_number,
+                'purpose': to_approve.purpose,
+                'players': players_count,
+            }
+        )
+
+    # Email approved
     html = render_to_string(
         'booking/emails/booking_status_email.html',
         {
             'site_name': 'SportDeck',
             'status': 'Approved',
-            'booking': booking,
-            'players': list(booking.players.all().values('name', 'branch', 'year', 'division')),
+            'booking': to_approve,
+            'players': list(to_approve.players.all().values('name', 'branch', 'year', 'division')),
         }
     )
     plain = strip_tags(html)
     send_mail(
-        subject=f'Booking Approved — {booking.ground} on {booking.date}',
+        subject=f'Booking Approved — {to_approve.ground} on {to_approve.date}',
         message=plain,
         from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[booking.student_email],
+        recipient_list=[to_approve.student_email],
         html_message=html,
         fail_silently=False,
     )
+
+    # Email auto-rejected
+    for rej in conflicts:
+        try:
+            r_html = render_to_string(
+                'booking/emails/booking_status_email.html',
+                {
+                    'site_name': 'SportDeck',
+                    'status': 'Rejected',
+                    'booking': rej,
+                    'players': list(rej.players.all().values('name', 'branch', 'year', 'division')),
+                }
+            )
+            r_plain = strip_tags(r_html)
+            send_mail(
+                subject=f'Booking Rejected — {rej.ground} on {rej.date}',
+                message=r_plain,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[rej.student_email],
+                html_message=r_html,
+                fail_silently=True,
+            )
+        except Exception:
+            pass
+
     return redirect('custom_admin_dashboard')
 
 def reject_booking(request, booking_id):
@@ -190,8 +245,6 @@ def reject_booking(request, booking_id):
         fail_silently=False,
     )
     return redirect('custom_admin_dashboard')
-
-# -------------------- STUDENT BOOKING --------------------
 def student_booking(request):
     number_options = range(1, 12)
 
@@ -385,7 +438,6 @@ def check_availability(request):
         return (start, end)
 
     approved_bookings = Booking.objects.filter(
-        ground=ground,
         date=date_selected,
         status__iexact='Approved',
         sport__iexact=sport,
@@ -418,11 +470,16 @@ def fetch_student_data(request):
     AJAX endpoint to fetch student info by first name
     """
     q = request.GET.get("q", "")
+    print(f"[fetch_student_data] Received query: '{q}'")
+    
     if not q:
+        print("[fetch_student_data] Empty query, returning empty list")
         return JsonResponse([], safe=False)
 
     # Search by first name (split full_name and check first part)
     students = StudentUser.objects.filter(full_name__icontains=q)[:10]
+    print(f"[fetch_student_data] Found {students.count()} students")
+    
     data = []
     for s in students:
         if s.full_name:  # Only include students with names
@@ -434,6 +491,8 @@ def fetch_student_data(request):
                 "year": s.year,
                 "division": s.division
             })
+    
+    print(f"[fetch_student_data] Returning {len(data)} student records")
     return JsonResponse(data, safe=False)
 
 from django.shortcuts import get_object_or_404

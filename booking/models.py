@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.contrib.auth.hashers import make_password, check_password
 
 
@@ -33,6 +34,21 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"{self.student_name} - {self.ground} - {self.date}"
+
+    class Meta:
+        indexes = [
+            # Index to speed up FCFS/auto-reject lookups by sport/date/slot/status
+            models.Index(fields=["date", "sport", "time_slot", "status"], name="idx_sport_date_slot_status"),
+            models.Index(fields=["created_at"], name="idx_created_at"),
+        ]
+        constraints = [
+            # Ensure only one Approved booking exists for a given (date, sport, time_slot)
+            models.UniqueConstraint(
+                fields=["date", "sport", "time_slot"],
+                condition=Q(status="Approved"),
+                name="uniq_approved_sport_slot"
+            )
+        ]
 
 class Player(models.Model):
     BRANCH_CHOICES = [
