@@ -40,34 +40,34 @@
                     <div class="scroll-track">
                         <!-- Original Cards -->
                         <div class="feature-card bg-blue-50">
-                            <div class="feature-icon"><img src="{% static 'images/ground.png' %}" alt="Instant Booking"></div>
+                            <div class="feature-icon"><img src="{% static 'images/ground.png' %}" alt="Instant Booking" loading="lazy" width="96" height="96"></div>
                                 <h3>Instant Booking</h3>
                                 <p>Book your preferred ground in just a few clicks</p>
                         </div>
                         <div class="feature-card bg-green-50">
-                            <div class="feature-icon"><img src="{% static 'images/calendar.png' %}" alt="Real-time Availability"></div>
+                            <div class="feature-icon"><img src="{% static 'images/calendar.png' %}" alt="Real-time Availability" loading="lazy" width="96" height="96"></div>
                             <h3>Real-time Availability</h3>
                             <p>See available time slots and dates instantly</p>
                         </div>
                         <div class="feature-card bg-purple-50">
-                            <div class="feature-icon"><img src="{% static 'images/management.png' %}" alt="Easy Management"></div>
+                            <div class="feature-icon"><img src="{% static 'images/management.png' %}" alt="Easy Management" loading="lazy" width="96" height="96"></div>
                             <h3>Easy Management</h3>
                             <p>Track your bookings and get instant approvals</p>
                         </div>
 
                         <!-- Duplicate Cards for seamless loop -->
                     <div class="feature-card bg-blue-50">
-                    <div class="feature-icon"><img src="{% static 'images/ground.png' %}" alt="Instant Booking"></div>
+                    <div class="feature-icon"><img src="{% static 'images/ground.png' %}" alt="Instant Booking" loading="lazy" width="96" height="96"></div>
                     <h3>Instant Booking</h3>
                     <p>Book your preferred ground in just a few clicks</p>
                     </div>
                     <div class="feature-card bg-green-50">
-                    <div class="feature-icon"><img src="{% static 'images/calendar.png' %}" alt="Real-time Availability"></div>
+                    <div class="feature-icon"><img src="{% static 'images/calendar.png' %}" alt="Real-time Availability" loading="lazy" width="96" height="96"></div>
                     <h3>Real-time Availability</h3>
                     <p>See available time slots and dates instantly</p>
                     </div>
                     <div class="feature-card bg-purple-50">
-                    <div class="feature-icon"><img src="{% static 'images/management.png' %}" alt="Easy Management"></div>
+                    <div class="feature-icon"><img src="{% static 'images/management.png' %}" alt="Easy Management" loading="lazy" width="96" height="96"></div>
                     <h3>Easy Management</h3>
                     <p>Track your bookings and get instant approvals</p>
                     </div>
@@ -86,17 +86,25 @@ const images = [
     '/static/images/VitGround4.jpg'
 ];
 
-// preload all images
-images.forEach(src => {
-    const img = new Image();
-    img.src = src;
-});
+// Optimized preload - only preload on non-mobile devices or good connection
+const shouldPreload = window.innerWidth > 768 || 
+    (navigator.connection && navigator.connection.effectiveType !== 'slow-2g' && navigator.connection.effectiveType !== '2g');
+
+if (shouldPreload) {
+    // Preload all images
+    images.forEach(src => {
+        const img = new Image();
+        img.src = src;
+    });
+}
 
 let i = 0;
+const slideInterval = window.innerWidth <= 768 ? 5000 : 4000; // Slower on mobile to save battery
+
 setInterval(() => {
     i = (i + 1) % images.length;
     hero.style.backgroundImage = `url('${images[i]}')`;
-}, 4000);
+}, slideInterval);
 </script>
 
 

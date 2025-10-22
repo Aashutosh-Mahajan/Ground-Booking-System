@@ -6,16 +6,23 @@
       <!-- Left: VIT Logo + SportDeck -->
       <div class="navbar-left flex items-center">
         <a href="{% url 'home' %}">
-          <img src="{% static 'images/VITLogo.png' %}" alt="VIT Logo" class="navbar-logo mr-4">
+          <img src="{% static 'images/VITLogo.png' %}" alt="VIT Logo" class="navbar-logo mr-4" width="64" height="64">
         </a>
         <a href="{% url 'home' %}" class="flex items-center gap-2 no-underline">
-          <img src="{% static 'images/SportDeckLogo.png' %}" alt="SportDeck Logo" class="navbar-logo">
+          <img src="{% static 'images/SportDeckLogo.png' %}" alt="SportDeck Logo" class="navbar-logo" width="48" height="48">
         </a>
         <h1 class="text-2xl font-bold text-primary">SportDeck</h1>
       </div>
 
+      <!-- Mobile Menu Toggle -->
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
       <!-- Right: Navigation links -->
-      <div class="navbar-links">
+      <div class="navbar-links" id="navbarLinks">
         <a href="{% url 'home' %}" class="navbar-link">Home</a>
 
         {% if request.session.student_email %}
@@ -34,3 +41,38 @@
     </div>
   </div>
 </nav>
+
+<script>
+// Mobile menu toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const navbarLinks = document.getElementById('navbarLinks');
+    
+    if (mobileMenuToggle && navbarLinks) {
+        mobileMenuToggle.addEventListener('click', function() {
+            this.classList.toggle('active');
+            navbarLinks.classList.toggle('active');
+            document.body.classList.toggle('menu-open');
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.navbar-container')) {
+                mobileMenuToggle.classList.remove('active');
+                navbarLinks.classList.remove('active');
+                document.body.classList.remove('menu-open');
+            }
+        });
+        
+        // Close menu when clicking a link
+        const navLinks = navbarLinks.querySelectorAll('.navbar-link');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                mobileMenuToggle.classList.remove('active');
+                navbarLinks.classList.remove('active');
+                document.body.classList.remove('menu-open');
+            });
+        });
+    }
+});
+</script>

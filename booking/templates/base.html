@@ -2,10 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"/>
+  <meta name="description" content="SportDeck - VIT Ground Booking System. Book sports grounds, event spaces, and recreational areas with ease."/>
+  <meta name="theme-color" content="#1e40af"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
   <title>{% block title %}Ground Booking{% endblock %}</title>
   {% load static %}
-  <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=1.2">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=3.2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <style>
+    /* Critical CSS for initial paint - prevent layout shift */
+    body { margin: 0; }
+    .page-wrapper { min-height: 100vh; display: flex; flex-direction: column; }
+    .main-content { flex: 1; }
+  </style>
 </head>
 <body>
   <div class="page-wrapper">
@@ -60,17 +72,6 @@
                         <p><i class="icon">📧</i> sportdeckvit@gmail.com</p>
                         <p><i class="icon">📞</i> +91 9876543210</p>
                         <p><i class="icon">📍</i> VIT Campus, Academic Block</p>
-                    </div>
-                </div>
-
-                <!-- Social Links -->
-                <div class="footer-section">
-                    <h4>Follow Us</h4>
-                    <div class="social-links">
-                        <a href="#" class="social-link">Facebook</a>
-                        <a href="#" class="social-link">Twitter</a>
-                        <a href="#" class="social-link">Instagram</a>
-                        <a href="#" class="social-link">LinkedIn</a>
                     </div>
                 </div>
             </div>
