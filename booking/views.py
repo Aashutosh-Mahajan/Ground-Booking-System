@@ -20,6 +20,33 @@ from django.db.models import Q
 def home(request):
     return render(request, 'booking/home.html')
 
+# -------------------- STUDENT BOOKING HISTORY --------------------
+def student_history(request):
+    """Show the logged-in student's booking history with status."""
+    student_email = request.session.get('student_email')
+    if not student_email:
+        return redirect('student_login')
+
+    status_filter = (request.GET.get('status') or '').strip()
+
+    bookings = (
+        Booking.objects
+        .filter(student_email=student_email)
+        .order_by('-date', '-created_at')
+    )
+    if status_filter in {"Pending", "Approved", "Rejected"}:
+        bookings = bookings.filter(status=status_filter)
+
+    paginator = Paginator(bookings, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'booking/student_history.html', {
+        'page_obj': page_obj,
+        'status_filter': status_filter,
+        'student_email': student_email,
+    })
+
 # -------------------- STUDENT LOGIN --------------------
 def student_login(request):
     if request.method == "POST":
