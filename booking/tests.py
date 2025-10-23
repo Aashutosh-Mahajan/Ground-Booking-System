@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from django.urls import reverse
-from .models import Booking
+from .models import Booking, Player
 from datetime import date
 
 
@@ -47,6 +47,21 @@ class StudentHistoryViewTests(TestCase):
 		self.assertContains(resp, 'My Booking History')
 		self.assertContains(resp, 'Ground A')
 		self.assertContains(resp, 'Ground B')
+
+	def test_players_render_in_history(self):
+		# attach players to one booking
+		booking = Booking.objects.filter(student_email=self.email).first()
+		Player.objects.create(booking=booking, name='Alice', branch='CSE', year='TE', division='A')
+		Player.objects.create(booking=booking, name='Bob', branch='IT', year='SE', division='B')
+
+		session = self.client.session
+		session['student_email'] = self.email
+		session.save()
+
+		resp = self.client.get(reverse('student_history'))
+		self.assertEqual(resp.status_code, 200)
+		self.assertContains(resp, 'Alice')
+		self.assertContains(resp, 'Bob')
 
 	def test_history_status_filter(self):
 		session = self.client.session
