@@ -32,6 +32,7 @@ def student_history(request):
     bookings = (
         Booking.objects
         .filter(student_email=student_email)
+        .prefetch_related('players')
         .order_by('-date', '-created_at')
     )
     if status_filter in {"Pending", "Approved", "Rejected"}:
