@@ -25,13 +25,20 @@
       <div class="navbar-links" id="navbarLinks">
         <a href="{% url 'home' %}" class="navbar-link">Home</a>
 
-        {% if request.session.student_email %}
+        {% if request.session.is_admin_logged_in %}
+          <!-- Admin logged in: show only Home, clickable Admin name (to Dashboard), and Logout -->
+          <a href="{% url 'custom_admin_dashboard' %}" class="navbar-link">
+            Admin: {{ request.session.admin_username }}
+          </a>
+          <a href="{% url 'admin_logout' %}" class="navbar-link">Logout</a>
+
+        {% elif request.session.student_email %}
           <!-- Show only for logged-in students -->
           <a href="{% url 'student_dashboard' %}" class="navbar-link">Dashboard</a>
           <a href="{% url 'student_history' %}" class="navbar-link">Booking History</a>
           <a href="{% url 'rules_regulations' %}" class="navbar-link">Rules & Regulations</a>
           <a href="{% url 'student_logout' %}" class="navbar-link">Logout</a>
-          
+
         {% else %}
           <!-- Show Login options if NOT logged in -->
           <a href="{% url 'student_login' %}" class="navbar-link">Student Login</a>

@@ -297,7 +297,8 @@ def student_booking(request):
         booking_form = BookingForm(request.POST)
         if booking_form.is_valid():
             # Get booking details
-            student_email = request.POST.get("student_email")
+            # Prefer posted email, else fall back to logged-in session email
+            student_email = request.POST.get("student_email") or request.session.get('student_email')
             booking_date = request.POST.get("date")
             
             # Check 1-day restriction for main student
@@ -347,7 +348,7 @@ def student_booking(request):
 
             # Organizer info
             booking.student_name = request.POST.get("student_name")
-            booking.student_email = request.POST.get("student_email")
+            booking.student_email = student_email
             booking.roll_number = ''  # optional, can fetch if needed
 
             # Booking info
@@ -410,7 +411,19 @@ def student_booking(request):
 
             return redirect('booking_success')
     else:
-        booking_form = BookingForm()
+        # Pre-fill email (and optionally name) for logged-in students
+        initial = {}
+        sess_email = request.session.get('student_email')
+        if sess_email:
+            initial['student_email'] = sess_email
+            try:
+                su = StudentUser.objects.get(email=sess_email)
+                if su.full_name:
+                    initial['student_name'] = su.full_name
+            except StudentUser.DoesNotExist:
+                pass
+
+        booking_form = BookingForm(initial=initial)
 
     return render(request, 'booking/student_booking.html', {
         'booking_form': booking_form,

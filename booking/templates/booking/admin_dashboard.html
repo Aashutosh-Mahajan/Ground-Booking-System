@@ -105,8 +105,8 @@
                                 </div>
                             </td>
                             <td class="ground-cell">{{ booking.ground }}</td>
-                            <td>{{ booking.date|date:"M. d, Y" }}</td>
-                            <td>{{ booking.time_slot }}</td>
+                            <td class="nowrap">{{ booking.date|date:"M. d, Y" }}</td>
+                            <td class="nowrap">{{ booking.time_slot }}</td>
                             <td>
                                 <button class="show-equipment-btn" data-id="{{ booking.id }}" data-type="booking">
                                     Show Equipment
@@ -184,9 +184,9 @@
                     <tbody>
                         {% for allot in allotments %}
                         <tr>
-                            <td>{{ allot.date|date:"M. d, Y" }}</td>
+                            <td class="nowrap">{{ allot.date|date:"M. d, Y" }}</td>
                             <td class="ground-cell">{{ allot.ground }}</td>
-                            <td>{{ allot.time_slot }}</td>
+                            <td class="nowrap">{{ allot.time_slot }}</td>
                             <td>
                                 <button class="show-equipment-btn" data-id="{{ allot.id }}" data-type="allotment">
                                     Show Equipment
@@ -629,12 +629,19 @@
 .user-details {
     display: flex;
     flex-direction: column;
+    /* Constrain width so name can ellipsis on a single line */
+    max-width: 220px;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .user-name {
     font-weight: 600;
     color: #111827;
     font-size: 14px;
+    white-space: nowrap;           /* keep on one line */
+    overflow: hidden;              /* hide overflow */
+    text-overflow: ellipsis;       /* add ellipsis if too long */
 }
 
 .user-id {
@@ -645,6 +652,9 @@
 .allotted-name {
     font-weight: 500;
     color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Ground Cell */
@@ -703,6 +713,11 @@
 .player-count {
     font-weight: 600;
     color: #2563eb;
+}
+
+/* Utility */
+.nowrap {
+    white-space: nowrap;
 }
 
 /* Status Badges */
