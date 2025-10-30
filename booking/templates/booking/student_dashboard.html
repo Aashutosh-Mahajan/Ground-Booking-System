@@ -10,6 +10,17 @@
         <p class="dashboard-subtitle">Book your sports facilities with ease</p>
     </div>
 
+    <!-- Welcome Message -->
+    <div class="welcome-message">
+        <h2 class="welcome-text">Welcome, {{ first_name }}!</h2>
+        <p class="welcome-subtext">Ready to book your favorite sports facility?</p>
+    </div>
+
+    <!-- Ground Image -->
+    <div class="ground-image-container">
+        <img src="{% static 'images/VitGround1.jpg' %}" alt="Sports Ground" class="ground-image">
+    </div>
+
     <!-- Progress Steps -->
     <div class="progress-steps">
         <div class="step-item active" id="step1">
@@ -477,7 +488,7 @@ async function fetchAvailability(ground) {
 
 function updateSummary() {
     document.getElementById('summaryDate').textContent = bookingData.date || 'Not selected';
-    document.getElementById('summaryGround').textContent = bookingData.ground ? `Premium Sports Complex ${bookingData.ground}` : 'Not selected';
+  document.getElementById('summaryGround').textContent = bookingData.ground ? `Ground ${bookingData.ground}` : 'Not selected';
     document.getElementById('summarySport').textContent = bookingData.sport || 'Not selected';
     document.getElementById('summaryTime').textContent = bookingData.timeSlot ? `Morning Session (${bookingData.timeSlot})` : 'Not selected';
 }
