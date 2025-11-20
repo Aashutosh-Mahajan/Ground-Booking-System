@@ -1,190 +1,159 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Home{% endblock %}
-{% block content %}
- <div id="home-page" class="page-content" style="flex: 1;">
 
-        
-        <div class="hero" id="hero">
-    <div class="container">
-        <div class="hero-content">
-            <h1 class="hero-title">
-                Book Your College Ground
-                <span class="text-primary">Instantly</span>
+{% block content %}
+<div class="relative bg-dark-900 overflow-hidden">
+    <!-- Hero Section -->
+    <div class="relative h-screen min-h-[600px] flex items-center justify-center">
+        <!-- Background Slider -->
+        <div id="hero-bg" class="absolute inset-0 z-0 transition-all duration-1000 ease-in-out bg-cover bg-center bg-no-repeat" 
+             style="background-image: url('{% static 'images/VitGround1.jpg' %}');">
+            <div class="absolute inset-0 bg-gradient-to-b from-dark-900/80 via-dark-900/60 to-dark-900"></div>
+        </div>
+
+        <!-- Content -->
+        <div class="relative z-10 container mx-auto px-4 text-center">
+            <span class="inline-block py-1 px-3 rounded-full bg-primary-600 text-white text-xs md:text-sm font-bold mb-4 md:mb-6 border border-primary-500 shadow-lg animate-fade-in-up">
+                Welcome to SportDeck
+            </span>
+            <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold font-heading text-white mb-4 md:mb-6 leading-tight animate-fade-in-up delay-100">
+                Book Your <span class="text-primary-400">Ground</span> <br/>
+                In Seconds
             </h1>
-            <p class="hero-subtitle">
-                Reserve sports grounds, event spaces, and recreational areas with our easy-to-use booking system.
+            <p class="text-base sm:text-lg md:text-xl text-slate-300 mb-8 md:mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-in-up delay-200 px-4">
+                The ultimate platform for students and faculty to reserve sports grounds, event spaces, and recreational areas effortlessly.
             </p>
-            {% if request.session.student_email %}
-            <a href="{% url 'student_dashboard' %}" class="btn btn-primary btn-lg">Book your Ground</a>
-            {% else %}
-            <a href="{% url 'student_login' %}" class="btn btn-primary btn-lg">Book your Ground</a>
-            {% endif %}
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up delay-300 px-4">
+                {% if request.session.student_email %}
+                <a href="{% url 'student_dashboard' %}" class="group relative px-6 py-3 md:px-8 md:py-4 bg-primary-600 text-white font-bold rounded-xl overflow-hidden shadow-lg shadow-primary-600/40 hover:shadow-primary-600/60 transition-all hover:-translate-y-1 w-full sm:w-auto">
+                    <span class="relative z-10 flex items-center justify-center gap-2">
+                        Book Now 
+                        <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                    </span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-primary-500 to-primary-700 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </a>
+                {% else %}
+                <a href="{% url 'student_login' %}" class="group relative px-6 py-3 md:px-8 md:py-4 bg-primary-600 text-white font-bold rounded-xl overflow-hidden shadow-lg shadow-primary-600/40 hover:shadow-primary-600/60 transition-all hover:-translate-y-1 w-full sm:w-auto">
+                    <span class="relative z-10 flex items-center justify-center gap-2">
+                        Get Started
+                        <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                    </span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-primary-500 to-primary-700 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </a>
+                <a href="#features" class="px-6 py-3 md:px-8 md:py-4 bg-white/10 text-white font-bold rounded-xl backdrop-blur-md border border-white/10 hover:bg-white/20 transition-all hover:-translate-y-1 w-full sm:w-auto">
+                    Learn More
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-slate-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
         </div>
     </div>
-</div>
 
 
-        
 
+    <!-- Features Section -->
+    <div id="features" class="py-24 bg-slate-50 relative overflow-hidden">
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold font-heading text-slate-900 mb-4">Why Choose SportDeck?</h2>
+                <p class="text-slate-600 text-lg">Experience the future of campus facility management with our cutting-edge features.</p>
+            </div>
 
-        <!-- Features Section -->
-        <div class="features py-12">
-            <div class="container">
-                <div class="features-header text-center mb-8">
-                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Why Choose GroundBook?</h2>
-                    <p class="text-gray-600">Simple, fast, and reliable ground booking for your college</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-100 hover:border-primary-100">
+                    <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <img src="{% static 'images/ground.png' %}" alt="Instant Booking" class="w-10 h-10 object-contain">
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-primary-600 transition-colors">Instant Booking</h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        Skip the paperwork. Book your preferred ground in just a few clicks with our real-time reservation system.
+                    </p>
                 </div>
 
-                <div class="features-slider">
-                    <div class="scroll-track">
-                        <!-- Original Cards -->
-                        <div class="feature-card bg-blue-50">
-                            <div class="feature-icon"><img src="{% static 'images/ground.png' %}" alt="Instant Booking" loading="lazy" width="96" height="96"></div>
-                                <h3>Instant Booking</h3>
-                                <p>Book your preferred ground in just a few clicks</p>
-                        </div>
-                        <div class="feature-card bg-green-50">
-                            <div class="feature-icon"><img src="{% static 'images/calendar.png' %}" alt="Real-time Availability" loading="lazy" width="96" height="96"></div>
-                            <h3>Real-time Availability</h3>
-                            <p>See available time slots and dates instantly</p>
-                        </div>
-                        <div class="feature-card bg-purple-50">
-                            <div class="feature-icon"><img src="{% static 'images/management.png' %}" alt="Easy Management" loading="lazy" width="96" height="96"></div>
-                            <h3>Easy Management</h3>
-                            <p>Track your bookings and get instant approvals</p>
-                        </div>
-
-                        <!-- Duplicate Cards for seamless loop -->
-                    <div class="feature-card bg-blue-50">
-                    <div class="feature-icon"><img src="{% static 'images/ground.png' %}" alt="Instant Booking" loading="lazy" width="96" height="96"></div>
-                    <h3>Instant Booking</h3>
-                    <p>Book your preferred ground in just a few clicks</p>
+                <!-- Feature 2 -->
+                <div class="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-100 hover:border-secondary-100">
+                    <div class="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <img src="{% static 'images/calendar.png' %}" alt="Real-time Availability" class="w-10 h-10 object-contain">
                     </div>
-                    <div class="feature-card bg-green-50">
-                    <div class="feature-icon"><img src="{% static 'images/calendar.png' %}" alt="Real-time Availability" loading="lazy" width="96" height="96"></div>
-                    <h3>Real-time Availability</h3>
-                    <p>See available time slots and dates instantly</p>
-                    </div>
-                    <div class="feature-card bg-purple-50">
-                    <div class="feature-icon"><img src="{% static 'images/management.png' %}" alt="Easy Management" loading="lazy" width="96" height="96"></div>
-                    <h3>Easy Management</h3>
-                    <p>Track your bookings and get instant approvals</p>
-                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-secondary-600 transition-colors">Live Availability</h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        View up-to-the-minute schedules. See available time slots and dates instantly to plan your games.
+                    </p>
                 </div>
+
+                <!-- Feature 3 -->
+                <div class="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-100 hover:border-purple-100">
+                    <div class="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <img src="{% static 'images/management.png' %}" alt="Easy Management" class="w-10 h-10 object-contain">
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-purple-600 transition-colors">Smart Management</h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        Track your booking history, manage cancellations, and get instant status updates on your dashboard.
+                    </p>
                 </div>
             </div>
         </div>
+        
+        <!-- Decorative blobs -->
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-primary-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
+        <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 bg-secondary-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
+    </div>
+</div>
+
+<style>
+    @keyframes fade-in-up {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up {
+        animation: fade-in-up 0.8s ease-out forwards;
+        opacity: 0;
+    }
+    .delay-100 { animation-delay: 0.1s; }
+    .delay-200 { animation-delay: 0.2s; }
+    .delay-300 { animation-delay: 0.3s; }
+    
+    @keyframes blob {
+        0% { transform: translate(0px, 0px) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(0px, 0px) scale(1); }
+    }
+    .animate-blob {
+        animation: blob 7s infinite;
+    }
+    .animation-delay-2000 {
+        animation-delay: 2s;
+    }
+</style>
 
 <script>
-const hero = document.getElementById('hero');
-
-const images = [
-    '/static/images/VitGround1.jpg',
-    '/static/images/VitGround2.jpg',
-    '/static/images/VitGround3.jpg',
-    '/static/images/VitGround4.jpg'
-];
-
-// Optimized preload - only preload on non-mobile devices or good connection
-const shouldPreload = window.innerWidth > 768 || 
-    (navigator.connection && navigator.connection.effectiveType !== 'slow-2g' && navigator.connection.effectiveType !== '2g');
-
-if (shouldPreload) {
-    // Preload all images
+    const heroBg = document.getElementById('hero-bg');
+    const images = [
+        "{% static 'images/VitGround1.jpg' %}",
+        "{% static 'images/VitGround2.jpg' %}",
+        "{% static 'images/VitGround3.jpg' %}",
+        "{% static 'images/VitGround4.jpg' %}"
+    ];
+    
+    let i = 0;
+    
+    // Preload images
     images.forEach(src => {
         const img = new Image();
         img.src = src;
     });
-}
 
-let i = 0;
-const slideInterval = window.innerWidth <= 768 ? 5000 : 4000; // Slower on mobile to save battery
-
-setInterval(() => {
-    i = (i + 1) % images.length;
-    hero.style.backgroundImage = `url('${images[i]}')`;
-}, slideInterval);
+    setInterval(() => {
+        i = (i + 1) % images.length;
+        heroBg.style.backgroundImage = `url('${images[i]}')`;
+    }, 5000);
 </script>
-
-
-<style>
-.features {
-  padding: 4rem 0;
-  background-color: #ffffff;
-}
-
-.features-header {
-  text-align: center;
-  margin-bottom: 3rem;
-}
-
-.features-slider {
-  overflow: hidden;
-  width: 100%;
-}
-
-.scroll-track {
-  display: flex;
-  gap: 30px;
-  flex-wrap: nowrap;
-  animation: scroll-left 10s linear infinite;
-}
-
-/* Smooth infinite scroll to left */
-@keyframes scroll-left {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%); /* width of first 3 cards + gaps */
-  }
-}
-
-.feature-card {
-  min-width: 300px;
-  flex-shrink: 0;
-  text-align: center;
-  padding: 2rem;
-  border-radius: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.06);
-}
-
-.feature-icon {
-  width: 96px;
-  height: 96px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0,0,0,0.03);
-  border-radius: 9999px;
-  margin-bottom: 1rem;
-}
-
-.feature-icon img {
-  width: 96px;
-  height: 96px;
-  object-fit: contain;
-}
-
-.features-slider:hover .scroll-track {
-  animation-play-state: paused;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .scroll-track {
-    animation-duration: 15s;
-  }
-  .feature-card {
-    min-width: 250px;
-  }
-}
-</style>
-
 {% endblock %}

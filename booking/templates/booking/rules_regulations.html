@@ -4,126 +4,166 @@
 {% block title %}Rules & Regulations{% endblock %}
 
 {% block content %}
-<div class="rules-container">
-  <div class="rules-header">
-    <h1>Ground Booking Rules & Regulations</h1>
-    <p>Follow these rules to ensure safe and fair use of college grounds.</p>
-    <img src="{% static 'images/rules-banner.jpeg' %}" alt="Rules Banner" class="rules-banner">
-  </div>
+<div class="min-h-screen bg-slate-50 pt-24 pb-8 md:pt-28 md:pb-24 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8 md:mb-12">
+            <h1 class="text-3xl md:text-4xl font-bold font-heading text-slate-900 mb-4">Ground Booking Rules</h1>
+            <p class="text-base md:text-lg text-slate-600 max-w-2xl mx-auto">Please read and follow these regulations to ensure a safe and fair environment for everyone.</p>
+        </div>
 
-  <div class="rules-list-container">
-    <div class="rule-card"><span class="rule-badge">1</span> Bookings must be made at least 24 hours in advance.</div>
-    <div class="rule-card"><span class="rule-badge">2</span> Maximum of 2 hours per day per student/group.</div>
-    <div class="rule-card"><span class="rule-badge">3</span> Only registered students may make bookings.</div>
-    <div class="rule-card"><span class="rule-badge">4</span> Leave the ground clean and on time.</div>
-    <div class="rule-card"><span class="rule-badge">5</span> Report any damages immediately.</div>
-    <div class="rule-card"><span class="rule-badge">6</span> Cancel bookings at least 12 hours in advance.</div>
-    <div class="rule-card"><span class="rule-badge">7</span> Unauthorized use may lead to suspension.</div>
-    <div class="rule-card"><span class="rule-badge">8</span> Follow all college safety and sports regulations.</div>
-    <div class="rule-card"><span class="rule-badge">9</span> Use of alcohol, drugs, or tobacco is strictly prohibited.</div>
-    <div class="rule-card"><span class="rule-badge">10</span> Maintain proper conduct; do not disturb other groups.</div>
-    <div class="rule-card"><span class="rule-badge">11</span> Equipment must be used responsibly and returned after use.</div>
-    <div class="rule-card"><span class="rule-badge">12</span> Restricted areas are off-limits.</div>
-    <div class="rule-card"><span class="rule-badge">13</span> Only authorized personnel can operate lighting/sound systems.</div>
-  </div>
+        <!-- Banner Image -->
+        <div class="mb-8 md:mb-12 rounded-3xl overflow-hidden shadow-xl relative h-48 md:h-80 group">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent z-10"></div>
+            <img src="{% static 'images/rules-banner.jpeg' %}" alt="Rules Banner" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
+            <div class="absolute bottom-0 left-0 p-6 md:p-8 z-20">
+                <h2 class="text-xl md:text-3xl font-bold text-white mb-2">Play Fair, Play Safe</h2>
+                <p class="text-sm md:text-base text-slate-200">Respect the ground, respect the game.</p>
+            </div>
+        </div>
 
-  <div class="note">
-    <p>By using the ground booking system, you agree to follow all rules and regulations.</p>
-    <a href="{% url 'student_dashboard' %}" class="btn-back">I agree</a>
-  </div>
+        <!-- Rules Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+            <!-- Rule 1 -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-primary-200 transition-all group">
+                <div class="flex items-start gap-4">
+                    <span class="flex-shrink-0 w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold text-lg group-hover:bg-primary-600 group-hover:text-white transition-colors">1</span>
+                    <div>
+                        <h3 class="font-bold text-slate-900 mb-1">Advance Booking</h3>
+                        <p class="text-slate-600 text-sm">Bookings must be made at least 24 hours in advance to ensure availability.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rule 2 -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-primary-200 transition-all group">
+                <div class="flex items-start gap-4">
+                    <span class="flex-shrink-0 w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold text-lg group-hover:bg-primary-600 group-hover:text-white transition-colors">2</span>
+                    <div>
+                        <h3 class="font-bold text-slate-900 mb-1">Time Limit</h3>
+                        <p class="text-slate-600 text-sm">Maximum of 2 hours per day per student/group to allow fair access for all.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rule 3 -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-primary-200 transition-all group">
+                <div class="flex items-start gap-4">
+                    <span class="flex-shrink-0 w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold text-lg group-hover:bg-primary-600 group-hover:text-white transition-colors">3</span>
+                    <div>
+                        <h3 class="font-bold text-slate-900 mb-1">Registered Students Only</h3>
+                        <p class="text-slate-600 text-sm">Only currently registered students with valid ID may make bookings.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rule 4 -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-primary-200 transition-all group">
+                <div class="flex items-start gap-4">
+                    <span class="flex-shrink-0 w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold text-lg group-hover:bg-primary-600 group-hover:text-white transition-colors">4</span>
+                    <div>
+                        <h3 class="font-bold text-slate-900 mb-1">Cleanliness & Punctuality</h3>
+                        <p class="text-slate-600 text-sm">Leave the ground clean and vacate strictly on time for the next group.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rule 5 -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-primary-200 transition-all group">
+                <div class="flex items-start gap-4">
+                    <span class="flex-shrink-0 w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold text-lg group-hover:bg-primary-600 group-hover:text-white transition-colors">5</span>
+                    <div>
+                        <h3 class="font-bold text-slate-900 mb-1">Report Damages</h3>
+                        <p class="text-slate-600 text-sm">Report any existing damages immediately before starting your game.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rule 6 -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-primary-200 transition-all group">
+                <div class="flex items-start gap-4">
+                    <span class="flex-shrink-0 w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold text-lg group-hover:bg-primary-600 group-hover:text-white transition-colors">6</span>
+                    <div>
+                        <h3 class="font-bold text-slate-900 mb-1">Cancellation Policy</h3>
+                        <p class="text-slate-600 text-sm">Cancel bookings at least 12 hours in advance to avoid penalties.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rule 7 -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-primary-200 transition-all group">
+                <div class="flex items-start gap-4">
+                    <span class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-lg group-hover:bg-red-600 group-hover:text-white transition-colors">7</span>
+                    <div>
+                        <h3 class="font-bold text-slate-900 mb-1">Unauthorized Use</h3>
+                        <p class="text-slate-600 text-sm">Unauthorized use of facilities may lead to suspension of booking privileges.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rule 8 -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-primary-200 transition-all group">
+                <div class="flex items-start gap-4">
+                    <span class="flex-shrink-0 w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold text-lg group-hover:bg-primary-600 group-hover:text-white transition-colors">8</span>
+                    <div>
+                        <h3 class="font-bold text-slate-900 mb-1">Safety First</h3>
+                        <p class="text-slate-600 text-sm">Follow all college safety guidelines and sports-specific regulations.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rule 9 -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-primary-200 transition-all group">
+                <div class="flex items-start gap-4">
+                    <span class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-lg group-hover:bg-red-600 group-hover:text-white transition-colors">9</span>
+                    <div>
+                        <h3 class="font-bold text-slate-900 mb-1">Prohibited Items</h3>
+                        <p class="text-slate-600 text-sm">Use of alcohol, drugs, or tobacco is strictly prohibited on premises.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rule 10 -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-primary-200 transition-all group">
+                <div class="flex items-start gap-4">
+                    <span class="flex-shrink-0 w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold text-lg group-hover:bg-primary-600 group-hover:text-white transition-colors">10</span>
+                    <div>
+                        <h3 class="font-bold text-slate-900 mb-1">Conduct</h3>
+                        <p class="text-slate-600 text-sm">Maintain proper conduct; do not disturb other groups or classes nearby.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rule 11 -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-primary-200 transition-all group">
+                <div class="flex items-start gap-4">
+                    <span class="flex-shrink-0 w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold text-lg group-hover:bg-primary-600 group-hover:text-white transition-colors">11</span>
+                    <div>
+                        <h3 class="font-bold text-slate-900 mb-1">Equipment</h3>
+                        <p class="text-slate-600 text-sm">College equipment must be used responsibly and returned immediately after use.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rule 12 -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-primary-200 transition-all group">
+                <div class="flex items-start gap-4">
+                    <span class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-lg group-hover:bg-red-600 group-hover:text-white transition-colors">12</span>
+                    <div>
+                        <h3 class="font-bold text-slate-900 mb-1">Restricted Areas</h3>
+                        <p class="text-slate-600 text-sm">Do not enter restricted areas or maintenance zones.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agreement Section -->
+        <div class="bg-primary-50 rounded-2xl p-8 text-center border border-primary-100">
+            <p class="text-slate-700 mb-6 text-lg">By using the ground booking system, you acknowledge that you have read and agree to follow all the above rules and regulations.</p>
+            <a href="{% url 'student_dashboard' %}" class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-xl shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all transform hover:-translate-y-1">
+                I Agree & Continue
+            </a>
+        </div>
+    </div>
 </div>
-
-<style>
-/* Container */
-.rules-container {
-  max-width: 900px;
-  margin: 50px auto;
-  padding: 20px;
-  font-family: 'Arial', sans-serif;
-}
-
-/* Header */
-.rules-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.rules-header h1 {
-  font-size: 32px;
-  color: #1e3a8a;
-  margin-bottom: 10px;
-}
-
-.rules-header p {
-  font-size: 18px;
-  color: #374151;
-}
-
-.rules-banner {
-  margin-top: 20px;
-  max-width: 300px;
-}
-
-/* Rule Cards */
-.rules-list-container {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.rule-card {
-  display: flex;
-  align-items: center;
-  padding: 15px 20px;
-  border-radius: 12px;
-  background: linear-gradient(90deg, #eff6ff, #e0f2fe);
-  color: #1e3a8a;
-  font-size: 16px;
-  font-weight: 500;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.rule-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-}
-
-.rule-badge {
-  display: inline-block;
-  min-width: 28px;
-  height: 28px;
-  line-height: 28px;
-  border-radius: 50%;
-  background-color: #2563eb;
-  color: white;
-  font-weight: bold;
-  text-align: center;
-  margin-right: 15px;
-  flex-shrink: 0;
-}
-
-/* Note and Back Button */
-.note {
-  text-align: center;
-  margin-top: 40px;
-  font-style: italic;
-  color: #4b5563;
-}
-
-.btn-back {
-  display: inline-block;
-  margin-top: 15px;
-  padding: 10px 20px;
-  background: #2563eb;
-  color: white;
-  text-decoration: none;
-  border-radius: 8px;
-  font-weight: bold;
-  transition: background 0.3s;
-}
-
-.btn-back:hover {
-  background: #1e40af;
-}
-</style>
 {% endblock %}
