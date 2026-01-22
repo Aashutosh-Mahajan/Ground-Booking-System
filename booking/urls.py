@@ -5,6 +5,12 @@ from .views import custom_admin_login
 urlpatterns = [
     path('', views.home, name='home'),
     path('student/login/', views.student_login, name='student_login'),
+    path('student/signup/', views.student_signup, name='student_signup'),
+    path('student/verify-otp/', views.verify_otp, name='verify_otp'),
+    path('student/resend-otp/', views.resend_otp, name='resend_otp'),
+    path('student/forgot-password/', views.forgot_password, name='forgot_password'),
+    path('student/reset-password/', views.reset_password, name='reset_password'),
+    path('student/resend-reset-otp/', views.resend_reset_otp, name='resend_reset_otp'),
     path('student/logout/', views.student_logout, name='student_logout'),
     path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
     path('student/history/', views.student_history, name='student_history'),

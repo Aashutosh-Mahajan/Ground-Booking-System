@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification OTP</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            background-color: #f8fafc;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .header p {
+            color: #e0e7ff;
+            margin: 10px 0 0 0;
+            font-size: 16px;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .greeting {
+            font-size: 18px;
+            color: #1e293b;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .message {
+            font-size: 16px;
+            color: #475569;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .otp-container {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 100%);
+            border: 2px dashed #667eea;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .otp-label {
+            font-size: 14px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .otp-code {
+            font-size: 42px;
+            font-weight: 700;
+            color: #667eea;
+            letter-spacing: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+        .otp-validity {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 15px;
+        }
+        .warning-box {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+        .warning-box p {
+            margin: 0;
+            font-size: 14px;
+            color: #92400e;
+        }
+        .footer {
+            background-color: #f8fafc;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+        }
+        .footer p {
+            color: #64748b;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        .footer-links {
+            margin-top: 15px;
+        }
+        .footer-links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 14px;
+        }
+        .brand {
+            color: #667eea;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>🏟️ SportsDeck</h1>
+            <p>Ground Booking System</p>
+        </div>
+        
+        <div class="content">
+            <div class="greeting">Hello {{ full_name }},</div>
+            
+            <div class="message">
+                <p>Thank you for signing up for <strong>SportsDeck Ground Booking System!</strong></p>
+                <p>To complete your registration, please verify your email address using the One-Time Password (OTP) below:</p>
+            </div>
+            
+            <div class="otp-container">
+                <div class="otp-label">Your Verification Code</div>
+                <div class="otp-code">{{ otp }}</div>
+                <div class="otp-validity">⏰ Valid for 10 minutes</div>
+            </div>
+            
+            <div class="warning-box">
+                <p><strong>⚠️ Important:</strong> If you did not request this registration, please ignore this email. Your account will not be created without verification.</p>
+            </div>
+            
+            <div class="message">
+                <p>Once verified, you'll be able to:</p>
+                <ul style="color: #475569; line-height: 1.8;">
+                    <li>Book sports grounds easily</li>
+                    <li>Track your booking history</li>
+                    <li>Receive instant booking confirmations</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong class="brand">SportsDeck</strong> - Your Sports Booking Partner</p>
+            <p style="margin-top: 10px; font-size: 12px;">
+                This is an automated email. Please do not reply to this message.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

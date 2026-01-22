@@ -1,6 +1,9 @@
 from django.db import models
 from django.db.models import Q
 from django.contrib.auth.hashers import make_password, check_password
+from django.utils import timezone
+from datetime import timedelta
+import random
 
 
 class Booking(models.Model):
@@ -126,4 +129,33 @@ class AllotedGroundBooking(models.Model):
 
     def __str__(self):
         return f"{self.date} | {self.ground} | {self.time_slot}"
+
+
+class OTPVerification(models.Model):
+    email = models.EmailField()
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_verified = models.BooleanField(default=False)
+    
+    # Temporary storage of signup data
+    full_name = models.CharField(max_length=100)
+    roll_number = models.CharField(max_length=20)
+    branch = models.CharField(max_length=50)
+    year = models.CharField(max_length=20)
+    division = models.CharField(max_length=10)
+    password = models.CharField(max_length=255)
+    
+    def __str__(self):
+        return f"{self.email} - {self.otp}"
+    
+    def is_expired(self):
+        return timezone.now() > self.expires_at
+    
+    @staticmethod
+    def generate_otp():
+        return str(random.randint(100000, 999999))
+    
+    class Meta:
+        ordering = ['-created_at']
 
