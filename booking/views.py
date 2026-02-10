@@ -15,6 +15,9 @@ from django.utils.html import strip_tags
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
+from booking.models import StudentUser
+from booking.utils.crypto import decrypt_data
+
 
 # -------------------- HOME --------------------
 def home(request):
@@ -51,27 +54,41 @@ def student_history(request):
 # -------------------- STUDENT LOGIN --------------------
 def student_login(request):
     if request.method == "POST":
-        email = request.POST.get("email")
+        email_input = request.POST.get("email")
         password = request.POST.get("password")
 
-        if not email or not password:
-            context = {'error': 'Please enter both email and password.'}
-            return render(request, "booking/student_login.html", context)
-        else:
+        # Step 1: Validation (same as before)
+        if not email_input or not password:
+            return render(request, "booking/student_login.html", {
+                "error": "Please enter both email and password."
+            })
+        
+        students = StudentUser.objects.all()
+
+        for student in students:
             try:
-                student = StudentUser.objects.get(email=email)
-                if student.password == password:
-                    request.session['student_email'] = student.email
-                    request.session['student_id'] = student.id
-                    return redirect('student_dashboard')
-                else:
-                    context = {'error': 'Invalid password'}
-                    return render(request, "booking/student_login.html", context)
-            except StudentUser.DoesNotExist:
-                context = {'error': 'No student found with this email address'}
-                return render(request, "booking/student_login.html", context)
+                decrypted_email = decrypt_data(student.email)
+
+                if decrypted_email == email_input:
+                    if student.password == password:
+                        request.session["student_email"] = decrypted_email
+                        request.session["student_id"] = student.id
+                        return redirect("student_dashboard")
+                    else:
+                        return render(request, "booking/student_login.html", {
+                            "error": "Invalid password"
+                        })
+            except Exception:
+                # In case of corrupted or old plaintext data
+                continue
+
+        # Step 3: No match found
+        return render(request, "booking/student_login.html", {
+            "error": "No student found with this email address"
+        })
 
     return render(request, "booking/student_login.html")
+
 
 def student_logout(request):
     request.session.flush()
