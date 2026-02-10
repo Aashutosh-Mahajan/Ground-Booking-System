@@ -3,170 +3,207 @@
 {% block title %}Student Dashboard{% endblock %}
 
 {% block content %}
-<div class="dashboard-container">
-    <!-- Header -->
-    <div class="dashboard-header">
-        <h1 class="dashboard-title">Student Dashboard</h1>
-        <p class="dashboard-subtitle">Book your sports facilities with ease</p>
-    </div>
+<div class="min-h-screen bg-slate-50 pt-24 pb-6 md:pt-28 md:pb-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8 md:mb-12 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold font-heading text-slate-900 mb-2 md:mb-4">Student Dashboard</h1>
+            <p class="text-base md:text-lg text-slate-600">Book your sports facilities with ease</p>
+        </div>
 
-    <!-- Progress Steps -->
-    <div class="progress-steps">
-        <div class="step-item active" id="step1">
-            <div class="step-circle">1</div>
-            <div class="step-content">
-                <h3 class="step-title">Select Date</h3>
-                <p class="step-description">Choose your preferred booking date</p>
-            </div>
-        </div>
-        
-        <div class="step-item" id="step2">
-            <div class="step-circle">2</div>
-            <div class="step-content">
-                <h3 class="step-title">Choose Ground</h3>
-                <p class="step-description">Pick from available facilities</p>
-            </div>
-        </div>
-        
-        <div class="step-item" id="step3">
-            <div class="step-circle">3</div>
-            <div class="step-content">
-                <h3 class="step-title">Sport & Time</h3>
-                <p class="step-description">Select sport and time slot</p>
-            </div>
-        </div>
-        
-        <div class="step-item" id="step4">
-            <div class="step-circle">4</div>
-            <div class="step-content">
-                <h3 class="step-title">Confirm</h3>
-                <p class="step-description">Review and submit booking</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Booking Form Card -->
-    <div class="booking-card">
-        <!-- Date Selection Section -->
-        <div class="form-section active" id="dateSection">
-            <div class="section-header">
-                <div class="calendar-icon">📅</div>
-                <h2 class="section-title">Select Booking Date</h2>
-                <p class="section-subtitle">Choose your preferred date for the booking</p>
-            </div>
-            
-      <div class="date-picker">
-        <label for="dateInput" class="date-label">Booking Date</label>
-        <div class="date-input-wrapper">
-          <span class="calendar-icon-small">📅</span>
-          <input type="date" id="dateInput" class="native-date-input" aria-label="Select booking date" />
-        </div>
-                <!-- Custom calendar fallback -->
-                <div id="customCalendar" class="custom-calendar hidden" aria-hidden="true">
-                  <div class="cal-header">
-                    <button type="button" class="cal-nav" id="calPrev" aria-label="Previous Month">‹</button>
-                    <div class="cal-month-year" id="calMonthLabel"></div>
-                    <button type="button" class="cal-nav" id="calNext" aria-label="Next Month">›</button>
-                  </div>
-                  <div class="cal-weekdays" id="calWeekdays"></div>
-                  <div class="cal-days" id="calDays"></div>
+        <!-- Welcome Message -->
+        <div class="bg-white rounded-3xl shadow-xl overflow-hidden mb-8 md:mb-12 relative">
+            <div class="absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-800 opacity-90"></div>
+            <div class="absolute inset-0 bg-[url('{% static 'images/pattern.svg' %}')] opacity-10"></div>
+            <div class="relative z-10 p-6 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
+                <div class="text-white text-center md:text-left">
+                    <h2 class="text-2xl md:text-3xl font-bold font-heading mb-2">Welcome, {{ first_name }}!</h2>
+                    <p class="text-primary-100 text-base md:text-lg">Ready to book your favorite sports facility?</p>
                 </div>
-      </div>
-        </div>
-
-        <!-- Ground Selection Section -->
-        <div class="form-section hidden" id="groundSection">
-            <div class="section-header">
-                <div class="ground-icon">FIELD</div>
-                <h2 class="section-title">Choose Ground</h2>
-                <p class="section-subtitle">Pick from available facilities</p>
-            </div>
-            
-            <div class="grounds-grid">
-                <div class="ground-card" onclick="selectGround('A', event)">
-                    <div class="ground-title">Ground A</div>
-                    <div class="sports-list">
-                        <span class="sport-tag">Handball</span>
-                        <span class="sport-tag">Volleyball</span>
-                        <span class="sport-tag">Cricket</span>
-                        <span class="sport-tag">Basketball</span>
-                    </div>
-                </div>
-                <div class="ground-card" onclick="selectGround('B', event)">
-                    <div class="ground-title">Ground B</div>
-                    <div class="sports-list">
-                        <span class="sport-tag">Football</span>
-                    </div>
+                <div class="hidden md:block">
+                    <img src="{% static 'images/VitGround1.jpg' %}" alt="Sports Ground" class="w-64 h-40 object-cover rounded-2xl shadow-lg border-4 border-white/20 transform rotate-3 hover:rotate-0 transition-transform duration-500">
                 </div>
             </div>
         </div>
 
-        <!-- Sport & Time Selection Section -->
-        <div class="form-section hidden" id="sportTimeSection">
-            <div class="section-header">
-                <div class="sport-icon">SPORT</div>
-                <h2 class="section-title">Sport & Time</h2>
-                <p class="section-subtitle">Select sport and time slot</p>
-            </div>
-            
-            <div class="sport-time-container">
-                <div class="sports-section">
-                    <h3>Available Sports</h3>
-                    <div class="sports-grid" id="sportsGrid"></div>
+        <!-- Progress Steps -->
+        <div class="mb-8 md:mb-12">
+            <div class="flex justify-between items-start max-w-4xl mx-auto relative">
+                <!-- Connecting Line -->
+                <div class="absolute top-5 md:top-6 left-0 right-0 mx-5 h-1 -translate-y-1/2 z-0">
+                    <div class="absolute inset-0 bg-slate-200 rounded-full"></div>
+                    <div class="absolute top-0 left-0 h-full bg-primary-500 rounded-full transition-all duration-500" id="progressLine" style="width: 0%"></div>
+                </div>
+
+                <!-- Steps -->
+                <div class="step-item relative z-10 flex flex-col items-center cursor-pointer group" id="step1" onclick="resetToStep(1)">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-slate-200 flex items-center justify-center font-bold text-slate-400 transition-all duration-300 group-hover:border-primary-300 step-circle text-sm md:text-base">1</div>
+                    <div class="mt-2 md:mt-3 text-xs md:text-sm font-medium text-slate-500 step-label">Date</div>
                 </div>
                 
-                <div class="time-section">
-                    <h3>Available Time Slots</h3>
-                    <div class="time-slots-grid" id="slotsGrid"></div>
+                <div class="step-item relative z-10 flex flex-col items-center cursor-pointer group" id="step2" onclick="if(currentStep>1) resetToStep(2)">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-slate-200 flex items-center justify-center font-bold text-slate-400 transition-all duration-300 group-hover:border-primary-300 step-circle text-sm md:text-base">2</div>
+                    <div class="mt-2 md:mt-3 text-xs md:text-sm font-medium text-slate-500 step-label">Ground</div>
                 </div>
-            </div>
-
-            <!-- Equipment Section -->
-            <div id="equipmentSection" class="equipment-section hidden">
-                <h3>Equipment Requirements</h3>
-                <label class="equipment-checkbox">
-                    <input type="checkbox" id="equipmentCheckbox" checked>
-                    <span class="checkmark"></span>
-                    Need equipment? (Yes/No)
-                </label>
-                <div id="equipmentField" class="equipment-field">
-                    <textarea id="equipmentInput" placeholder="Specify equipment needed..." readonly></textarea>
+                
+                <div class="step-item relative z-10 flex flex-col items-center cursor-pointer group" id="step3" onclick="if(currentStep>2) resetToStep(3)">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-slate-200 flex items-center justify-center font-bold text-slate-400 transition-all duration-300 group-hover:border-primary-300 step-circle text-sm md:text-base">3</div>
+                    <div class="mt-2 md:mt-3 text-xs md:text-sm font-medium text-slate-500 step-label">Sport & Time</div>
+                </div>
+                
+                <div class="step-item relative z-10 flex flex-col items-center cursor-pointer group" id="step4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-slate-200 flex items-center justify-center font-bold text-slate-400 transition-all duration-300 group-hover:border-primary-300 step-circle text-sm md:text-base">4</div>
+                    <div class="mt-2 md:mt-3 text-xs md:text-sm font-medium text-slate-500 step-label">Confirm</div>
                 </div>
             </div>
         </div>
 
-        <!-- Confirmation Section -->
-        <div class="form-section hidden confirm-section" id="confirmSection">
-            <div class="section-header">
-                <div class="confirm-icon">✓</div>
-                <h2 class="section-title">Confirm Your Booking</h2>
-                <p class="section-subtitle">Review your booking details before submitting</p>
-            </div>
+        <!-- Booking Form Card -->
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden min-h-[600px] relative">
             
-            <div class="booking-summary confirm-wrapper">
-                <h3 class="booking-summary-title">Booking Summary</h3>
-                <div class="summary-card">
-                    <div class="summary-item">
-                        <span class="summary-label">Date:</span>
-                        <strong id="summaryDate" class="summary-value">Not selected</strong>
+            <!-- Date Selection Section -->
+            <div class="form-section p-6 md:p-12 transition-all duration-500 h-full flex flex-col justify-center" id="dateSection">
+                <div class="text-center mb-8 md:mb-10">
+                    <div class="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-primary-600">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     </div>
-                    <div class="summary-item">
-                        <span class="summary-label">Facility:</span>
-                        <strong id="summaryGround" class="summary-value">Not selected</strong>
-                    </div>
-                    <div class="summary-item">
-                        <span class="summary-label">Sport:</span>
-                        <strong id="summarySport" class="summary-value">Not selected</strong>
-                    </div>
-                    <div class="summary-item">
-                        <span class="summary-label">Time Slot:</span>
-                        <strong id="summaryTime" class="summary-value">Not selected</strong>
-                    </div>
+                    <h2 class="text-2xl font-bold text-slate-900">Select Booking Date</h2>
+                    <p class="text-slate-500 mt-2">Choose your preferred date for the booking</p>
                 </div>
                 
-                <button class="submit-booking-btn" onclick="submitBooking()">
-                    <span>Proceed to Book</span>
-                </button>
+                <div class="max-w-md mx-auto">
+                    <label for="dateInput" class="block text-sm font-medium text-slate-700 mb-2">Booking Date</label>
+                    <div class="relative">
+                        <input type="date" id="dateInput" onclick="this.showPicker()" class="block w-full pl-4 pr-10 py-4 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-slate-50 hover:bg-white cursor-pointer" />
+                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ground Selection Section -->
+            <div class="form-section hidden p-6 md:p-12 transition-all duration-500 h-full flex flex-col justify-center" id="groundSection">
+                <div class="text-center mb-8 md:mb-10">
+                    <div class="w-16 h-16 bg-secondary-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-secondary-600">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-900">Choose Ground</h2>
+                    <p class="text-slate-500 mt-2">Pick from available facilities</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                    <div class="ground-card group cursor-pointer p-6 md:p-8 min-h-[200px] flex flex-col justify-center rounded-2xl border-2 border-slate-100 hover:border-primary-500 hover:bg-primary-50/30 transition-all duration-300" onclick="selectGround('A', event)">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-2xl font-bold text-slate-900 group-hover:text-primary-700">Ground A</h3>
+                            <span class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-primary-100 group-hover:text-primary-600 transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </span>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 rounded-lg bg-slate-100 text-slate-600 text-sm font-medium">Handball</span>
+                            <span class="px-3 py-1 rounded-lg bg-slate-100 text-slate-600 text-sm font-medium">Volleyball</span>
+                            <span class="px-3 py-1 rounded-lg bg-slate-100 text-slate-600 text-sm font-medium">Cricket</span>
+                            <span class="px-3 py-1 rounded-lg bg-slate-100 text-slate-600 text-sm font-medium">Basketball</span>
+                        </div>
+                    </div>
+                    
+                    <div class="ground-card group cursor-pointer p-6 md:p-8 min-h-[200px] flex flex-col justify-center rounded-2xl border-2 border-slate-100 hover:border-primary-500 hover:bg-primary-50/30 transition-all duration-300" onclick="selectGround('B', event)">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-2xl font-bold text-slate-900 group-hover:text-primary-700">Ground B</h3>
+                            <span class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-primary-100 group-hover:text-primary-600 transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </span>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 rounded-lg bg-slate-100 text-slate-600 text-sm font-medium">Football</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sport & Time Selection Section -->
+            <div class="form-section hidden p-6 md:p-12 transition-all duration-500 h-full flex flex-col justify-center" id="sportTimeSection">
+                <div class="text-center mb-8 md:mb-10">
+                    <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-purple-600">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-900">Sport & Time</h2>
+                    <p class="text-slate-500 mt-2">Select sport and time slot</p>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <div class="sports-section">
+                        <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-xs">1</span>
+                            Available Sports
+                        </h3>
+                        <div class="grid grid-cols-2 gap-4" id="sportsGrid"></div>
+                    </div>
+                    
+                    <div class="time-section">
+                        <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-xs">2</span>
+                            Available Time Slots
+                        </h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4" id="slotsGrid"></div>
+                    </div>
+                </div>
+
+                <!-- Equipment Section -->
+                <div id="equipmentSection" class="mt-12 pt-8 border-t border-slate-100 hidden">
+                    <h3 class="text-lg font-bold text-slate-900 mb-4">Equipment Requirements</h3>
+                    <label class="flex items-center gap-3 cursor-pointer mb-4 group">
+                        <div class="relative">
+                            <input type="checkbox" id="equipmentCheckbox" checked class="peer sr-only">
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                        </div>
+                        <span class="text-slate-700 font-medium group-hover:text-primary-600 transition-colors">Need equipment?</span>
+                    </label>
+                    <div id="equipmentField" class="equipment-field">
+                        <textarea id="equipmentInput" class="w-full p-4 border border-slate-200 rounded-xl bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all resize-none h-32" placeholder="Specify equipment needed..." readonly></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Confirmation Section -->
+            <div class="form-section hidden p-6 md:p-12 transition-all duration-500 h-full flex flex-col justify-center" id="confirmSection">
+                <div class="text-center mb-8 md:mb-10">
+                    <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-green-600">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-900">Confirm Your Booking</h2>
+                    <p class="text-slate-500 mt-2">Review your booking details before submitting</p>
+                </div>
+                
+                <div class="max-w-2xl mx-auto">
+                    <div class="bg-slate-50 rounded-2xl p-6 md:p-8 border border-slate-200 mb-8">
+                        <h3 class="text-lg font-bold text-slate-900 mb-6 border-b border-slate-200 pb-4">Booking Summary</h3>
+                        <div class="space-y-4">
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-4">
+                                <span class="text-slate-500">Date</span>
+                                <strong id="summaryDate" class="text-slate-900 font-semibold text-left sm:text-right">Not selected</strong>
+                            </div>
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-4">
+                                <span class="text-slate-500">Facility</span>
+                                <strong id="summaryGround" class="text-slate-900 font-semibold text-left sm:text-right">Not selected</strong>
+                            </div>
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-4">
+                                <span class="text-slate-500">Sport</span>
+                                <strong id="summarySport" class="text-slate-900 font-semibold text-left sm:text-right">Not selected</strong>
+                            </div>
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-4">
+                                <span class="text-slate-500 shrink-0">Time Slot</span>
+                                <strong id="summaryTime" class="text-slate-900 font-semibold text-left sm:text-right">Not selected</strong>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="w-full py-4 px-6 bg-primary-600 text-white font-bold rounded-xl shadow-lg shadow-primary-600/30 hover:bg-primary-700 hover:shadow-primary-600/50 hover:-translate-y-1 transition-all flex items-center justify-center gap-2" onclick="submitBooking()">
+                        <span>Proceed to Book</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -178,125 +215,25 @@ let currentStep = 1;
 
 const groundSports = {
     'A': [
-        { name: 'Handball', icon: 'HB' },
-        { name: 'Volleyball', icon: 'VB' },
-        { name: 'Cricket', icon: 'CR' },
-        { name: 'Basketball', icon: 'BB' }
+        { name: 'Handball', icon: '🤾' },
+        { name: 'Volleyball', icon: '🏐' },
+        { name: 'Cricket', icon: '🏏' },
+        { name: 'Basketball', icon: '🏀' }
     ],
     'B': [
-        { name: 'Football', icon: 'FB' }
+        { name: 'Football', icon: '⚽' }
     ]
 };
 
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', function() {
   const dateInput = document.getElementById('dateInput');
-  const cal = document.getElementById('customCalendar');
-  const calMonthLabel = document.getElementById('calMonthLabel');
-  const calDays = document.getElementById('calDays');
-  const calWeekdays = document.getElementById('calWeekdays');
-  const calPrev = document.getElementById('calPrev');
-  const calNext = document.getElementById('calNext');
   const today = new Date();
-  let viewYear = today.getFullYear();
-  let viewMonth = today.getMonth();
   const minDateStr = today.toISOString().split('T')[0];
   if (dateInput) dateInput.min = minDateStr;
 
-  const weekdayLabels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  if (calWeekdays && !calWeekdays.dataset.built) {
-    weekdayLabels.forEach(d => {
-      const div = document.createElement('div');
-      div.textContent = d;
-      calWeekdays.appendChild(div);
-    });
-    calWeekdays.dataset.built = '1';
-  }
-
-  function renderCalendar() {
-    if (!calDays) return;
-    calDays.innerHTML = '';
-    const firstOfMonth = new Date(viewYear, viewMonth, 1);
-    const startDay = firstOfMonth.getDay();
-    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
-    const prevMonthDays = new Date(viewYear, viewMonth, 0).getDate();
-
-    if (calMonthLabel) {
-      calMonthLabel.textContent = firstOfMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-    }
-
-    // Fill leading days from previous month
-    for (let i = 0; i < startDay; i++) {
-      const btn = document.createElement('button');
-      btn.textContent = String(prevMonthDays - startDay + 1 + i);
-      btn.className = 'other';
-      btn.tabIndex = -1;
-      btn.disabled = true;
-      calDays.appendChild(btn);
-    }
-    // Current month days
-    for (let d = 1; d <= daysInMonth; d++) {
-      const dateObj = new Date(viewYear, viewMonth, d);
-      const dateStr = dateObj.toISOString().split('T')[0];
-      const btn = document.createElement('button');
-      btn.textContent = d;
-      const todayObj = new Date();
-      if (dateObj.getFullYear() === todayObj.getFullYear() && dateObj.getMonth() === todayObj.getMonth() && dateObj.getDate() === todayObj.getDate()) {
-        btn.classList.add('today');
-      }
-      if (dateStr < minDateStr) {
-        btn.classList.add('disabled');
-        btn.disabled = true;
-      }
-      if (dateInput && dateInput.value === dateStr) {
-        btn.classList.add('selected');
-      }
-      btn.addEventListener('click', () => {
-        if (btn.disabled) return;
-        if (dateInput) {
-          dateInput.value = dateStr;
-          bookingData.date = dateStr;
-          hideCalendar();
-          nextStep();
-          updateSummary();
-        }
-      });
-      calDays.appendChild(btn);
-    }
-  }
-
-  function showCalendar() {
-    if (!cal) return;
-    cal.classList.remove('hidden');
-    cal.setAttribute('aria-hidden', 'false');
-    renderCalendar();
-    document.addEventListener('click', outsideHandler, { capture: true });
-  }
-  function hideCalendar() {
-    if (!cal) return;
-    cal.classList.add('hidden');
-    cal.setAttribute('aria-hidden', 'true');
-    document.removeEventListener('click', outsideHandler, { capture: true });
-  }
-  function outsideHandler(e) {
-    if (!cal) return;
-    if (!cal.contains(e.target) && e.target !== dateInput) {
-      hideCalendar();
-    }
-  }
-  // positioning handled purely by CSS now (calendar shows above input)
-
-  if (calPrev) calPrev.addEventListener('click', () => { viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; } renderCalendar(); });
-  if (calNext) calNext.addEventListener('click', () => { viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; } renderCalendar(); });
-
   if (dateInput) {
-    dateInput.addEventListener('focus', showCalendar);
-    dateInput.addEventListener('click', (e) => { e.preventDefault(); showCalendar(); });
-    dateInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') hideCalendar();
-    });
     dateInput.addEventListener('change', function() {
-      // In browsers where native picker works, selecting triggers change
       bookingData.date = this.value;
       if (this.value) { nextStep(); }
       updateSummary();
@@ -324,12 +261,26 @@ function updateStepIndicators() {
     // Update step indicators
     for (let i = 1; i <= 4; i++) {
         const stepElement = document.getElementById(`step${i}`);
+        const circle = stepElement.querySelector('.step-circle');
+        const label = stepElement.querySelector('.step-label');
+        
         if (i <= currentStep) {
-            stepElement.classList.add('active');
+            circle.classList.remove('bg-white', 'border-slate-200', 'text-slate-400');
+            circle.classList.add('bg-primary-600', 'border-primary-600', 'text-white');
+            label.classList.remove('text-slate-500');
+            label.classList.add('text-primary-600', 'font-bold');
         } else {
-            stepElement.classList.remove('active');
+            circle.classList.add('bg-white', 'border-slate-200', 'text-slate-400');
+            circle.classList.remove('bg-primary-600', 'border-primary-600', 'text-white');
+            label.classList.add('text-slate-500');
+            label.classList.remove('text-primary-600', 'font-bold');
         }
     }
+    
+    // Update progress line
+    const progressLine = document.getElementById('progressLine');
+    const progress = ((currentStep - 1) / 3) * 100;
+    progressLine.style.width = `${progress}%`;
 
     // Update form sections
     const sections = ['dateSection', 'groundSection', 'sportTimeSection', 'confirmSection'];
@@ -337,6 +288,9 @@ function updateStepIndicators() {
         const section = document.getElementById(sectionId);
         if (index + 1 === currentStep) {
             section.classList.remove('hidden');
+            // Add fade in animation
+            section.style.opacity = '0';
+            setTimeout(() => section.style.opacity = '1', 50);
         } else {
             section.classList.add('hidden');
         }
@@ -375,8 +329,12 @@ function selectGround(ground, event) {
     bookingData.timeSlot = '';
 
     // Update UI
-    document.querySelectorAll('.ground-card').forEach(c => c.classList.remove('selected'));
-    event.currentTarget.classList.add('selected');
+    document.querySelectorAll('.ground-card').forEach(c => {
+        c.classList.remove('border-primary-500', 'bg-primary-50/30', 'ring-2', 'ring-primary-500', 'ring-offset-2');
+        c.classList.add('border-slate-100');
+    });
+    event.currentTarget.classList.remove('border-slate-100');
+    event.currentTarget.classList.add('border-primary-500', 'bg-primary-50/30', 'ring-2', 'ring-primary-500', 'ring-offset-2');
 
     // Populate sports for this ground
     populateSports(ground);
@@ -394,8 +352,8 @@ function populateSports(ground) {
     grid.innerHTML = '';
     groundSports[ground].forEach(s => {
         const btn = document.createElement('button');
-        btn.className = 'sport-option';
-        btn.innerHTML = `${s.icon} ${s.name}`;
+        btn.className = 'sport-option w-full p-5 rounded-xl border-2 border-slate-200 hover:border-primary-500 hover:bg-primary-50 transition-all text-left font-semibold text-slate-700 flex items-center gap-3';
+        btn.innerHTML = `<span class="text-2xl">${s.icon}</span> ${s.name}`;
         btn.onclick = (e) => selectSport(s.name, e);
         grid.appendChild(btn);
     });
@@ -403,8 +361,12 @@ function populateSports(ground) {
 
 function selectSport(sport, event) {
     bookingData.sport = sport;
-    document.querySelectorAll('.sport-option').forEach(o => o.classList.remove('selected'));
-    event.currentTarget.classList.add('selected');
+    document.querySelectorAll('.sport-option').forEach(o => {
+        o.classList.remove('border-primary-600', 'bg-primary-50', 'text-primary-700', 'ring-2', 'ring-primary-500', 'ring-offset-2');
+        o.classList.add('border-slate-200', 'text-slate-700');
+    });
+    event.currentTarget.classList.remove('border-slate-200', 'text-slate-700');
+    event.currentTarget.classList.add('border-primary-600', 'bg-primary-50', 'text-primary-700', 'ring-2', 'ring-primary-500', 'ring-offset-2');
 
     // Show equipment section
     const equipSection = document.getElementById('equipmentSection');
@@ -430,8 +392,14 @@ function selectSport(sport, event) {
 
 function selectTimeSlot(slot, event) {
     bookingData.timeSlot = slot;
-    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
-    event.currentTarget.classList.add('selected');
+    document.querySelectorAll('.time-slot').forEach(s => {
+        s.classList.remove('bg-primary-600', 'text-white', 'border-primary-600', 'ring-2', 'ring-primary-500', 'ring-offset-2');
+        if(!s.classList.contains('booked') && !s.classList.contains('freeze')) {
+            s.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
+        }
+    });
+    event.currentTarget.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
+    event.currentTarget.classList.add('bg-primary-600', 'text-white', 'border-primary-600', 'ring-2', 'ring-primary-500', 'ring-offset-2');
     
     updateSummary();
     
@@ -447,7 +415,7 @@ async function fetchAvailability(ground) {
   if (!date || !sport) return;
 
   const grid = document.getElementById('slotsGrid');
-  grid.innerHTML = '<div class="loading">Loading available slots...</div>';
+  grid.innerHTML = '<div class="col-span-full text-center py-8 text-slate-500">Loading available slots...</div>';
 
   try {
   const params = new URLSearchParams({ ground, date, sport });
@@ -458,26 +426,32 @@ async function fetchAvailability(ground) {
     grid.innerHTML = '';
     (data.slots || []).forEach(({ time, status }) => {
       const slotDiv = document.createElement('div');
-      slotDiv.className = `time-slot ${status}`; // available | booked | freeze
-      slotDiv.textContent = time.replace(/^0/, ''); // light fmt tweak
+      // Base classes
+      let classes = 'time-slot p-4 rounded-xl border-2 text-center font-medium transition-all cursor-pointer';
+      
       if (status === 'available') {
+        classes += ' bg-white border-slate-200 hover:border-primary-500 hover:bg-primary-50 text-slate-700';
         slotDiv.onclick = (e) => selectTimeSlot(time, e);
-      } else {
-        slotDiv.setAttribute('aria-disabled', 'true');
-        slotDiv.style.opacity = '0.6';
-        slotDiv.style.cursor = 'not-allowed';
+      } else if (status === 'booked') {
+        classes += ' bg-red-50 border-red-100 text-red-400 cursor-not-allowed opacity-60 booked';
+      } else { // freeze
+        classes += ' bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed freeze';
       }
+      
+      slotDiv.className = classes;
+      slotDiv.textContent = time.replace(/^0/, ''); // light fmt tweak
+      
       grid.appendChild(slotDiv);
     });
   } catch (error) {
     console.error('Error fetching availability:', error);
-    grid.innerHTML = '<div class="loading">Error loading slots. Please try again.</div>';
+    grid.innerHTML = '<div class="col-span-full text-center py-8 text-red-500">Error loading slots. Please try again.</div>';
   }
 }
 
 function updateSummary() {
     document.getElementById('summaryDate').textContent = bookingData.date || 'Not selected';
-    document.getElementById('summaryGround').textContent = bookingData.ground ? `Premium Sports Complex ${bookingData.ground}` : 'Not selected';
+  document.getElementById('summaryGround').textContent = bookingData.ground ? `Ground ${bookingData.ground}` : 'Not selected';
     document.getElementById('summarySport').textContent = bookingData.sport || 'Not selected';
     document.getElementById('summaryTime').textContent = bookingData.timeSlot ? `Morning Session (${bookingData.timeSlot})` : 'Not selected';
 }
@@ -507,604 +481,6 @@ async function submitBooking() {
 // Initialize the dashboard
 updateStepIndicators();
 </script>
-
-<style>
-/* Global Styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: #f8fafc;
-  color: #334155;
-  line-height: 1.6;
-}
-
-/* Dashboard Container */
-.dashboard-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px 24px;
-}
-
-/* Header */
-.dashboard-header {
-  margin-bottom: 48px;
-}
-
-.dashboard-title {
-  font-size: 36px;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 8px;
-}
-
-.dashboard-subtitle {
-  font-size: 16px;
-  color: #64748b;
-  font-weight: 400;
-}
-
-/* Progress Steps - Exact match to image */
-.progress-steps {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 48px;
-  padding: 0 40px;
-  max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.step-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  flex: 1;
-  max-width: 180px;
-}
-
-.step-circle {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: #e2e8f0;
-  border: 3px solid #e2e8f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: 700;
-  color: #94a3b8;
-  margin-bottom: 16px;
-  transition: all 0.3s ease;
-}
-
-.step-item.active .step-circle {
-  background: #3b82f6;
-  border-color: #3b82f6;
-  color: white;
-}
-
-.step-content {
-  text-align: center;
-}
-
-.step-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 4px;
-}
-
-.step-description {
-  font-size: 14px;
-  color: #64748b;
-  line-height: 1.4;
-}
-
-/* Main Booking Card - Exact match to image */
-.booking-card {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
-  overflow: visible; /* allow calendar popup */
-  position: relative; /* establish stacking context */
-  max-width: 900px;
-  margin: 0 auto;
-  z-index: 1;
-}
-
-/* Form Sections */
-.form-section {
-  padding: 48px;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.form-section:last-child {
-  border-bottom: none;
-}
-
-.form-section.hidden {
-  display: none;
-}
-
-/* Section Header - Exact match to image */
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 32px;
-}
-
-.calendar-icon, .ground-icon, .sport-icon, .confirm-icon {
-  font-size: 14px;
-  font-weight: 600;
-  background: #3b82f6;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  min-width: 50px;
-  text-align: center;
-}
-
-.section-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #1e293b;
-  margin: 0;
-}
-
-.section-subtitle {
-  font-size: 16px;
-  color: #64748b;
-  margin: 0;
-  margin-left: auto;
-}
-
-/* Date Picker - Exact match to image */
-.date-picker {
-  margin-top: 16px;
-  position: relative; /* ensure overlay is positioned relative to this container */
-  display: inline-block;
-}
-
-/* Overlay input sits on top of the visible button and receives pointer events */
-/* New native date input styling */
-.date-input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: #f8fafc;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  width: 240px;
-  transition: border-color .25s, background .25s;
-}
-
-.date-input-wrapper:hover {
-  border-color: #3b82f6;
-  background: #ffffff;
-}
-
-.native-date-input {
-  appearance: none;
-  -webkit-appearance: none;
-  background: transparent;
-  border: none;
-  font-size: 15px;
-  color: #475569;
-  width: 100%;
-  cursor: pointer;
-  outline: none;
-}
-
-.native-date-input::-webkit-calendar-picker-indicator {
-  cursor: pointer;
-  opacity: 0; /* Hide default icon; we use our own */
-}
-
-.native-date-input:focus {
-  outline: none;
-}
-
-/* Custom calendar fallback */
-.custom-calendar {
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  margin-bottom: 8px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
-  border-radius: 12px;
-  padding: 12px;
-  width: 240px; /* match wrapper width */
-  z-index: 500;
-  animation: slideUp .18s ease;
-}
-.custom-calendar.hidden { display: none; }
-.cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.cal-month-year { font-weight: 600; font-size: 15px; color: #1e293b; }
-.cal-nav { background: #f1f5f9; border: 1px solid #e2e8f0; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 18px; line-height: 1; display: flex; align-items: center; justify-content: center; color: #334155; }
-.cal-nav:hover { background:#e2e8f0; }
-.cal-weekdays, .cal-days { display: grid; grid-template-columns: repeat(7, 1fr); }
-.cal-weekdays { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color:#64748b; margin-bottom: 4px; }
-.cal-weekdays div { text-align: center; padding:4px 0; }
-.cal-days button { border:none; background:none; padding:6px 0; font-size:13px; cursor:pointer; border-radius:6px; color:#334155; position:relative; min-height:32px; }
-.cal-days button.other { opacity:.35; cursor:default; }
-.cal-days button:focus { outline:2px solid #3b82f6; outline-offset:2px; }
-.cal-days button:not(.other):hover { background:#eff6ff; }
-.cal-days button.selected { background:#3b82f6; color:#fff; font-weight:600; }
-.cal-days button.today:not(.selected) { box-shadow: 0 0 0 2px #3b82f6 inset; font-weight:600; }
-.cal-days button.disabled { color:#94a3b8; cursor:not-allowed; opacity:.5; }
-@keyframes fadeIn { from { opacity:0; transform:translateY(4px);} to { opacity:1; transform:translateY(0);} }
-@keyframes slideUp { from { opacity:0; transform:translateY(6px);} to { opacity:1; transform:translateY(0);} }
-
-.calendar-icon-small {
-  font-size: 12px;
-  font-weight: 600;
-  background: #f3f4f6;
-  color: #374151;
-  padding: 4px 8px;
-  border-radius: 4px;
-  border: 1px solid #d1d5db;
-}
-
-/* Grounds Grid */
-.grounds-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
-  margin-top: 32px;
-}
-
-.ground-card {
-  padding: 24px;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  background: #f8fafc;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.ground-card:hover {
-  border-color: #3b82f6;
-  background: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
-}
-
-.ground-card.selected {
-  border-color: #3b82f6;
-  background: white;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
-}
-
-.ground-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 12px;
-}
-
-.sports-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.sport-tag {
-  padding: 6px 12px;
-  background: #dbeafe;
-  color: #1e40af;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-/* Sport & Time Container */
-.sport-time-container {
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-  margin-top: 32px;
-}
-
-.sports-section h3, .time-section h3 {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 16px;
-}
-
-.sports-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
-}
-
-.sport-option {
-  padding: 14px 18px;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  background: #ffffff;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  font-size: 15px;
-  font-weight: 600;
-  color: #1e293b;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-}
-
-.sport-option:hover {
-  border-color: #3b82f6;
-  background: white;
-}
-
-.sport-option.selected {
-  border-color: #2563eb;
-  background: #eff6ff;
-  color: #1e3a8a;
-  box-shadow: 0 4px 12px rgba(37,99,235,0.18);
-}
-
-.time-slots-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: 16px;
-  max-width: 540px;
-}
-
-.time-slot {
-  padding: 12px 16px;
-  border: 2px solid #e2e8f0;
-  border-radius: 10px;
-  background: #f8fafc;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 14px;
-  font-weight: 500;
-  text-align: center;
-}
-
-.time-slot.available {
-  background: #dcfce7;
-  border-color: #16a34a;
-  color: #15803d;
-}
-
-.time-slot.available:hover {
-  background: #bbf7d0;
-}
-
-.time-slot.selected {
-  background: #3b82f6;
-  border-color: #3b82f6;
-  color: white;
-}
-
-.time-slot.booked {
-  background: #fecaca;
-  border-color: #ef4444;
-  color: #dc2626;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.time-slot.freeze {
-  background: #f3f4f6;
-  border-color: #d1d5db;
-  color: #6b7280;
-  cursor: not-allowed;
-}
-
-/* Equipment Section */
-.equipment-section {
-  margin-top: 32px;
-  padding: 24px;
-  background: #f8fafc;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-}
-
-.equipment-section h3 {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 16px;
-}
-
-.equipment-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 16px;
-  font-weight: 500;
-  color: #374151;
-  cursor: pointer;
-  margin-bottom: 16px;
-}
-
-.equipment-checkbox input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  accent-color: #3b82f6;
-  cursor: pointer;
-}
-
-.equipment-field textarea {
-  width: 100%;
-  height: 100px;
-  padding: 16px;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  font-size: 14px;
-  background: white;
-  resize: vertical;
-  outline: none;
-  transition: border-color 0.3s ease;
-}
-
-.equipment-field textarea:focus {
-  border-color: #3b82f6;
-}
-
-/* Booking Summary */
-.booking-summary {
-  margin-top: 32px;
-}
-
-.booking-summary-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 16px;
-  padding-left: 4px;
-}
-
-.confirm-section {
-  padding: 48px;
-}
-
-.confirm-wrapper {
-  max-width: 700px;
-  margin: 0 auto;
-}
-
-.summary-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: none;
-}
-
-.summary-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 0;
-  border-bottom: none;
-}
-
-.summary-item:last-child {
-  border-bottom: none;
-}
-
-.summary-label {
-  font-size: 16px;
-  color: #6b7280;
-  font-weight: 400;
-}
-
-.summary-value {
-  font-size: 16px;
-  font-weight: 600;
-  color: #111827;
-}
-
-/* Submit Button */
-.submit-booking-btn {
-  width: 100%;
-  padding: 14px 24px;
-  background: #1e40af;
-  color: white;
-  font-size: 16px;
-  font-weight: 500;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  box-shadow: none;
-}
-
-.submit-booking-btn:hover {
-  background: #1e3a8a;
-}
-
-.submit-arrow {
-  font-size: 20px;
-  transition: transform 0.3s ease;
-}
-
-.submit-booking-btn:hover .submit-arrow {
-  transform: translateX(4px);
-}
-
-/* Loading State */
-.loading {
-  text-align: center;
-  padding: 20px;
-  color: #64748b;
-  font-size: 16px;
-}
-
-/* Hidden Elements */
-.hidden {
-  display: none;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .dashboard-container {
-    padding: 16px;
-  }
-  
-  .progress-steps {
-    flex-direction: column;
-    gap: 24px;
-    padding: 0;
-  }
-  
-  .step-item {
-    flex-direction: row;
-    text-align: left;
-    max-width: none;
-  }
-  
-  .step-circle {
-    margin-bottom: 0;
-    margin-right: 16px;
-  }
-  
-  .form-section {
-    padding: 24px;
-  }
-  
-  .sport-time-container {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-  
-  .grounds-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .section-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-}
-</style>
-
 {% endblock %}
 
 {% block footer %}

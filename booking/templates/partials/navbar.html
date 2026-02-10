@@ -1,79 +1,153 @@
 {% load static %}
-<nav class="navbar">
-  <div class="navbar-container">
-    <div class="navbar-content">
+<nav class="fixed w-full z-50 top-0 transition-all duration-300 bg-white/90 backdrop-blur-md border-b border-slate-200/60" id="mainNav">
+  <div class="w-full px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-20">
 
       <!-- Left: VIT Logo + SportDeck -->
-      <div class="navbar-left flex items-center">
-        <a href="{% url 'home' %}">
-          <img src="{% static 'images/VITLogo.png' %}" alt="VIT Logo" class="navbar-logo mr-4" width="64" height="64">
+      <div class="flex items-center gap-6">
+        <a href="{% url 'home' %}" class="hover:opacity-80 transition-opacity flex-shrink-0">
+          <img src="{% static 'images/VITLogo.png' %}" alt="VIT Logo" class="h-12 w-auto object-contain">
         </a>
-        <a href="{% url 'home' %}" class="flex items-center gap-2 no-underline">
-          <img src="{% static 'images/SportDeckLogo.png' %}" alt="SportDeck Logo" class="navbar-logo" width="48" height="48">
+        <div class="h-8 w-px bg-slate-200 hidden sm:block"></div>
+        <a href="{% url 'home' %}" class="flex items-center gap-3 group no-underline">
+          <div class="relative">
+            <div class="absolute inset-0 bg-primary-500/20 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <img src="{% static 'images/SportDeckLogo.png' %}" alt="SportDeck Logo" class="relative h-10 w-auto object-contain transform group-hover:scale-105 transition-transform duration-300">
+          </div>
+          <span class="text-2xl font-bold font-heading text-slate-900 tracking-tight group-hover:text-primary-600 transition-colors">SportDeck</span>
         </a>
-        <h1 class="text-2xl font-bold text-primary">SportDeck</h1>
       </div>
 
       <!-- Mobile Menu Toggle -->
-      <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
-        <span></span>
-        <span></span>
-        <span></span>
+      <button class="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-primary-600 focus:outline-none transition-colors" id="mobileMenuToggle" aria-label="Toggle menu">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path class="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          <path class="close-icon hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
       </button>
 
       <!-- Right: Navigation links -->
-      <div class="navbar-links" id="navbarLinks">
-        <a href="{% url 'home' %}" class="navbar-link">Home</a>
+      <div class="hidden md:flex items-center gap-8" id="navbarLinks">
+        <a href="{% url 'home' %}" class="text-sm font-semibold text-slate-600 hover:text-primary-600 transition-colors relative group">
+          Home
+          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
+        </a>
 
-        {% if request.session.student_email %}
+        {% if request.session.is_admin_logged_in %}
+          <!-- Admin logged in -->
+          <div class="flex items-center gap-6">
+            <a href="{% url 'custom_admin_dashboard' %}" class="flex items-center gap-3 text-sm font-medium text-slate-700 hover:text-primary-600 transition-colors group">
+              <div class="w-9 h-9 rounded-full bg-primary-50 text-primary-600 flex items-center justify-center font-bold border border-primary-100 group-hover:bg-primary-100 transition-colors">
+                {{ request.session.admin_username|first|upper }}
+              </div>
+              <span class="hidden lg:block">{{ request.session.admin_username }}</span>
+            </a>
+            <a href="{% url 'admin_logout' %}" class="px-5 py-2.5 text-sm font-semibold text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-600/20 hover:shadow-primary-600/40 hover:-translate-y-0.5">
+              Logout
+            </a>
+          </div>
+
+        {% elif request.session.student_email %}
           <!-- Show only for logged-in students -->
-          <a href="{% url 'student_dashboard' %}" class="navbar-link">Dashboard</a>
-          <a href="{% url 'student_history' %}" class="navbar-link">Booking History</a>
-          <a href="{% url 'rules_regulations' %}" class="navbar-link">Rules & Regulations</a>
-          <a href="{% url 'student_logout' %}" class="navbar-link">Logout</a>
+          <a href="{% url 'student_dashboard' %}" class="text-sm font-semibold text-slate-600 hover:text-primary-600 transition-colors relative group">
+            Dashboard
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
+          </a>
+          <a href="{% url 'student_history' %}" class="text-sm font-semibold text-slate-600 hover:text-primary-600 transition-colors relative group">
+            History
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
+          </a>
+          <a href="{% url 'rules_regulations' %}" class="text-sm font-semibold text-slate-600 hover:text-primary-600 transition-colors relative group">
+            Rules
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
+          </a>
           
+          <div class="h-6 w-px bg-slate-200"></div>
+          
+          <a href="{% url 'student_logout' %}" class="px-5 py-2.5 text-sm font-semibold text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-600/20 hover:shadow-primary-600/40 hover:-translate-y-0.5">
+            Logout
+          </a>
+
         {% else %}
           <!-- Show Login options if NOT logged in -->
-          <a href="{% url 'student_login' %}" class="navbar-link">Student Login</a>
-          <a href="{% url 'admin_login' %}" class="navbar-link">Admin Login</a>
+          <div class="flex items-center gap-4">
+            <a href="{% url 'student_login' %}" class="text-sm font-semibold text-slate-600 hover:text-primary-600 transition-colors px-4 py-2 rounded-lg hover:bg-slate-50">
+              Student Login
+            </a>
+            <a href="{% url 'admin_login' %}" class="px-5 py-2.5 text-sm font-semibold text-white bg-slate-900 rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20 hover:shadow-slate-900/40 hover:-translate-y-0.5">
+              Admin Login
+            </a>
+          </div>
         {% endif %}
       </div>
 
     </div>
   </div>
+  
+  <!-- Mobile Menu (Hidden by default) -->
+  <div class="md:hidden hidden bg-white/95 backdrop-blur-xl border-t border-slate-100 absolute w-full left-0 shadow-2xl transition-all duration-300 ease-in-out" id="mobileMenu">
+    <div class="flex flex-col p-6 space-y-4">
+        <a href="{% url 'home' %}" class="flex items-center gap-3 text-slate-600 hover:text-primary-600 font-medium p-2 rounded-lg hover:bg-slate-50 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            Home
+        </a>
+        
+        {% if request.session.is_admin_logged_in %}
+            <div class="h-px bg-slate-100 my-2"></div>
+            <div class="px-2 py-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Admin</div>
+            <a href="{% url 'custom_admin_dashboard' %}" class="flex items-center gap-3 text-slate-600 hover:text-primary-600 font-medium p-2 rounded-lg hover:bg-slate-50 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                Dashboard
+            </a>
+            <a href="{% url 'admin_logout' %}" class="flex items-center gap-3 text-red-600 hover:text-red-700 font-medium p-2 rounded-lg hover:bg-red-50 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Logout
+            </a>
+        {% elif request.session.student_email %}
+            <div class="h-px bg-slate-100 my-2"></div>
+            <div class="px-2 py-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Student</div>
+            <a href="{% url 'student_dashboard' %}" class="flex items-center gap-3 text-slate-600 hover:text-primary-600 font-medium p-2 rounded-lg hover:bg-slate-50 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                Dashboard
+            </a>
+            <a href="{% url 'student_history' %}" class="flex items-center gap-3 text-slate-600 hover:text-primary-600 font-medium p-2 rounded-lg hover:bg-slate-50 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                History
+            </a>
+            <a href="{% url 'rules_regulations' %}" class="flex items-center gap-3 text-slate-600 hover:text-primary-600 font-medium p-2 rounded-lg hover:bg-slate-50 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Rules
+            </a>
+            <a href="{% url 'student_logout' %}" class="flex items-center gap-3 text-red-600 hover:text-red-700 font-medium p-2 rounded-lg hover:bg-red-50 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Logout
+            </a>
+        {% else %}
+            <div class="h-px bg-slate-100 my-2"></div>
+            <a href="{% url 'student_login' %}" class="flex items-center gap-3 text-slate-600 hover:text-primary-600 font-medium p-2 rounded-lg hover:bg-slate-50 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
+                Student Login
+            </a>
+            <a href="{% url 'admin_login' %}" class="flex items-center gap-3 text-slate-600 hover:text-primary-600 font-medium p-2 rounded-lg hover:bg-slate-50 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                Admin Login
+            </a>
+        {% endif %}
+    </div>
+  </div>
 </nav>
 
 <script>
-// Mobile menu toggle functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-    const navbarLinks = document.getElementById('navbarLinks');
-    
-    if (mobileMenuToggle && navbarLinks) {
-        mobileMenuToggle.addEventListener('click', function() {
-            this.classList.toggle('active');
-            navbarLinks.classList.toggle('active');
-            document.body.classList.toggle('menu-open');
-        });
-        
-        // Close menu when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!event.target.closest('.navbar-container')) {
-                mobileMenuToggle.classList.remove('active');
-                navbarLinks.classList.remove('active');
-                document.body.classList.remove('menu-open');
-            }
-        });
-        
-        // Close menu when clicking a link
-        const navLinks = navbarLinks.querySelectorAll('.navbar-link');
-        navLinks.forEach(link => {
-            link.addEventListener('click', function() {
-                mobileMenuToggle.classList.remove('active');
-                navbarLinks.classList.remove('active');
-                document.body.classList.remove('menu-open');
-            });
-        });
-    }
-});
+  const btn = document.getElementById('mobileMenuToggle');
+  const menu = document.getElementById('mobileMenu');
+  const menuIcon = btn?.querySelector('.menu-icon');
+  const closeIcon = btn?.querySelector('.close-icon');
+
+  if(btn && menu){
+    btn.addEventListener('click', () => {
+      menu.classList.toggle('hidden');
+      menuIcon?.classList.toggle('hidden');
+      closeIcon?.classList.toggle('hidden');
+    });
+  }
 </script>

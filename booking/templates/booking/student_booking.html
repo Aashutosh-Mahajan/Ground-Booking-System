@@ -2,88 +2,153 @@
 {% block title %}Book Ground{% endblock %}
 {% block content %}
 
-<div class="mx-auto py-12 px-8" style="max-width: 1600px;">
-    <div class="card w-full">
-        <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Book a Ground</h2>
-
-        <!-- Display Messages -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} mb-4 p-4 rounded-lg">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        <form method="POST" action="{% url 'student_booking' %}" class="space-y-6">
-            {% csrf_token %}
-
-            <!-- Step 1 hidden inputs -->
-            <input type="hidden" name="date" value="{{ request.GET.date }}">
-            <input type="hidden" name="ground" value="{{ request.GET.ground }}">
-            <input type="hidden" name="sport" value="{{ request.GET.sport }}">
-            <input type="hidden" name="time_slot" value="{{ request.GET.time_slot }}">
-            <!-- equipment may come as 'equipment' or 'equipment_selected' depending on flow -->
-            <input type="hidden" name="equipment" value="{{ request.GET.equipment }}">
-
-            <!-- Optional summary of Step 1 selections -->
-            <div class="booking-summary">
-                <p><strong>Date:</strong> {{ request.GET.date }}</p>
-                <p><strong>Ground:</strong> {{ request.GET.ground }}</p>
-                <p><strong>Sport:</strong> {{ request.GET.sport }}</p>
-                <p><strong>Time Slot:</strong> {{ request.GET.time_slot }}</p>
+<div class="min-h-screen bg-slate-50 pt-24 pb-8 md:pt-28 md:pb-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+            <div class="bg-primary-600 px-6 py-6 md:px-10 md:py-8">
+                <h2 class="text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
+                    <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    Complete Your Booking
+                </h2>
+                <p class="text-primary-100 mt-2 text-sm md:text-base">Please fill in the details below to confirm your reservation.</p>
             </div>
 
-            <!-- Student Information -->
-            <div class="grid grid-cols-3 gap-6">
-                <div class="form-group">
-                    <label class="form-label">Main Student Name</label>
-                    {{ booking_form.student_name }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Email Address</label>
-                    {{ booking_form.student_email }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Number of Players</label>
-                    <select name="number_of_players" id="id_number_of_players" class="form-select">
-                        {% for i in number_options %}
-                            <option value="{{ i }}" {% if i == 1 %}selected{% endif %}>{{ i }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
+            <div class="p-6 md:p-10">
+                <!-- Display Messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="mb-6 p-4 rounded-xl border flex items-start gap-3 {% if message.tags == 'error' %}bg-red-50 border-red-200 text-red-700{% elif message.tags == 'success' %}bg-green-50 border-green-200 text-green-700{% else %}bg-blue-50 border-blue-200 text-blue-700{% endif %}">
+                            <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {% if message.tags == 'error' %}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                {% elif message.tags == 'success' %}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                {% else %}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                {% endif %}
+                            </svg>
+                            <span class="text-sm font-medium">{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
 
-            <!-- Equipment Selected -->
-            <div class="form-group" id="equipment-section" style="display: none;">
-                <label class="form-label">Equipment Selected</label>
-                <textarea id="equipmentField" name="equipment_selected" class="form-input" readonly rows="3"></textarea>
-            </div>
+                <form method="POST" action="{% url 'student_booking' %}" class="space-y-8">
+                    {% csrf_token %}
 
-            <!-- Purpose -->
-            <div class="form-group">
-                <label class="form-label">Purpose</label>
-                {{ booking_form.purpose }}
-            </div>
+                    <!-- Step 1 hidden inputs -->
+                    <input type="hidden" name="date" value="{{ request.GET.date }}">
+                    <input type="hidden" name="ground" value="{{ request.GET.ground }}">
+                    <input type="hidden" name="sport" value="{{ request.GET.sport }}">
+                    <input type="hidden" name="time_slot" value="{{ request.GET.time_slot }}">
+                    <input type="hidden" name="equipment" value="{{ request.GET.equipment }}">
 
-            <!-- Player Selection -->
-            <div id="players-container" class="space-y-4">
-                <div class="form-group">
-                    <label class="form-label">Add Players</label>
-                    <div class="relative">
-                        <input type="text" id="playerSearchInput" class="form-input" placeholder="Type first name to search players...">
-                        <div id="playerSuggestions" class="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg hidden max-h-60 overflow-y-auto mt-1"></div>
+                    <!-- Booking Summary -->
+                    <div class="bg-slate-50 rounded-xl p-4 md:p-6 border border-slate-200">
+                        <h3 class="text-base font-bold text-slate-900 uppercase tracking-wider mb-4">Booking Summary</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                            <div>
+                                <span class="block text-sm text-slate-500">Date</span>
+                                <span class="block text-base font-semibold text-slate-900">{{ request.GET.date }}</span>
+                            </div>
+                            <div>
+                                <span class="block text-sm text-slate-500">Ground</span>
+                                <span class="block text-base font-semibold text-slate-900">{{ request.GET.ground }}</span>
+                            </div>
+                            <div>
+                                <span class="block text-sm text-slate-500">Sport</span>
+                                <span class="block text-base font-semibold text-slate-900">{{ request.GET.sport }}</span>
+                            </div>
+                            <div>
+                                <span class="block text-sm text-slate-500">Time Slot</span>
+                                <span class="block text-base font-semibold text-slate-900">{{ request.GET.time_slot }}</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                
-                <div id="selectedPlayers" class="space-y-2"></div>
-            </div>
 
-            <!-- Submit -->
-            <button type="submit" class="btn btn-primary btn-full">
-                Submit Booking Request
-            </button>
-        </form>
+                    <!-- Student Information -->
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-sm font-bold">1</span>
+                            Student Details
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <div>
+                                <label class="block text-base font-medium text-slate-700 mb-2">Main Student Name</label>
+                                <div class="relative">
+                                    {{ booking_form.student_name }}
+                                    <!-- Add Tailwind classes to form field via JS or assume widget tweaks, but for now wrap in div -->
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-base font-medium text-slate-700 mb-2">Email Address</label>
+                                {{ booking_form.student_email }}
+                            </div>
+                            <div>
+                                <label class="block text-base font-medium text-slate-700 mb-2">Number of Players</label>
+                                <select name="number_of_players" id="id_number_of_players" class="block w-full rounded-lg border-slate-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-base py-3">
+                                    {% for i in number_options %}
+                                        <option value="{{ i }}" {% if i == 1 %}selected{% endif %}>{{ i }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Equipment Selected -->
+                    <div id="equipment-section" style="display: none;">
+                        <h3 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-sm font-bold">2</span>
+                            Equipment
+                        </h3>
+                        <div>
+                            <label class="block text-base font-medium text-slate-700 mb-2">Equipment Selected</label>
+                            <textarea id="equipmentField" name="equipment_selected" class="block w-full rounded-lg border-slate-300 bg-slate-50 text-slate-500 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-base p-3" readonly rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Purpose -->
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-sm font-bold">3</span>
+                            Purpose
+                        </h3>
+                        <div>
+                            <label class="block text-base font-medium text-slate-700 mb-2">Purpose of Booking</label>
+                            {{ booking_form.purpose }}
+                        </div>
+                    </div>
+
+                    <!-- Player Selection -->
+                    <div id="players-container">
+                        <h3 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-sm font-bold">4</span>
+                            Team Members
+                        </h3>
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-base font-medium text-slate-700 mb-2">Add Players</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <svg class="h-6 w-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                    </div>
+                                    <input type="text" id="playerSearchInput" class="block w-full pl-12 pr-4 py-3 border border-slate-300 rounded-lg leading-5 bg-white placeholder-slate-500 focus:outline-none focus:placeholder-slate-400 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 text-base" placeholder="Type first name to search players...">
+                                    <div id="playerSuggestions" class="absolute z-10 w-full bg-white border border-slate-200 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto mt-1"></div>
+                                </div>
+                            </div>
+                            
+                            <div id="selectedPlayers" class="space-y-3"></div>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="pt-8 border-t border-slate-200">
+                        <button type="submit" class="w-full flex justify-center py-4 px-6 border border-transparent rounded-xl shadow-sm text-lg font-bold text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all hover:shadow-lg hover:shadow-primary-600/30">
+                            Confirm Booking Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -181,10 +246,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (students.length > 0) {
             students.forEach(student => {
                 const suggestionDiv = document.createElement('div');
-                suggestionDiv.className = 'p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-200';
+                suggestionDiv.className = 'p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-0 transition-colors';
                 suggestionDiv.innerHTML = `
-                    <div class="font-medium">${student.full_name}</div>
-                    <div class="text-sm text-gray-600">${student.email} | ${student.branch} - ${student.year}${student.division}${student.roll_number ? ` | ${student.roll_number}` : ''}</div>
+                    <div class="font-medium text-slate-900">${student.full_name}</div>
+                    <div class="text-xs text-slate-500">${student.email} | ${student.branch} - ${student.year}${student.division}${student.roll_number ? ` | ${student.roll_number}` : ''}</div>
                 `;
                 suggestionDiv.addEventListener('click', () => {
                     addPlayer(student);
@@ -244,13 +309,15 @@ document.addEventListener('DOMContentLoaded', function() {
         selectedPlayers.innerHTML = '';
         selectedPlayersList.forEach((player, index) => {
             const playerDiv = document.createElement('div');
-            playerDiv.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg border';
+            playerDiv.className = 'flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200';
             playerDiv.innerHTML = `
                 <div class="flex-1">
-                    <div class="font-medium">${player.full_name}</div>
-                    <div class="text-sm text-gray-600">${player.email} | ${player.branch} - ${player.year}${player.division}${player.roll_number ? ` | ${player.roll_number}` : ''}</div>
+                    <div class="font-medium text-slate-900">${player.full_name}</div>
+                    <div class="text-xs text-slate-500">${player.email} | ${player.branch} - ${player.year}${player.division}${player.roll_number ? ` | ${player.roll_number}` : ''}</div>
                 </div>
-                <button type="button" onclick="removePlayer(${index})" class="text-red-600 hover:text-red-800 font-bold text-lg">×</button>
+                <button type="button" onclick="removePlayer(${index})" class="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
             `;
             selectedPlayers.appendChild(playerDiv);
         });
@@ -295,38 +362,24 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
-.alert {
-    border: 1px solid;
-    border-radius: 0.5rem;
-    padding: 1rem;
-    margin-bottom: 1rem;
-}
-
-.alert-error {
-    background-color: #fef2f2;
-    border-color: #fecaca;
-    color: #dc2626;
-}
-
-.alert-success {
-    background-color: #f0fdf4;
-    border-color: #bbf7d0;
-    color: #16a34a;
-}
-
-.alert-warning {
-    background-color: #fffbeb;
-    border-color: #fed7aa;
-    color: #d97706;
-}
-
-.alert-info {
-    background-color: #eff6ff;
-    border-color: #bfdbfe;
-    color: #2563eb;
-}
+    /* Custom form field styling to match Tailwind */
+    input[type="text"], input[type="email"], textarea {
+        display: block;
+        width: 100%;
+        border-radius: 0.5rem;
+        border-color: #cbd5e1;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+    input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
+        border-color: #3b82f6;
+        --tw-ring-color: #3b82f6;
+        --tw-ring-opacity: 1;
+        --tw-ring-offset-width: 0px;
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+        box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+    }
 </style>
-
 {% endblock %}
 
 {% block footer %}

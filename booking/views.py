@@ -5,18 +5,34 @@ from django.template.loader import render_to_string
 from datetime import date, timedelta, datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
-from .forms import BookingForm, PlayerForm
+from .forms import BookingForm, PlayerForm, StudentSignupForm, OTPVerificationForm, ForgotPasswordForm, ResetPasswordForm
 from .models import Player, Booking, AllotedGroundBooking
-from .models import StudentUser, AdminUser
+from .models import StudentUser, AdminUser, OTPVerification
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.utils.html import strip_tags
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
 from booking.models import StudentUser
 from booking.utils.crypto import decrypt_data
+from django.utils import timezone
+
+
+# -------------------- HELPER FUNCTIONS --------------------
+def mask_email(email):
+    """Mask email address for privacy (e.g., ma***@gmail.com)"""
+    if not email or '@' not in email:
+        return email
+    
+    local, domain = email.split('@')
+    if len(local) <= 2:
+        masked_local = local[0] + '***'
+    else:
+        masked_local = local[:2] + '***'
+    
+    return f"{masked_local}@{domain}"
 
 
 # -------------------- HOME --------------------
@@ -88,6 +104,421 @@ def student_login(request):
         })
 
     return render(request, "booking/student_login.html")
+
+
+# -------------------- STUDENT SIGNUP --------------------
+def student_signup(request):
+    if request.method == "POST":
+        form = StudentSignupForm(request.POST)
+        if form.is_valid():
+            # Generate OTP
+            otp = OTPVerification.generate_otp()
+            expires_at = timezone.now() + timedelta(minutes=10)
+            
+            # Delete any existing OTP for this email
+            OTPVerification.objects.filter(email=form.cleaned_data['email']).delete()
+            
+            # Create OTP record with signup data
+            otp_record = OTPVerification.objects.create(
+                email=form.cleaned_data['email'],
+                otp=otp,
+                expires_at=expires_at,
+                full_name=form.cleaned_data['full_name'],
+                roll_number=form.cleaned_data['roll_number'],
+                branch=form.cleaned_data['branch'],
+                year=form.cleaned_data['year'],
+                division=form.cleaned_data['division'],
+                password=form.cleaned_data['password']
+            )
+            
+            # Send OTP email
+            try:
+                subject = 'Email Verification - SportsDeck Ground Booking'
+                
+                # Render HTML email template
+                html_content = render_to_string('booking/emails/signup_otp.html', {
+                    'full_name': form.cleaned_data['full_name'],
+                    'otp': otp,
+                })
+                
+                # Plain text fallback
+                text_content = f'''
+Hello {form.cleaned_data['full_name']},
+
+Thank you for signing up for SportsDeck Ground Booking System!
+
+Your One-Time Password (OTP) for email verification is: {otp}
+
+This OTP will expire in 10 minutes.
+
+If you did not request this registration, please ignore this email.
+
+Best regards,
+SportsDeck Admin Team
+                '''
+                
+                # Create email with both HTML and plain text
+                email = EmailMultiAlternatives(
+                    subject,
+                    text_content,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [form.cleaned_data['email']]
+                )
+                email.attach_alternative(html_content, "text/html")
+                email.send(fail_silently=False)
+                
+                # Store email in session for verification page
+                request.session['signup_email'] = form.cleaned_data['email']
+                messages.success(request, '📧 OTP sent to your email! Please check your inbox.')
+                return redirect('verify_otp')
+                
+            except Exception as e:
+                messages.error(request, f'Error sending OTP email: {str(e)}')
+                otp_record.delete()
+    else:
+        form = StudentSignupForm()
+    
+    return render(request, 'booking/student_signup.html', {'form': form})
+
+
+# -------------------- VERIFY OTP --------------------
+def verify_otp(request):
+    email = request.session.get('signup_email')
+    if not email:
+        messages.error(request, 'Invalid session. Please signup again.')
+        return redirect('student_signup')
+    
+    if request.method == "POST":
+        form = OTPVerificationForm(request.POST)
+        if form.is_valid():
+            entered_otp = form.cleaned_data['otp']
+            
+            try:
+                otp_record = OTPVerification.objects.filter(
+                    email=email,
+                    is_verified=False
+                ).latest('created_at')
+                
+                if otp_record.is_expired():
+                    messages.error(request, 'OTP has expired. Please request a new one.')
+                elif otp_record.otp == entered_otp:
+                    # OTP is valid, create the student account
+                    StudentUser.objects.create(
+                        full_name=otp_record.full_name,
+                        email=otp_record.email,
+                        roll_number=otp_record.roll_number,
+                        branch=otp_record.branch,
+                        year=otp_record.year,
+                        division=otp_record.division,
+                        password=otp_record.password
+                    )
+                    
+                    # Mark OTP as verified
+                    otp_record.is_verified = True
+                    otp_record.save()
+                    
+                    # Clear session
+                    del request.session['signup_email']
+                    
+                    messages.success(request, '🎉 Account created successfully! Please login to continue.')
+                    return redirect('student_login')
+                else:
+                    messages.error(request, 'Invalid OTP. Please try again.')
+                    
+            except OTPVerification.DoesNotExist:
+                messages.error(request, 'No OTP found. Please signup again.')
+                return redirect('student_signup')
+    else:
+        form = OTPVerificationForm()
+    
+    return render(request, 'booking/verify_otp.html', {
+        'form': form,
+        'email': mask_email(email)
+    })
+
+
+# -------------------- RESEND OTP --------------------
+def resend_otp(request):
+    email = request.session.get('signup_email')
+    if not email:
+        messages.error(request, 'Invalid session. Please signup again.')
+        return redirect('student_signup')
+    
+    try:
+        # Get the latest OTP record for this email
+        otp_record = OTPVerification.objects.filter(
+            email=email,
+            is_verified=False
+        ).latest('created_at')
+        
+        # Generate new OTP
+        new_otp = OTPVerification.generate_otp()
+        otp_record.otp = new_otp
+        otp_record.expires_at = timezone.now() + timedelta(minutes=10)
+        otp_record.created_at = timezone.now()
+        otp_record.save()
+        
+        # Send new OTP email
+        try:
+            subject = 'New OTP - SportsDeck Ground Booking'
+            
+            # Render HTML email template
+            html_content = render_to_string('booking/emails/signup_otp.html', {
+                'full_name': otp_record.full_name,
+                'otp': new_otp,
+            })
+            
+            # Plain text fallback
+            text_content = f'''
+Hello {otp_record.full_name},
+
+Your new One-Time Password (OTP) for email verification is: {new_otp}
+
+This OTP will expire in 10 minutes.
+
+Best regards,
+SportsDeck Admin Team
+            '''
+            
+            # Create email with both HTML and plain text
+            email_msg = EmailMultiAlternatives(
+                subject,
+                text_content,
+                settings.DEFAULT_FROM_EMAIL,
+                [email]
+            )
+            email_msg.attach_alternative(html_content, "text/html")
+            email_msg.send(fail_silently=False)
+            
+            messages.success(request, 'New OTP sent to your email.')
+            
+        except Exception as e:
+            messages.error(request, f'Error sending OTP email: {str(e)}')
+            
+    except OTPVerification.DoesNotExist:
+        messages.error(request, 'No pending signup found. Please signup again.')
+        return redirect('student_signup')
+    
+    return redirect('verify_otp')
+
+def student_logout(request):
+    request.session.flush()
+    return redirect('student_login')
+
+
+# -------------------- FORGOT PASSWORD --------------------
+def forgot_password(request):
+    if request.method == "POST":
+        form = ForgotPasswordForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            student = StudentUser.objects.get(email=email)
+            
+            # Generate OTP
+            otp = OTPVerification.generate_otp()
+            expires_at = timezone.now() + timedelta(minutes=10)
+            
+            # Delete any existing password reset OTP for this email
+            OTPVerification.objects.filter(email=email, is_verified=False).delete()
+            
+            # Create OTP record for password reset
+            otp_record = OTPVerification.objects.create(
+                email=email,
+                otp=otp,
+                expires_at=expires_at,
+                full_name=student.full_name or '',
+                roll_number=student.roll_number or '',
+                branch=student.branch or '',
+                year=student.year or '',
+                division=student.division or '',
+                password=''  # Will be set during reset
+            )
+            
+            # Send OTP email
+            try:
+                subject = 'Password Reset OTP - SportsDeck Ground Booking'
+                
+                # Render HTML email template
+                html_content = render_to_string('booking/emails/reset_password_otp.html', {
+                    'full_name': student.full_name or 'Student',
+                    'otp': otp,
+                })
+                
+                # Plain text fallback
+                text_content = f'''
+Hello {student.full_name},
+
+You have requested to reset your password for SportsDeck Ground Booking System.
+
+Your One-Time Password (OTP) for password reset is: {otp}
+
+This OTP will expire in 10 minutes.
+
+If you did not request this password reset, please ignore this email and your password will remain unchanged.
+
+Best regards,
+SportsDeck Admin Team
+                '''
+                
+                # Create email with both HTML and plain text
+                email_msg = EmailMultiAlternatives(
+                    subject,
+                    text_content,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email]
+                )
+                email_msg.attach_alternative(html_content, "text/html")
+                email_msg.send(fail_silently=False)
+                
+                # Store email in session for reset page
+                request.session['reset_email'] = email
+                messages.success(request, '📧 Password reset OTP sent! Please check your email.')
+                return redirect('reset_password')
+                
+            except Exception as e:
+                messages.error(request, f'Error sending OTP email: {str(e)}')
+                otp_record.delete()
+    else:
+        form = ForgotPasswordForm()
+    
+    return render(request, 'booking/forgot_password.html', {'form': form})
+
+
+# -------------------- RESET PASSWORD --------------------
+def reset_password(request):
+    email = request.session.get('reset_email')
+    if not email:
+        messages.error(request, 'Invalid session. Please start password reset again.')
+        return redirect('forgot_password')
+    
+    if request.method == "POST":
+        form = ResetPasswordForm(request.POST)
+        if form.is_valid():
+            entered_otp = form.cleaned_data['otp']
+            new_password = form.cleaned_data['new_password']
+            
+            try:
+                otp_record = OTPVerification.objects.filter(
+                    email=email,
+                    is_verified=False
+                ).latest('created_at')
+                
+                if otp_record.is_expired():
+                    messages.error(request, 'OTP has expired. Please request a new one.')
+                elif otp_record.otp == entered_otp:
+                    # OTP is valid, update the password
+                    student = StudentUser.objects.get(email=email)
+                    student.password = new_password
+                    student.save()
+                    
+                    # Mark OTP as verified
+                    otp_record.is_verified = True
+                    otp_record.save()
+                    
+                    # Clear session
+                    del request.session['reset_email']
+                    
+                    messages.success(request, '🔒 Password reset successfully! You can now login with your new password.')
+                    return redirect('student_login')
+                else:
+                    messages.error(request, 'Invalid OTP. Please try again.')
+                    
+            except OTPVerification.DoesNotExist:
+                messages.error(request, 'No OTP found. Please start password reset again.')
+                return redirect('forgot_password')
+            except StudentUser.DoesNotExist:
+                messages.error(request, 'Student account not found.')
+                return redirect('forgot_password')
+    else:
+        form = ResetPasswordForm()
+    
+    return render(request, 'booking/reset_password.html', {
+        'form': form,
+        'email': mask_email(email)
+    })
+
+
+# -------------------- RESEND RESET PASSWORD OTP --------------------
+def resend_reset_otp(request):
+    email = request.session.get('reset_email')
+    if not email:
+        messages.error(request, 'Invalid session. Please start password reset again.')
+        return redirect('forgot_password')
+    
+    try:
+        student = StudentUser.objects.get(email=email)
+        
+        # Get the latest OTP record or create new one
+        try:
+            otp_record = OTPVerification.objects.filter(
+                email=email,
+                is_verified=False
+            ).latest('created_at')
+        except OTPVerification.DoesNotExist:
+            # Create new OTP record
+            otp = OTPVerification.generate_otp()
+            expires_at = timezone.now() + timedelta(minutes=10)
+            otp_record = OTPVerification.objects.create(
+                email=email,
+                otp=otp,
+                expires_at=expires_at,
+                full_name=student.full_name or '',
+                roll_number=student.roll_number or '',
+                branch=student.branch or '',
+                year=student.year or '',
+                division=student.division or '',
+                password=''
+            )
+        
+        # Generate new OTP
+        new_otp = OTPVerification.generate_otp()
+        otp_record.otp = new_otp
+        otp_record.expires_at = timezone.now() + timedelta(minutes=10)
+        otp_record.created_at = timezone.now()
+        otp_record.save()
+        
+        # Send new OTP email
+        try:
+            subject = 'New Password Reset OTP - SportsDeck Ground Booking'
+            
+            # Render HTML email template
+            html_content = render_to_string('booking/emails/reset_password_otp.html', {
+                'full_name': student.full_name or 'Student',
+                'otp': new_otp,
+            })
+            
+            # Plain text fallback
+            text_content = f'''
+Hello {student.full_name},
+
+Your new One-Time Password (OTP) for password reset is: {new_otp}
+
+This OTP will expire in 10 minutes.
+
+Best regards,
+SportsDeck Admin Team
+            '''
+            
+            # Create email with both HTML and plain text
+            email_msg = EmailMultiAlternatives(
+                subject,
+                text_content,
+                settings.DEFAULT_FROM_EMAIL,
+                [email]
+            )
+            email_msg.attach_alternative(html_content, "text/html")
+            email_msg.send(fail_silently=False)
+            
+            messages.success(request, 'New OTP sent to your email.')
+            
+        except Exception as e:
+            messages.error(request, f'Error sending OTP email: {str(e)}')
+            
+    except StudentUser.DoesNotExist:
+        messages.error(request, 'Student account not found.')
+        return redirect('forgot_password')
+    
+    return redirect('reset_password')
 
 
 def student_logout(request):
@@ -240,11 +671,11 @@ def approve_booking(request, booking_id):
             html_message=html,
             fail_silently=False,
         )
-        messages.success(request, f'Booking approved and confirmation email sent to {to_approve.student_email}')
+        messages.success(request, f'✅ Booking approved! Confirmation email sent successfully.')
     except Exception as e:
         # Email failed - log error and show warning but booking is still approved
         print(f"ERROR: Failed to send approval email to {to_approve.student_email}: {e}")
-        messages.warning(request, f'Booking approved, but email notification failed. Please inform student manually.')
+        messages.warning(request, f'⚠️ Booking approved, but email notification failed. Please inform the student manually.')
         pass
 
     # Email auto-rejected
@@ -299,11 +730,11 @@ def reject_booking(request, booking_id):
             html_message=html,
             fail_silently=False,
         )
-        messages.success(request, f'Booking rejected and notification email sent to {booking.student_email}')
+        messages.success(request, f'❌ Booking rejected. Notification email sent successfully.')
     except Exception as e:
         # Email failed - log error and show warning but booking is still rejected
         print(f"ERROR: Failed to send rejection email to {booking.student_email}: {e}")
-        messages.warning(request, f'Booking rejected, but email notification failed. Please inform student manually.')
+        messages.warning(request, f'⚠️ Booking rejected, but email notification failed. Please inform the student manually.')
         pass
     
     return redirect('custom_admin_dashboard')
@@ -314,7 +745,8 @@ def student_booking(request):
         booking_form = BookingForm(request.POST)
         if booking_form.is_valid():
             # Get booking details
-            student_email = request.POST.get("student_email")
+            # Prefer posted email, else fall back to logged-in session email
+            student_email = request.POST.get("student_email") or request.session.get('student_email')
             booking_date = request.POST.get("date")
             
             # Check 1-day restriction for main student
@@ -364,7 +796,7 @@ def student_booking(request):
 
             # Organizer info
             booking.student_name = request.POST.get("student_name")
-            booking.student_email = request.POST.get("student_email")
+            booking.student_email = student_email
             booking.roll_number = ''  # optional, can fetch if needed
 
             # Booking info
@@ -427,7 +859,19 @@ def student_booking(request):
 
             return redirect('booking_success')
     else:
-        booking_form = BookingForm()
+        # Pre-fill email (and optionally name) for logged-in students
+        initial = {}
+        sess_email = request.session.get('student_email')
+        if sess_email:
+            initial['student_email'] = sess_email
+            try:
+                su = StudentUser.objects.get(email=sess_email)
+                if su.full_name:
+                    initial['student_name'] = su.full_name
+            except StudentUser.DoesNotExist:
+                pass
+
+        booking_form = BookingForm(initial=initial)
 
     return render(request, 'booking/student_booking.html', {
         'booking_form': booking_form,
