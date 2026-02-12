@@ -9,3 +9,12 @@ __pycache__/
 db.sqlite3
 .env
 .env.*
+
+# Virtual Environment
+venv/
+venv311/
+
+# SSL Certificates
+*.pem
+*.key
+*.crt

@@ -99,13 +99,13 @@ class AdminUser(models.Model):
 
 
 class StudentUser(models.Model):
-    full_name = models.CharField(max_length=100,null=True, blank=True)     # add this
-    email = models.EmailField(unique=True,null=True, blank=True)
-    roll_number = models.CharField(max_length=20,null=True, blank=True)     # add this
-    branch = models.CharField(max_length=50,null=True, blank=True)          # add this
-    year = models.CharField(max_length=20,null=True, blank=True)            # add this
-    division = models.CharField(max_length=10,null=True, blank=True)        # add this
-    password = models.CharField(max_length=255,null=True, blank=True)
+    full_name = models.CharField(max_length=500, null=True, blank=True)     # encrypted
+    email = models.CharField(max_length=500, unique=True, null=True, blank=True)  # encrypted
+    roll_number = models.CharField(max_length=500, null=True, blank=True)   # encrypted
+    branch = models.CharField(max_length=50, null=True, blank=True)
+    year = models.CharField(max_length=20, null=True, blank=True)
+    division = models.CharField(max_length=10, null=True, blank=True)
+    password = models.CharField(max_length=500, null=True, blank=True)      # encrypted
 
     def __str__(self):
         return self.email
@@ -132,19 +132,19 @@ class AllotedGroundBooking(models.Model):
 
 
 class OTPVerification(models.Model):
-    email = models.EmailField()
-    otp = models.CharField(max_length=6)
+    email = models.CharField(max_length=500)          # encrypted
+    otp = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
     is_verified = models.BooleanField(default=False)
     
-    # Temporary storage of signup data
-    full_name = models.CharField(max_length=100)
-    roll_number = models.CharField(max_length=20)
+    # Temporary storage of signup data (encrypted fields)
+    full_name = models.CharField(max_length=500)      # encrypted
+    roll_number = models.CharField(max_length=500)    # encrypted
     branch = models.CharField(max_length=50)
     year = models.CharField(max_length=20)
     division = models.CharField(max_length=10)
-    password = models.CharField(max_length=255)
+    password = models.CharField(max_length=500)       # encrypted
     
     def __str__(self):
         return f"{self.email} - {self.otp}"

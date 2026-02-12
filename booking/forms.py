@@ -2,6 +2,7 @@ from django import forms
 from django.forms import inlineformset_factory, BaseInlineFormSet
 from .models import Booking, Player, StudentUser
 from django.core.exceptions import ValidationError
+from booking.utils.crypto import decrypt_data
 
 
 class BookingForm(forms.ModelForm):
@@ -213,8 +214,13 @@ class StudentSignupForm(forms.Form):
     
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        if StudentUser.objects.filter(email=email).exists():
-            raise ValidationError('An account with this email already exists.')
+        # Emails are stored encrypted, so we must decrypt each to compare
+        for student in StudentUser.objects.all():
+            try:
+                if decrypt_data(student.email) == email:
+                    raise ValidationError('An account with this email already exists.')
+            except Exception:
+                continue
         return email
     
     def clean(self):
@@ -251,7 +257,16 @@ class ForgotPasswordForm(forms.Form):
     
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        if not StudentUser.objects.filter(email=email).exists():
+        # Emails are stored encrypted, so we must decrypt each to compare
+        found = False
+        for student in StudentUser.objects.all():
+            try:
+                if decrypt_data(student.email) == email:
+                    found = True
+                    break
+            except Exception:
+                continue
+        if not found:
             raise ValidationError('No account found with this email address.')
         return email
 

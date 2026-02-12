@@ -16,7 +16,7 @@ from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
 from booking.models import StudentUser
-from booking.utils.crypto import decrypt_data
+from booking.utils.crypto import decrypt_data, encrypt_data
 from django.utils import timezone
 
 
@@ -33,6 +33,17 @@ def mask_email(email):
         masked_local = local[:2] + '***'
     
     return f"{masked_local}@{domain}"
+
+
+def find_student_by_email(plain_email):
+    """Find a StudentUser by plain-text email (decrypts each stored email to compare)."""
+    for student in StudentUser.objects.all():
+        try:
+            if decrypt_data(student.email) == plain_email:
+                return student
+        except Exception:
+            continue
+    return None
 
 
 # -------------------- HOME --------------------
@@ -86,7 +97,13 @@ def student_login(request):
                 decrypted_email = decrypt_data(student.email)
 
                 if decrypted_email == email_input:
-                    if student.password == password:
+                    # Decrypt stored password and compare
+                    try:
+                        decrypted_password = decrypt_data(student.password)
+                    except Exception:
+                        decrypted_password = student.password
+                    
+                    if decrypted_password == password:
                         request.session["student_email"] = decrypted_email
                         request.session["student_id"] = student.id
                         return redirect("student_dashboard")
@@ -115,20 +132,26 @@ def student_signup(request):
             otp = OTPVerification.generate_otp()
             expires_at = timezone.now() + timedelta(minutes=10)
             
-            # Delete any existing OTP for this email
-            OTPVerification.objects.filter(email=form.cleaned_data['email']).delete()
+            # Encrypt sensitive fields before storing
+            encrypted_email = encrypt_data(form.cleaned_data['email'])
+            encrypted_name = encrypt_data(form.cleaned_data['full_name'])
+            encrypted_roll = encrypt_data(form.cleaned_data['roll_number'])
+            encrypted_password = encrypt_data(form.cleaned_data['password'])
             
-            # Create OTP record with signup data
+            # Delete any existing OTP for this email
+            OTPVerification.objects.filter(email=encrypted_email).delete()
+            
+            # Create OTP record with encrypted signup data
             otp_record = OTPVerification.objects.create(
-                email=form.cleaned_data['email'],
+                email=encrypted_email,
                 otp=otp,
                 expires_at=expires_at,
-                full_name=form.cleaned_data['full_name'],
-                roll_number=form.cleaned_data['roll_number'],
+                full_name=encrypted_name,
+                roll_number=encrypted_roll,
                 branch=form.cleaned_data['branch'],
                 year=form.cleaned_data['year'],
                 division=form.cleaned_data['division'],
-                password=form.cleaned_data['password']
+                password=encrypted_password
             )
             
             # Send OTP email
@@ -167,8 +190,8 @@ SportsDeck Admin Team
                 email.attach_alternative(html_content, "text/html")
                 email.send(fail_silently=False)
                 
-                # Store email in session for verification page
-                request.session['signup_email'] = form.cleaned_data['email']
+                # Store encrypted email in session for verification page
+                request.session['signup_email'] = encrypted_email
                 messages.success(request, '📧 OTP sent to your email! Please check your inbox.')
                 return redirect('verify_otp')
                 
@@ -203,6 +226,7 @@ def verify_otp(request):
                     messages.error(request, 'OTP has expired. Please request a new one.')
                 elif otp_record.otp == entered_otp:
                     # OTP is valid, create the student account
+                    # Fields are already encrypted from signup step
                     StudentUser.objects.create(
                         full_name=otp_record.full_name,
                         email=otp_record.email,
@@ -231,9 +255,15 @@ def verify_otp(request):
     else:
         form = OTPVerificationForm()
     
+    # email in session is encrypted, decrypt for masked display
+    try:
+        display_email = mask_email(decrypt_data(email))
+    except Exception:
+        display_email = mask_email(email)
+    
     return render(request, 'booking/verify_otp.html', {
         'form': form,
-        'email': mask_email(email)
+        'email': display_email
     })
 
 
@@ -258,19 +288,27 @@ def resend_otp(request):
         otp_record.created_at = timezone.now()
         otp_record.save()
         
+        # Decrypt fields for email content
+        try:
+            plain_name = decrypt_data(otp_record.full_name)
+            plain_email = decrypt_data(email)
+        except Exception:
+            plain_name = otp_record.full_name
+            plain_email = email
+        
         # Send new OTP email
         try:
             subject = 'New OTP - SportsDeck Ground Booking'
             
             # Render HTML email template
             html_content = render_to_string('booking/emails/signup_otp.html', {
-                'full_name': otp_record.full_name,
+                'full_name': plain_name,
                 'otp': new_otp,
             })
             
             # Plain text fallback
             text_content = f'''
-Hello {otp_record.full_name},
+Hello {plain_name},
 
 Your new One-Time Password (OTP) for email verification is: {new_otp}
 
@@ -285,7 +323,7 @@ SportsDeck Admin Team
                 subject,
                 text_content,
                 settings.DEFAULT_FROM_EMAIL,
-                [email]
+                [plain_email]
             )
             email_msg.attach_alternative(html_content, "text/html")
             email_msg.send(fail_silently=False)
@@ -311,19 +349,32 @@ def forgot_password(request):
     if request.method == "POST":
         form = ForgotPasswordForm(request.POST)
         if form.is_valid():
-            email = form.cleaned_data['email']
-            student = StudentUser.objects.get(email=email)
+            plain_email = form.cleaned_data['email']
+            
+            # Find the student by decrypting emails
+            student = None
+            for s in StudentUser.objects.all():
+                try:
+                    if decrypt_data(s.email) == plain_email:
+                        student = s
+                        break
+                except Exception:
+                    continue
+            
+            if not student:
+                messages.error(request, 'No account found with this email address.')
+                return render(request, 'booking/forgot_password.html', {'form': form})
             
             # Generate OTP
             otp = OTPVerification.generate_otp()
             expires_at = timezone.now() + timedelta(minutes=10)
             
-            # Delete any existing password reset OTP for this email
-            OTPVerification.objects.filter(email=email, is_verified=False).delete()
+            # Delete any existing password reset OTP for this email (stored encrypted)
+            OTPVerification.objects.filter(email=student.email, is_verified=False).delete()
             
-            # Create OTP record for password reset
+            # Create OTP record for password reset (store encrypted email)
             otp_record = OTPVerification.objects.create(
-                email=email,
+                email=student.email,
                 otp=otp,
                 expires_at=expires_at,
                 full_name=student.full_name or '',
@@ -334,19 +385,25 @@ def forgot_password(request):
                 password=''  # Will be set during reset
             )
             
+            # Decrypt name for email content
+            try:
+                plain_name = decrypt_data(student.full_name)
+            except Exception:
+                plain_name = student.full_name or 'Student'
+            
             # Send OTP email
             try:
                 subject = 'Password Reset OTP - SportsDeck Ground Booking'
                 
                 # Render HTML email template
                 html_content = render_to_string('booking/emails/reset_password_otp.html', {
-                    'full_name': student.full_name or 'Student',
+                    'full_name': plain_name,
                     'otp': otp,
                 })
                 
                 # Plain text fallback
                 text_content = f'''
-Hello {student.full_name},
+Hello {plain_name},
 
 You have requested to reset your password for SportsDeck Ground Booking System.
 
@@ -365,13 +422,13 @@ SportsDeck Admin Team
                     subject,
                     text_content,
                     settings.DEFAULT_FROM_EMAIL,
-                    [email]
+                    [plain_email]
                 )
                 email_msg.attach_alternative(html_content, "text/html")
                 email_msg.send(fail_silently=False)
                 
-                # Store email in session for reset page
-                request.session['reset_email'] = email
+                # Store encrypted email in session for reset page
+                request.session['reset_email'] = student.email
                 messages.success(request, '📧 Password reset OTP sent! Please check your email.')
                 return redirect('reset_password')
                 
@@ -407,8 +464,9 @@ def reset_password(request):
                     messages.error(request, 'OTP has expired. Please request a new one.')
                 elif otp_record.otp == entered_otp:
                     # OTP is valid, update the password
+                    # email in session is encrypted, match directly
                     student = StudentUser.objects.get(email=email)
-                    student.password = new_password
+                    student.password = encrypt_data(new_password)
                     student.save()
                     
                     # Mark OTP as verified
@@ -432,9 +490,15 @@ def reset_password(request):
     else:
         form = ResetPasswordForm()
     
+    # email in session is encrypted, decrypt for masked display
+    try:
+        display_email = mask_email(decrypt_data(email))
+    except Exception:
+        display_email = mask_email(email)
+    
     return render(request, 'booking/reset_password.html', {
         'form': form,
-        'email': mask_email(email)
+        'email': display_email
     })
 
 
@@ -446,7 +510,16 @@ def resend_reset_otp(request):
         return redirect('forgot_password')
     
     try:
+        # email in session is already encrypted, matches DB directly
         student = StudentUser.objects.get(email=email)
+        
+        # Decrypt for email sending
+        try:
+            plain_name = decrypt_data(student.full_name)
+            plain_email = decrypt_data(email)
+        except Exception:
+            plain_name = student.full_name or 'Student'
+            plain_email = email
         
         # Get the latest OTP record or create new one
         try:
@@ -483,13 +556,13 @@ def resend_reset_otp(request):
             
             # Render HTML email template
             html_content = render_to_string('booking/emails/reset_password_otp.html', {
-                'full_name': student.full_name or 'Student',
+                'full_name': plain_name,
                 'otp': new_otp,
             })
             
             # Plain text fallback
             text_content = f'''
-Hello {student.full_name},
+Hello {plain_name},
 
 Your new One-Time Password (OTP) for password reset is: {new_otp}
 
@@ -504,7 +577,7 @@ SportsDeck Admin Team
                 subject,
                 text_content,
                 settings.DEFAULT_FROM_EMAIL,
-                [email]
+                [plain_email]
             )
             email_msg.attach_alternative(html_content, "text/html")
             email_msg.send(fail_silently=False)
@@ -778,10 +851,13 @@ def student_booking(request):
                         status='Approved'
                     )
                     if player_recent_bookings.exists():
-                        try:
-                            player = StudentUser.objects.get(email=player_email)
-                            restricted_players.append(player.full_name)
-                        except StudentUser.DoesNotExist:
+                        player_student = find_student_by_email(player_email)
+                        if player_student:
+                            try:
+                                restricted_players.append(decrypt_data(player_student.full_name))
+                            except Exception:
+                                restricted_players.append(player_email)
+                        else:
                             restricted_players.append(player_email)
             
             if restricted_players:
@@ -818,16 +894,20 @@ def student_booking(request):
                     continue
 
                 # Fetch student from DB
-                try:
-                    student = StudentUser.objects.get(email=player_name_or_email)
+                student = find_student_by_email(player_name_or_email)
+                if student:
+                    try:
+                        player_name = decrypt_data(student.full_name)
+                    except Exception:
+                        player_name = student.full_name
                     Player.objects.create(
                         booking=booking,
-                        name=student.full_name,
+                        name=player_name,
                         branch=student.branch,
                         year=student.year,
                         division=student.division
                     )
-                except StudentUser.DoesNotExist:
+                else:
                     # If not found, create with only name
                     Player.objects.create(
                         booking=booking,
@@ -839,16 +919,20 @@ def student_booking(request):
 
             # Ensure at least one player exists (include organizer if none selected)
             if booking.players.count() == 0:
-                try:
-                    organizer = StudentUser.objects.get(email=booking.student_email)
+                organizer = find_student_by_email(booking.student_email)
+                if organizer:
+                    try:
+                        org_name = decrypt_data(organizer.full_name) or booking.student_name
+                    except Exception:
+                        org_name = booking.student_name or 'Organizer'
                     Player.objects.create(
                         booking=booking,
-                        name=organizer.full_name or booking.student_name,
+                        name=org_name,
                         branch=organizer.branch or '',
                         year=organizer.year or '',
                         division=organizer.division or ''
                     )
-                except StudentUser.DoesNotExist:
+                else:
                     Player.objects.create(
                         booking=booking,
                         name=booking.student_name or (booking.student_email or 'Organizer'),
@@ -864,12 +948,12 @@ def student_booking(request):
         sess_email = request.session.get('student_email')
         if sess_email:
             initial['student_email'] = sess_email
-            try:
-                su = StudentUser.objects.get(email=sess_email)
-                if su.full_name:
+            su = find_student_by_email(sess_email)
+            if su and su.full_name:
+                try:
+                    initial['student_name'] = decrypt_data(su.full_name)
+                except Exception:
                     initial['student_name'] = su.full_name
-            except StudentUser.DoesNotExist:
-                pass
 
         booking_form = BookingForm(initial=initial)
 
@@ -982,21 +1066,25 @@ def fetch_student_data(request):
         print("[fetch_student_data] Empty query, returning empty list")
         return JsonResponse([], safe=False)
 
-    # Search by first name (split full_name and check first part)
-    students = StudentUser.objects.filter(full_name__icontains=q)[:10]
-    print(f"[fetch_student_data] Found {students.count()} students")
-    
+    # Data is encrypted, so we must decrypt all and filter in Python
+    students = StudentUser.objects.all()
     data = []
     for s in students:
-        if s.full_name:  # Only include students with names
-            data.append({
-                "full_name": s.full_name,
-                "email": s.email,
-                "roll_number": s.roll_number,
-                "branch": s.branch,
-                "year": s.year,
-                "division": s.division
-            })
+        try:
+            decrypted_name = decrypt_data(s.full_name) if s.full_name else ''
+            if q.lower() in decrypted_name.lower():
+                data.append({
+                    "full_name": decrypted_name,
+                    "email": decrypt_data(s.email) if s.email else '',
+                    "roll_number": decrypt_data(s.roll_number) if s.roll_number else '',
+                    "branch": s.branch,
+                    "year": s.year,
+                    "division": s.division
+                })
+        except Exception:
+            continue
+        if len(data) >= 10:
+            break
     
     print(f"[fetch_student_data] Returning {len(data)} student records")
     return JsonResponse(data, safe=False)

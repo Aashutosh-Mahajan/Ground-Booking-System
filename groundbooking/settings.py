@@ -30,6 +30,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'booking',
+    "django_extensions",
+    'sslserver',
 ]
 
 MIDDLEWARE = [
